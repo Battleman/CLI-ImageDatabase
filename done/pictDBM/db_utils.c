@@ -8,6 +8,7 @@
 
 #include "pictDB.h"
 
+#include <inttypes.h>
 #include <stdint.h> // for uint8_t
 #include <stdio.h> // for sprintf
 #include <openssl/sha.h> // for SHA256_DIGEST_LENGTH
@@ -36,6 +37,14 @@ sha_to_string (const unsigned char* SHA,
  * TODO: WRITE YOUR print_header CODE HERE
  * **********************************************************************
  */
+ void print_header(const struct pictdb_header header) {
+	 printf("*****************************************\n**********DATABASE HEADER START**********\n");
+	 printf("DBNAME: %31s\n", header.db_name);
+	 printf("VERSION: %" PRIu32 "\n", header.db_version);
+	 printf("IMAGE COUNT: %" PRIu32 "\t\tMAX IMAGES: %" PRIu32 "\n", header.num_files, header.max_files);
+	 printf("THUMBNAIL: %" PRIu16 " x %" PRIu16 "\tSMALL: %" PRIu16 " x %" PRIu16 "\n", header.res_resized[0],header.res_resized[1],header.res_resized[2],header.res_resized[3]);
+	 printf("***********DATABASE HEADER END***********\n*****************************************");
+ }
 
 /********************************************************************//**
  * Metadata display.

@@ -83,10 +83,8 @@ struct pictdb_header{
  *
  * @param header The header to be displayed.
  */
-/* **********************************************************************
- * TODO WEEK 04: ADD THE PROTOTYPE OF print_header HERE.
- * **********************************************************************
- */
+void print_header(const struct pictdb_header header);
+
 
 /**
  * @brief Prints picture metadata informations.
