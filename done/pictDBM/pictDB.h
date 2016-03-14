@@ -102,6 +102,8 @@ void print_metadata (const struct pict_metadata metadata);
  * TODO WEEK 04: ADD THE PROTOTYPE OF do_list HERE.
  * **********************************************************************
  */
+void do_list(struct pictdb_file myfile);
+
 
 /**
  * @brief Creates the database called db_filename. Writes the header and the
