@@ -33,10 +33,7 @@ sha_to_string (const unsigned char* SHA,
 /********************************************************************//**
  * pictDB header display.
  */
-/* **********************************************************************
- * TODO: WRITE YOUR print_header CODE HERE
- * **********************************************************************
- */
+
  void print_header(const struct pictdb_header header) {
 	 printf("*****************************************\n**********DATABASE HEADER START**********\n");
 	 printf("DBNAME: %31s\n", header.db_name);
@@ -55,8 +52,13 @@ print_metadata (const struct pict_metadata metadata)
     char sha_printable[2*SHA256_DIGEST_LENGTH+1];
     sha_to_string(metadata.SHA, sha_printable);
 
-    /* **********************************************************************
-     * TODO: WRITE YOUR CODE HERE
-     * **********************************************************************
-     */
+    printf("PICTURE ID: %31s\n", metadata.pict_id);
+    printf("SHA: %31s\n", sha_printable);
+    printf("VALID: %" PRIu16 "\n", metadata.is_valid);
+    printf("UNUSED: %" PRIu16 "\n", metadata.unused_16);
+    printf("OFFSET ORIG.: %" PRIu64 "\t\tSIZE ORIG.: %" PRIu32 "\n", metadata.offset[0], metadata.size[0]);
+	printf("OFFSET THUMB.: %" PRIu64 "\t\tSIZE THUMB.: %" PRIu32 "\n", metadata.offset[1], metadata.size[1]);
+	printf("OFFSET SMALL.: %" PRIu64 "\t\tSIZE SMALL.: %" PRIu32 "\n", metadata.offset[2], metadata.size[2]);
+	printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata.res_orig[0], metadata.res_orig[1]);
+	printf("*****************************************");
 }
