@@ -1,0 +1,15 @@
+CFLAGS = -Wall
+CFLAGS += -std=c99
+
+all: pictDBM
+	@echo "réalisation de la cible: 'all'"
+pictDB.h: error.h
+	@echo "réalisation de la cible: 'pictDB.h'"
+error.o: error.c
+	@echo "réalisation de la cible: 'error.o'"
+db_list.o: db_list.c pictDB.h
+	@echo "réalisation de la cible: 'db_list.o'"
+db_utils.o: db_utils.c pictDB.h
+	@echo "réalisation de la cible: 'db_utils.o'"
+pictDBM: pictDBM.c pictDB.h db_list.o pictDBM.o db_utils.o error.o
+	gcc -std=c99 -o pictDBM pictDBM.c pictDB.h db_list.o pictDBM.o db_utils.o error.o
