@@ -66,10 +66,10 @@ do_create_cmd (const char* filename)
 int
 help (void)
 {
-    /* **********************************************************************
-     * TODO WEEK 05: WRITE YOUR CODE HERE (and change the return if needed).
-     * **********************************************************************
-     */
+    printf("pictDBM [COMMAND] [ARGUMENTS]\n");
+    printf("\thelp: displays this help.\n");
+    printf("\tlist <dbfilename>: list pictDB content.\n");
+    printf("\tcreate <dbfilename>: create a new pictDB.\n");
     return 0;
 }
 
