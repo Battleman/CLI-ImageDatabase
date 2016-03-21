@@ -12,6 +12,6 @@ void do_list(struct pictdb_file myfile) {
 	}
 	
 	if(empty == 1) {
-		printf("<<empty database>>");
+		printf("<<empty database>>\n");
 	}
 }

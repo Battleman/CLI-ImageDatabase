@@ -40,7 +40,7 @@ sha_to_string (const unsigned char* SHA,
 	 printf("VERSION: %" PRIu32 "\n", header.db_version);
 	 printf("IMAGE COUNT: %" PRIu32 "\t\tMAX IMAGES: %" PRIu32 "\n", header.num_files, header.max_files);
 	 printf("THUMBNAIL: %" PRIu16 " x %" PRIu16 "\tSMALL: %" PRIu16 " x %" PRIu16 "\n", header.res_resized[0],header.res_resized[1],header.res_resized[2],header.res_resized[3]);
-	 printf("***********DATABASE HEADER END***********\n*****************************************");
+	 printf("***********DATABASE HEADER END***********\n*****************************************\n");
  }
 
 /********************************************************************//**
@@ -60,5 +60,5 @@ print_metadata (const struct pict_metadata metadata)
 	printf("OFFSET THUMB.: %" PRIu64 "\t\tSIZE THUMB.: %" PRIu32 "\n", metadata.offset[1], metadata.size[1]);
 	printf("OFFSET SMALL.: %" PRIu64 "\t\tSIZE SMALL.: %" PRIu32 "\n", metadata.offset[2], metadata.size[2]);
 	printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata.res_orig[0], metadata.res_orig[1]);
-	printf("*****************************************");
+	printf("*****************************************\n");
 }
