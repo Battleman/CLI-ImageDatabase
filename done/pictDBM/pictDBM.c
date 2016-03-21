@@ -19,7 +19,7 @@
 int
 do_list_cmd (const char* filename)
 {
-    struct pictdb_file myfile;
+    struct pictdb_file myfile; 
 
     /* This is a quick and dirty way of reading the file.
      * It's provided here as such to avoid solution leak.
@@ -53,7 +53,7 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-    struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
+		struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
     struct pictdb_file fichier;
     fichier.header = header;
     fichier.fpdb = fopen(filename, "r");
