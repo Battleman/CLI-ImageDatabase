@@ -53,10 +53,10 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-		struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
+	struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
     struct pictdb_file fichier;
     fichier.header = header;
-    fichier.fpdb = fopen(filename, "r");
+    fichier.fpdb = fopen(filename, "wb");
     
     int error = do_create(filename, fichier);
     
