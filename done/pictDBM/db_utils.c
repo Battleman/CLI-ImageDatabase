@@ -1,4 +1,4 @@
-/* ** NOTE: undocumented in Doxygen
+	/* ** NOTE: undocumented in Doxygen
  * @file db_utils.c
  * @brief implementation of several tool functions for pictDB
  *
@@ -56,9 +56,9 @@ print_metadata (const struct pict_metadata metadata)
     printf("SHA: %31s\n", sha_printable);
     printf("VALID: %" PRIu16 "\n", metadata.is_valid);
     printf("UNUSED: %" PRIu16 "\n", metadata.unused_16);
-    printf("OFFSET ORIG.: %" PRIu64 "\t\tSIZE ORIG.: %" PRIu32 "\n", metadata.offset[0], metadata.size[0]);
+    printf("OFFSET ORIG.: %" PRIu64 "\t\tSIZE ORIG.: %" PRIu32 "\n", metadata.offset[2], metadata.size[2]);
 	printf("OFFSET THUMB.: %" PRIu64 "\t\tSIZE THUMB.: %" PRIu32 "\n", metadata.offset[1], metadata.size[1]);
-	printf("OFFSET SMALL.: %" PRIu64 "\t\tSIZE SMALL.: %" PRIu32 "\n", metadata.offset[2], metadata.size[2]);
+	printf("OFFSET SMALL : %" PRIu64 "\t\tSIZE SMALL : %" PRIu32 "\n", metadata.offset[0], metadata.size[0]);
 	printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata.res_orig[0], metadata.res_orig[1]);
 	printf("*****************************************\n");
 }
