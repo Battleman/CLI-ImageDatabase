@@ -98,10 +98,7 @@ void print_metadata (const struct pict_metadata metadata);
  *
  * @param db_file In memory structure with header and metadata.
  */
-/* **********************************************************************
- * TODO WEEK 04: ADD THE PROTOTYPE OF do_list HERE.
- * **********************************************************************
- */
+
 void do_list(struct pictdb_file myfile);
 
 
@@ -111,10 +108,7 @@ void do_list(struct pictdb_file myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-/* **********************************************************************
- * TODO WEEK 05: ADD THE PROTOTYPE OF do_create HERE.
- * **********************************************************************
- */
+int do_create(const char* filename, struct pictdb_file file);
 
 /* **********************************************************************
  * TODO WEEK 06: ADD THE PROTOTYPE OF do_delete HERE.
