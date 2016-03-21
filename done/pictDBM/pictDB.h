@@ -56,8 +56,8 @@ struct pictdb_header{
 	 char db_name[MAX_DB_NAME + 1];
 	 uint32_t db_version;
 	 uint32_t num_files;
-	 const uint32_t max_files;
-	 const uint16_t res_resized[2*(NB_RES - 1)];
+	 uint32_t max_files;
+	 uint16_t res_resized[2*(NB_RES - 1)];
 	 uint32_t unused_32;
 	 uint64_t unused_64;
  };
@@ -108,7 +108,7 @@ void do_list(struct pictdb_file myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-int do_create(const char* filename, struct pictdb_file file);
+int do_create(const char* filename, struct pictdb_file db_file);
 
 /* **********************************************************************
  * TODO WEEK 06: ADD THE PROTOTYPE OF do_delete HERE.
