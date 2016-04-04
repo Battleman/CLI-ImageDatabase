@@ -64,14 +64,12 @@ print_metadata (const struct pict_metadata* metadata)
 }
 
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file){
-	FILE* file = fopen(filename, mode);
-	if(file == NULL){
+	db_file -> fpdb = fopen(filename, mode);
+	if(db_file -> fpdb == NULL){
 		return ERR_FILE_NOT_FOUND;
 	} else {
-		while(!feof(file) && !ferror(file)){
-			db_file -> header = ;
-			db_file -> metadata = ;
-		}
+		fread(&db_file -> header , sizeof(struct pictdb_header),             1, db_file -> fpdb);
+		fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb);
 	}
 	
 	return 0;
