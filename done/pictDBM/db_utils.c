@@ -62,3 +62,21 @@ print_metadata (const struct pict_metadata* metadata)
 	printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata -> res_orig[0], metadata -> res_orig[1]);
 	printf("*****************************************\n");
 }
+
+int do_open(const char* filename, const char* mode, struct pictdb_file* db_file){
+	FILE* file = fopen(filename, mode);
+	if(file == NULL){
+		return ERR_FILE_NOT_FOUND;
+	} else {
+		while(!feof(file) && !ferror(file)){
+			db_file -> header = ;
+			db_file -> metadata = ;
+		}
+	}
+	
+	return 0;
+}
+
+void do_close(struct pictdb_file* db_file){
+	
+}

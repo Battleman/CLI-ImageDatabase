@@ -110,6 +110,10 @@ void do_list(struct pictdb_file* myfile);
  */
 int do_create(const char* filename, struct pictdb_file* db_file);
 
+int do_open(const char* filename, const char* mode, struct pictdb_file* db_file);
+
+void do_close(struct pictdb_file* db_file);
+
 /* **********************************************************************
  * TODO WEEK 06: ADD THE PROTOTYPE OF do_delete HERE.
  * **********************************************************************
