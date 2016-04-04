@@ -83,7 +83,7 @@ struct pictdb_header{
  *
  * @param header The header to be displayed.
  */
-void print_header(const struct pictdb_header header);
+void print_header(const struct pictdb_header* header);
 
 
 /**
@@ -91,7 +91,7 @@ void print_header(const struct pictdb_header header);
  *
  * @param metadata The metadata of one picture.
  */
-void print_metadata (const struct pict_metadata metadata);
+void print_metadata (const struct pict_metadata* metadata);
 
 /**
  * @brief Displays (on stdout) pictDB metadata.
@@ -99,7 +99,7 @@ void print_metadata (const struct pict_metadata metadata);
  * @param db_file In memory structure with header and metadata.
  */
 
-void do_list(struct pictdb_file myfile);
+void do_list(struct pictdb_file* myfile);
 
 
 /**
@@ -108,7 +108,7 @@ void do_list(struct pictdb_file myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-int do_create(const char* filename, struct pictdb_file db_file);
+int do_create(const char* filename, struct pictdb_file* db_file);
 
 /* **********************************************************************
  * TODO WEEK 06: ADD THE PROTOTYPE OF do_delete HERE.
