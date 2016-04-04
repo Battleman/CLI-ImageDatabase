@@ -73,6 +73,7 @@ help (void)
     printf("\thelp: displays this help.\n");
     printf("\tlist <dbfilename>: list pictDB content.\n");
     printf("\tcreate <dbfilename>: create a new pictDB.\n");
+    printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
 
