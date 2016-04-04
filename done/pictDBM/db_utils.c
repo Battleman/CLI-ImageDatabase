@@ -68,7 +68,7 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 	if(db_file -> fpdb == NULL){
 		return ERR_FILE_NOT_FOUND;
 	} else {
-		fread(&db_file -> header , sizeof(struct pictdb_header),             1, db_file -> fpdb);
+		fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb);
 		fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb);
 	}
 	
@@ -76,5 +76,5 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 }
 
 void do_close(struct pictdb_file* db_file){
-	
+	fclose(db_file -> fpdb);
 }
