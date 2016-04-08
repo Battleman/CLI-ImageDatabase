@@ -76,5 +76,7 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 }
 
 void do_close(struct pictdb_file* db_file){
-	fclose(db_file -> fpdb);
+	if(db_file != NULL){
+		fclose(db_file -> fpdb);
+	}
 }

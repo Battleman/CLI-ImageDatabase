@@ -30,14 +30,18 @@ do_list_cmd (const char* filename)
      * TODO WEEK 06: REPLACE THE PROVIDED CODE BY YOUR OWN CODE HERE
      * **********************************************************************
      */
-    myfile.fpdb = fopen(filename, "rb");
+    /*myfile.fpdb = fopen(filename, "rb");
     if (myfile.fpdb == NULL) {
         return ERR_IO;
     }
     fread(&myfile.header , sizeof(struct pictdb_header),             1, myfile.fpdb);
     fread(myfile.metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, myfile.fpdb);
-
-    do_list(&myfile);
+    */
+	int fail = do_open(filename, "rb", myfile);
+    if(fail == 0){
+		do_list(&myfile);
+	}
+    do_close(myfile);
     return 0;
 }
 
