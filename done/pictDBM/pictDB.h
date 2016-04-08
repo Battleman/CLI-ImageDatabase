@@ -114,7 +114,7 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 
 void do_close(struct pictdb_file* db_file);
 
-int do_delete(const char* filename, struct pictdb_file file);
+int do_delete(const char* filename, struct pictdb_file* file);
 
 /* **********************************************************************
  * TODO WEEK 09: ADD THE PROTOTYPE OF resolution_atoi HERE.
