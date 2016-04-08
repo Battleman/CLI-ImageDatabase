@@ -36,9 +36,10 @@ int do_create(const char* filename, struct pictdb_file* db_file){
 		
 		if(sum == (MAX_MAX_FILES + 1)){
 			printf("%d item(s) written\n", sum);
+			fclose(db);
 			return 0;
-		} else {
-			return ERR_MAX_FILES;
 		}
+		fclose(db);
+		return ERR_MAX_FILES;
 	}
 }

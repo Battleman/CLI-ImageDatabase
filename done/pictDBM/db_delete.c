@@ -16,7 +16,8 @@ int do_delete(const char* filename, struct pictdb_file* file){
 int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table){
 	for(int i = 0; i < MAX_MAX_FILES; i++){
 		if(meta_table[i].pict_id == filename){
-			fseek(fpdb, meta_table[i].offset[2], SEEK_SET);
+			/*#################MIEUX IMPLÉMENTER########################*/
+			fseek(fpdb, meta_table[i].offset[2], SEEK_SET); 
 			return 0;
 		}
 	}

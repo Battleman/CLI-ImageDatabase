@@ -91,6 +91,10 @@ do_delete_cmd (const char* filename, const char* pictID)
      * TODO WEEK 06: WRITE YOUR CODE HERE (and change the return if needed).
      * **********************************************************************
      */
+     
+     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) {
+		 return ERR_INVALID_PICID;
+	 }
     return 0;
 }
 
