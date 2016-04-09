@@ -36,6 +36,12 @@
 ehthumbs.db
 Thumbs.db
 
+# Misc #
+########
+#backup files :
+*~
+#local directory file :
+.directory
 # Décommenter pour faire le rendu #
 ############################
 #done/pictDBM/stylish.sh
