@@ -1,5 +1,5 @@
 #include "error.h"
-#include "pictdb.h"
+#include "pictDB.h"
 
 int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table);
 int modify_header(FILE* fpdb, struct pictdb_header* header);

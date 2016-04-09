@@ -64,7 +64,7 @@ print_metadata (const struct pict_metadata* metadata)
 }
 
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file){
-	char* open_modes[] = {"rb", "wb", "ab",
+	//char* open_modes[] = {"rb", "wb", "ab",
 	db_file -> fpdb = fopen(filename, mode);
 	if(db_file -> fpdb == NULL){
 		return ERR_FILE_NOT_FOUND;
