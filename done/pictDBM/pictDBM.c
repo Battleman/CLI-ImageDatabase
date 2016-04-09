@@ -91,10 +91,12 @@ do_delete_cmd (const char* filename, const char* pictID)
      * TODO WEEK 06: WRITE YOUR CODE HERE (and change the return if needed).
      * **********************************************************************
      */
-     struct pictdb_file myfile;
-     do_open(filename, "wb", &myfile);
-     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) {
+     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
 		 return ERR_INVALID_PICID;
+	 }
+	 struct pictdb_file myfile;
+	 if(do_open(filename, "wb", &myfile)){ //first open the file
+		return ERR_FILE_NOT_FOUND;
 	 }
 	 do_delete(filename, &myfile);
 	 do_close(&myfile);
