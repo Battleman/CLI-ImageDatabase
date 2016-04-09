@@ -2,10 +2,23 @@
 ###################
 *.com
 *.class
-*.dll
-*.exe
-*.o
 *.so
+
+# Object files #
+################
+*.o
+*.ko
+*.obj
+*.elf
+
+# Executables #
+###############
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
 
 # Packages #
 ############
@@ -36,14 +49,41 @@
 ehthumbs.db
 Thumbs.db
 
+
+# Precompiled Headers #
+#######################
+*.gch
+*.pch
+
+# Libraries #
+#############
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs) #
+######################################
+*.dll
+*.so
+*.so.*
+*.dylib
+
+
+
+# Debug files #
+##############
+*.dSYM/
+
 # Misc #
 ########
 #backup files :
 *~
 #local directory file :
 .directory
+
 # Décommenter pour faire le rendu #
-############################
+###################################
 #done/pictDBM/stylish.sh
 #done/pictDBM/astyle_orig/
 
