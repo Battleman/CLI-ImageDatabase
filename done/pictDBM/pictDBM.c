@@ -19,7 +19,7 @@
 int
 do_list_cmd (const char* filename)
 {
-    struct pictdb_file myfile; 
+    struct pictdb_file myfile;
 
     /* This is a quick and dirty way of reading the file.
      * It's provided here as such to avoid solution leak.
@@ -30,18 +30,18 @@ do_list_cmd (const char* filename)
      * TODO WEEK 06: REPLACE THE PROVIDED CODE BY YOUR OWN CODE HERE
      * **********************************************************************
      */
-	/*myfile.fpdb = fopen(filename, "rb");
+    /*myfile.fpdb = fopen(filename, "rb");
     if (myfile.fpdb == NULL) {
         return ERR_IO;
     }
     fread(&myfile.header , sizeof(struct pictdb_header),             1, myfile.fpdb);
     fread(myfile.metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, myfile.fpdb);
     */
-	int fail = do_open(filename, "rb", &myfile);
-    if(fail == 0){
-		do_list(&myfile);
-		do_close(&myfile);
-	}
+    int fail = do_open(filename, "rb", &myfile);
+    if(fail == 0) {
+        do_list(&myfile);
+        do_close(&myfile);
+    }
     return 0;
 }
 
@@ -57,13 +57,13 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-	struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
+    struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
     struct pictdb_file fichier;
     fichier.header = header;
     fichier.fpdb = fopen(filename, "wb");
-    
+
     int error = do_create(filename, &fichier);
-    
+
     return error;
 }
 
@@ -91,15 +91,15 @@ do_delete_cmd (const char* filename, const char* pictID)
      * TODO WEEK 06: WRITE YOUR CODE HERE (and change the return if needed).
      * **********************************************************************
      */
-     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
-		 return ERR_INVALID_PICID;
-	 }
-	 struct pictdb_file myfile;
-	 if(do_open(filename, "wb", &myfile)){ //first open the file
-		return ERR_FILE_NOT_FOUND;
-	 }
-	 do_delete(filename, &myfile);
-	 do_close(&myfile);
+    if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
+        return ERR_INVALID_PICID;
+    }
+    struct pictdb_file myfile;
+    if(do_open(filename, "wb", &myfile)) { //first open the file
+        return ERR_FILE_NOT_FOUND;
+    }
+    do_delete(filename, &myfile);
+    do_close(&myfile);
     return 0;
 }
 
@@ -117,7 +117,8 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-        argc--; argv++; // skips command call name
+        argc--;
+        argv++; // skips command call name
         if (!strcmp("list", argv[0])) {
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
