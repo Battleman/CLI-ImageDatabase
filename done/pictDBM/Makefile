@@ -11,7 +11,6 @@ pictDBM.o: pictDBM.c pictDB.h error.h
  
 
 pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o
-	gcc -g -o pictDBM pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o
-		
+	gcc -g -o $@ $^ $(CFLAGS)	
 	
 
