@@ -4,21 +4,21 @@
 int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table);
 int modify_header(FILE* fpdb, struct pictdb_header* header);
 
-int do_delete(const char* filename, struct pictdb_file* file)
+int do_delete(const char* pic_name, struct pictdb_file* file)
 {
-    int err = modify_reference(filename, file -> fpdb, file -> metadata);
+    int err = modify_reference(pic_name, file -> fpdb, file -> metadata);
     if(err == 0) {
         err = modify_header(file -> fpdb, &file -> header);
     }
     return err;
 }
 
-int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table)
+int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* meta_table)
 {
 	int index, valid = 0;
 	struct pict_metadata* new;
 	for(int i = 0; i < MAX_MAX_FILES; i++){
-		if(filename == meta_table[i].pict_id){
+		if(strcmp(pic_name, meta_table[i].pict_id) == 0){
 			meta_table[i].is_valid = 0;
 			new = &meta_table[i];
 			index = i;
@@ -27,9 +27,8 @@ int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* met
 	}
 	
 	if(valid != 0){
-		rewind(fpdb);
 		fseek(fpdb, sizeof(struct pictdb_header), SEEK_SET);
-		fseek(fpdb, index * sizeof(struct pictdb_header), SEEK_CUR);
+		fseek(fpdb, index*sizeof(struct pict_metadata), SEEK_CUR);
 		valid = fwrite(new, sizeof(struct pict_metadata), 1, fpdb);
 	}
 	
