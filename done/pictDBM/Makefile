@@ -14,3 +14,13 @@ pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o
 	gcc -g -o $@ $^ $(CFLAGS)	
 	
 
+clean:
+	rm -rf *.o
+
+mrproper : clean
+	rm -rf $(EXEC)
+	cp ../../provided/week04/testDB01.pictdb_static .
+	cp ../../provided/week04/testDB02.pictdb_static .
+
+stylish:
+	./stylish.sh

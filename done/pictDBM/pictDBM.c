@@ -87,17 +87,13 @@ help (void)
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
-    /* **********************************************************************
-     * TODO WEEK 06: WRITE YOUR CODE HERE (and change the return if needed).
-     * **********************************************************************
-     */
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    if(do_open(filename, "wb", &myfile)) { //first open the file
-        return ERR_FILE_NOT_FOUND;
-    }
+    if(do_open(filename, "r+b", &myfile)) { //first open the file
+        return ERR_VIPS;
+    }	
     do_delete(filename, &myfile);
     do_close(&myfile);
     return 0;

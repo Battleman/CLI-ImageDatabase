@@ -6,12 +6,11 @@ int modify_header(FILE* fpdb, struct pictdb_header* header);
 
 int do_delete(const char* filename, struct pictdb_file* file)
 {
-    int valid = modify_reference(filename, file -> fpdb, file -> metadata);
-    if(valid == 0) {
-        valid = modify_header(file -> fpdb, &file -> header);
+    int err = modify_reference(filename, file -> fpdb, file -> metadata);
+    if(err == 0) {
+        err = modify_header(file -> fpdb, &file -> header);
     }
-
-    return valid;
+    return err;
 }
 
 int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table)
