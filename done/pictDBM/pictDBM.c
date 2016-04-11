@@ -92,11 +92,13 @@ do_delete_cmd (const char* filename, const char* pictID)
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    if((errcode = do_open(filename, "r+b", &myfile))) { //first open the file
+    if((errcode = do_open(filename, "r+b", &myfile)) ||
+		errcode = do_delete(pictID, &myfile) ||
+		errcode = do_close(&myfile)) { //utilisation intensive de la lazy evaluation 
         return errcode;
     }
-    do_delete(pictID, &myfile);
-    do_close(&myfile);
+    ;
+    ;
     return 0;
 }
 

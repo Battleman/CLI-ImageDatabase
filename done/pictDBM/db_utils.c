@@ -70,9 +70,9 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     if(db_file -> fpdb == NULL) {
         return ERR_FILE_NOT_FOUND;
     } else {
-        if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
-           MAX_MAX_FILES != fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb)) {
-            return ERR_IO;
+        if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb) || //fread doit retourner 1, car on cherche à lire 1 élément
+           MAX_MAX_FILES != fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb)) { //idem avec MAX_MAX_FILES
+            return ERR_IO; //n'arrive que si une des lecture a échoué mais l'ouverture s'est faite (par ex "wb" d'un fichier inexistant)
         }
     }
 
@@ -81,7 +81,7 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 
 void do_close(struct pictdb_file* db_file)
 {
-    if(db_file != NULL) {
-        fclose(db_file -> fpdb);
+    if((db_file == NULL) || (0 != fclose(db_file -> fpdb))) {
+        fprintf(stderr, "ERR: impossible de fermer le fichier %s (null ou non-ouvert)", filename);
     }
 }
