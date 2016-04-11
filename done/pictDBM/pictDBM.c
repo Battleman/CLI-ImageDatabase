@@ -21,28 +21,12 @@ do_list_cmd (const char* filename)
 {
     struct pictdb_file myfile;
 
-    /* This is a quick and dirty way of reading the file.
-     * It's provided here as such to avoid solution leak.
-     * You shall NOT proceed as such in your future open function
-     * (in week 6).
-     */
-    /* **********************************************************************
-     * TODO WEEK 06: REPLACE THE PROVIDED CODE BY YOUR OWN CODE HERE
-     * **********************************************************************
-     */
-    /*myfile.fpdb = fopen(filename, "rb");
-    if (myfile.fpdb == NULL) {
-        return ERR_IO;
-    }
-    fread(&myfile.header , sizeof(struct pictdb_header),             1, myfile.fpdb);
-    fread(myfile.metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, myfile.fpdb);
-    */
     int fail = do_open(filename, "rb", &myfile);
     if(fail == 0) {
         do_list(&myfile);
         do_close(&myfile);
     }
-    return 0;
+    return fail;
 }
 
 /********************************************************************//**
@@ -92,13 +76,10 @@ do_delete_cmd (const char* filename, const char* pictID)
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    if((errcode = do_open(filename, "r+b", &myfile)) ||
-		errcode = do_delete(pictID, &myfile) ||
-		errcode = do_close(&myfile)) { //utilisation intensive de la lazy evaluation 
+    if((errcode = do_open(filename, "r+b", &myfile)) || (errcode = do_delete(pictID, &myfile))) { //utilisation de la lazy evaluation 
         return errcode;
     }
-    ;
-    ;
+    do_close(&myfile);
     return 0;
 }
 
