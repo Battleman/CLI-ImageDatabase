@@ -92,7 +92,7 @@ void print_metadata (const struct pict_metadata* metadata);
 /**
  * @brief Displays (on stdout) pictDB metadata.
  *
- * @param db_file In memory structure with header and metadata.
+ * @param myfile In memory structure with header and metadata.
  */
 
 void do_list(struct pictdb_file* myfile);
@@ -106,10 +106,35 @@ void do_list(struct pictdb_file* myfile);
  */
 int do_create(const char* filename, struct pictdb_file* db_file);
 
+/**
+ * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)
+ *
+ * @param filename name of the file to open
+ * @param mode opening (r/w (b)...)
+ * @param db_file In memory structure ; where to stock the read file
+ *
+ * @return 0 if success; a non-null integer if fail (corresponds to an
+ * 			error code, defined in error.h
+ **/
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file);
+
+/**
+ * @brief Closes a file (if possible)
+ *
+ * @param db_file The file to close
+ */
 
 void do_close(struct pictdb_file* db_file);
 
+/**
+ * @brief Deletes a specified entry in the database of the specified file
+ *
+ * @param picname The ID of the pic to be deleted
+ * @param file The file (already opened) in which delete the image
+ *
+ * @return 0 if success; else a non-null integer (corresponds to an
+ * 			error code defined in error.h)
+ **/
 int do_delete(const char* picname, struct pictdb_file* file);
 
 /* **********************************************************************

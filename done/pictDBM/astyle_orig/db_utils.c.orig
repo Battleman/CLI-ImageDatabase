@@ -6,7 +6,7 @@
 * @date 2 Nov 2015
 */
 
- #include "pictDB.h"
+#include "pictDB.h"
 
 #include <inttypes.h>
 #include <stdint.h> // for uint8_t
@@ -18,11 +18,12 @@
  */
 static void
 sha_to_string (const unsigned char* SHA,
-               char* sha_string){
+               char* sha_string)
+{
     if (SHA == NULL) {
         return;
- }
-		for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+    }
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
         sprintf(&sha_string[i*2], "%02x", SHA[i]);
     }
 
@@ -65,13 +66,14 @@ print_metadata (const struct pict_metadata* metadata)
 
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
-    //char* open_modes[] = {"rb", "wb", "ab",
     db_file -> fpdb = fopen(filename, mode);
     if(db_file -> fpdb == NULL) {
         return ERR_FILE_NOT_FOUND;
     } else {
-        fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb);
-        fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb);
+        if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
+		   MAX_MAX_FILES != fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb)) {
+			   return ERR_IO;
+		}   
     }
 
     return 0;

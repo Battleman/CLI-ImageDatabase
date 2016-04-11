@@ -87,14 +87,14 @@ help (void)
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
-	int errcode = 0;
+    int errcode = 0;
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
     if((errcode = do_open(filename, "r+b", &myfile))) { //first open the file
         return errcode;
-    }	
+    }
     do_delete(pictID, &myfile);
     do_close(&myfile);
     return 0;
