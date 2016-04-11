@@ -70,8 +70,8 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     if(db_file -> fpdb == NULL) {
         return ERR_FILE_NOT_FOUND;
     } else {
-        if(0 == fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
-		   0 == fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb)) {
+        if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
+		   MAX_MAX_FILES != fread(db_file -> metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file -> fpdb)) {
 			   return ERR_IO;
 		}   
     }
