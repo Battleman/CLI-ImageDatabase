@@ -45,11 +45,19 @@ do_create_cmd (const char* filename)
     myfile.header = (struct pictdb_header) {
         "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
     };
-    int errcode = do_create(filename, &myfile);
-    if(errcode == 0) {
-		print_header(&myfile.header);
+    
+    int errcode = 0;
+    myfile.fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
+    if(myfile.fpdb == NULL) {
+        errcode = ERR_FILE_NOT_FOUND;
+	} else {
+		errcode = do_create(filename, &myfile);
+		if(errcode == 0) {
+			print_header(&myfile.header);
+		}
+		do_close(&myfile);
 	}
-    return errcode;
+	return errcode;
 }
 
 /********************************************************************//**
@@ -72,20 +80,15 @@ help (void)
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
-    //int errcode = 0;
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    /*if((errcode = do_open(filename, "r+b", &myfile)) || (errcode = do_delete(pictID, &myfile))) { //utilisation de la lazy evaluation
-        return errcode;
+    int errcode = do_open(filename, "r+b", &myfile); //try to open
+    if(errcode == 0) { 
+        errcode = do_delete(pictID, &myfile); //if opening worked, try to delete
+        do_close(&myfile); //indepently of delete, always close the stream
     }
-    do_close(&myfile);*/
-    int errcode = do_open(filename, "r+b", &myfile);
-    if(errcode == 0){
-		errcode = do_delete(pictID, &myfile);
-		do_close(&myfile);
-	}
     return errcode;
 }
 

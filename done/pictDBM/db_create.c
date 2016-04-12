@@ -23,23 +23,15 @@ int do_create(const char* filename, struct pictdb_file* db_file)
     for(int i = 0; i < db_file -> header.max_files; i++) { //initialisation des bits de validité --> header.max_files pour ne pas déborder
         db_file -> metadata[i].is_valid = EMPTY;
     }
-    
-    int errcode = 0; //par défaut : tout se passe bien, on ne modifie pas le code d'erreur et on retourne 0.
-    
-    db_file->fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
-    if(db_file->fpdb == NULL) { //une erreur pourrait arriver à l'ouverture
-        errcode = ERR_FILE_NOT_FOUND;
-    } else {
-        unsigned int sum = 0;
-        sum += fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb);
-        sum += fwrite(db_file->metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file->fpdb);
 
-        if(sum == (MAX_MAX_FILES + 1)) { //# of metadata + 1 header
-            printf("%u item(s) written\n", sum);
-        } else {
-            errcode = ERR_MAX_FILES; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore
-        }
-        fclose(db_file->fpdb); //quoi qu'il se soit passé, le flux a été ouvert -> fermeture
-    }
-    return errcode; //return the error code (or 0)
+	unsigned int sum = 0;
+	sum += fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb);
+	sum += fwrite(db_file->metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file->fpdb);
+
+	if(sum == (MAX_MAX_FILES + 1)) { //# of metadata + 1 header
+		printf("%u item(s) written\n", sum);
+	} else {
+		return ERR_MAX_FILES; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore
+	}
+    return 0; //no error;
 }

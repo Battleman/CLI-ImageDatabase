@@ -4,7 +4,7 @@
  */
 #include "pictDB.h"
 /********************************************************************//**
- * Iterates through the database and prints the header and each 
+ * Iterates through the database and prints the header and each
  * valid database entry
  */
 void do_list(struct pictdb_file* myfile)

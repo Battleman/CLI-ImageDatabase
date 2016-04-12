@@ -1,3 +1,7 @@
+#Disclaimer : This file is a copy-paste of the one I usually
+#use, ignoring all useless files ; we added a few entries for this specific project.
+#Most entries here are useless, but it does no harm :)
+
 # Compiled source #
 ###################
 *.com
@@ -20,10 +24,8 @@
 *.x86_64
 *.hex
 
-# Packages #
+# Packages #(git already provides compress methodes)
 ############
-# it's better to unpack these files and commit the raw source
-# git has its own built in compression methods
 *.7z
 *.dmg
 *.gz
@@ -85,4 +87,5 @@ Thumbs.db
 # Décommenter pour faire le rendu #
 ###################################
 #*.sh
-#done/pictDBM/astyle_orig/
+#*/astyle_orig/
+#doxyfile
