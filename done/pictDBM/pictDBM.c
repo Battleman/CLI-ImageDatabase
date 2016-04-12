@@ -41,11 +41,15 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-    struct pictdb_file fichier;
-    fichier.header = (struct pictdb_header) {
+    struct pictdb_file myfile;
+    myfile.header = (struct pictdb_header) {
         "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
     };
-    return do_create(filename, &fichier);
+    int errcode = do_create(filename, &myfile);
+    if(errcode == 0) {
+		print_header(&myfile.header);
+	}
+    return errcode;
 }
 
 /********************************************************************//**
