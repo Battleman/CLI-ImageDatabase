@@ -1,3 +1,7 @@
+/**
+ * @file db_delete.c
+ * @brief pictDB library: do_delete implementation.
+ */
 #include "error.h"
 #include "pictDB.h"
 
@@ -36,7 +40,6 @@ int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* met
     if(valid != 1) { //doit être 1, car écrit exactement un éléments juste avant
         return ERR_IO;
     }
-
     return 0;
 }
 

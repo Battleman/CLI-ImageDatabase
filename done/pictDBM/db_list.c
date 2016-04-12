@@ -1,5 +1,12 @@
+/**
+ * @file db_list.c
+ * @brief pictDB library: do_list implementation.
+ */
 #include "pictDB.h"
-
+/********************************************************************//**
+ * Iterates through the database and prints the header and each 
+ * valid database entry
+ */
 void do_list(struct pictdb_file* myfile)
 {
     int empty = 1; //check if there is an entry in the database

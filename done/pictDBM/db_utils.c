@@ -57,13 +57,15 @@ print_metadata (const struct pict_metadata* metadata)
     printf("SHA: %31s\n", sha_printable);
     printf("VALID: %" PRIu16 "\n", metadata -> is_valid);
     printf("UNUSED: %" PRIu16 "\n", metadata -> unused_16);
-    printf("OFFSET ORIG.: %" PRIu64 "\t\tSIZE ORIG.: %" PRIu32 "\n", metadata -> offset[2], metadata -> size[2]);
-    printf("OFFSET THUMB.: %" PRIu64 "\t\tSIZE THUMB.: %" PRIu32 "\n", metadata -> offset[1], metadata -> size[1]);
-    printf("OFFSET SMALL : %" PRIu64 "\t\tSIZE SMALL : %" PRIu32 "\n", metadata -> offset[0], metadata -> size[0]);
+    printf("OFFSET ORIG.: %" PRIu64 "\t\tSIZE ORIG.: %" PRIu32 "\n", metadata -> offset[RES_ORIG], metadata -> size[RES_ORIG]);
+    printf("OFFSET THUMB.: %" PRIu64 "\t\tSIZE THUMB.: %" PRIu32 "\n", metadata -> offset[RES_THUMB], metadata -> size[RES_THUMB]);
+    printf("OFFSET SMALL : %" PRIu64 "\t\tSIZE SMALL : %" PRIu32 "\n", metadata -> offset[RES_SMALL], metadata -> size[RES_SMALL]);
     printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata -> res_orig[0], metadata -> res_orig[1]);
     printf("*****************************************\n");
 }
-
+/******************************************//**
+ * File opening and header/metadata reading
+ */
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
     db_file -> fpdb = fopen(filename, mode);
@@ -82,6 +84,6 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 void do_close(struct pictdb_file* db_file)
 {
     if((db_file == NULL) || (0 != fclose(db_file -> fpdb))) {
-        fprintf(stderr, "ERR: impossible de fermer le fichier %s (null ou non-ouvert)", filename);
+        fprintf(stderr, "ERR: impossible de fermer un fichier (null ou non-ouvert)");
     }
 }

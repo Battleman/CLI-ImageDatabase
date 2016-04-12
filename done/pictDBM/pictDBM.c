@@ -41,14 +41,11 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-    struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
     struct pictdb_file fichier;
-    fichier.header = header;
-    fichier.fpdb = fopen(filename, "wb");
-
-    int error = do_create(filename, &fichier);
-
-    return error;
+    fichier.header = (struct pictdb_header) {
+        "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
+    };
+    return do_create(filename, &fichier);
 }
 
 /********************************************************************//**
@@ -67,20 +64,25 @@ help (void)
 
 /********************************************************************//**
  * Deletes a picture from the database.
- */
+ ********************************************************************* */
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
-    int errcode = 0;
+    //int errcode = 0;
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    if((errcode = do_open(filename, "r+b", &myfile)) || (errcode = do_delete(pictID, &myfile))) { //utilisation de la lazy evaluation 
+    /*if((errcode = do_open(filename, "r+b", &myfile)) || (errcode = do_delete(pictID, &myfile))) { //utilisation de la lazy evaluation
         return errcode;
     }
-    do_close(&myfile);
-    return 0;
+    do_close(&myfile);*/
+    int errcode = do_open(filename, "r+b", &myfile);
+    if(errcode == 0){
+		errcode = do_delete(pictID, &myfile);
+		do_close(&myfile);
+	}
+    return errcode;
 }
 
 /********************************************************************//**

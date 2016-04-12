@@ -19,6 +19,7 @@ clean:
 
 mrproper : clean
 	rm -rf $(EXEC)
+	rm *.pictdb_static
 	cp ../../provided/week04/testDB01.pictdb_static .
 	cp ../../provided/week04/testDB02.pictdb_static .
 

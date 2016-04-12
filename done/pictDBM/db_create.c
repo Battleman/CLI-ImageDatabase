@@ -16,31 +16,30 @@
  */
 int do_create(const char* filename, struct pictdb_file* db_file)
 {
-    // Sets the DB header name
-    strncpy(db_file -> header.db_name, CAT_TXT,  MAX_DB_NAME);
-    (db_file -> header).db_name[MAX_DB_NAME] = '\0';
+    //initialisation des valeurs par défaut
+    strncpy	(db_file -> header.db_name, CAT_TXT,  MAX_DB_NAME); //copie du nom par défaut
+    (db_file -> header).db_name[MAX_DB_NAME] = '\0'; //la "string" doit se terminer par \0
 
-    (db_file -> header).db_version = 0;
-    (db_file -> header).num_files = 0;
-
-    for(int i = 0; i < db_file -> header.max_files; i++) {
+    for(int i = 0; i < db_file -> header.max_files; i++) { //initialisation des bits de validité --> header.max_files pour ne pas déborder
         db_file -> metadata[i].is_valid = EMPTY;
     }
-
-    FILE* db = fopen(filename, "wb");
-    if(db == NULL) {
-        return ERR_FILE_NOT_FOUND;
+    
+    int errcode = 0; //par défaut : tout se passe bien, on ne modifie pas le code d'erreur et on retourne 0.
+    
+    db_file->fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
+    if(db_file->fpdb == NULL) { //une erreur pourrait arriver à l'ouverture
+        errcode = ERR_FILE_NOT_FOUND;
     } else {
-        int sum = 0;
-        sum += fwrite(&(*db_file).header, sizeof(struct pictdb_header), 1, db);
-        sum += fwrite(&(*db_file).metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db);
+        unsigned int sum = 0;
+        sum += fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb);
+        sum += fwrite(db_file->metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, db_file->fpdb);
 
-        if(sum == (MAX_MAX_FILES + 1)) {
-            printf("%d item(s) written\n", sum);
-            fclose(db);
-            return 0;
+        if(sum == (MAX_MAX_FILES + 1)) { //# of metadata + 1 header
+            printf("%u item(s) written\n", sum);
+        } else {
+            errcode = ERR_MAX_FILES; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore
         }
-        fclose(db);
-        return ERR_MAX_FILES;
+        fclose(db_file->fpdb); //quoi qu'il se soit passé, le flux a été ouvert -> fermeture
     }
+    return errcode; //return the error code (or 0)
 }
