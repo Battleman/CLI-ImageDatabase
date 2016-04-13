@@ -20,7 +20,7 @@ int do_create(const char* filename, struct pictdb_file* db_file)
     strncpy	(db_file -> header.db_name, CAT_TXT,  MAX_DB_NAME); //copie du nom par défaut
     (db_file -> header).db_name[MAX_DB_NAME] = '\0'; //la "string" doit se terminer par \0
 
-    for(int i = 0; i < db_file -> header.max_files; i++) { //initialisation des bits de validité --> header.max_files pour ne pas déborder
+    for(size_t i = 0; i < db_file -> header.max_files; i++) { //initialisation des bits de validité --> header.max_files pour ne pas déborder
         db_file -> metadata[i].is_valid = EMPTY;
     }
 

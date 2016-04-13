@@ -19,7 +19,7 @@ int do_delete(const char* pic_name, struct pictdb_file* file)
 
 int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* meta_table)
 {
-    int index = 0, valid = 0;
+    size_t index = 0, valid = 0;
     do {
         if(strcmp(pic_name, meta_table[index].pict_id) == 0) { //comparaison entre le nom donné en argument et le nom de chaque metadata
             meta_table[index].is_valid = 0; //modification du bit de validité
