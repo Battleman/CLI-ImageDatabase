@@ -19,26 +19,14 @@
 int
 do_list_cmd (const char* filename)
 {
-    struct pictdb_file myfile; 
+    struct pictdb_file myfile;
 
-    /* This is a quick and dirty way of reading the file.
-     * It's provided here as such to avoid solution leak.
-     * You shall NOT proceed as such in your future open function
-     * (in week 6).
-     */
-    /* **********************************************************************
-     * TODO WEEK 06: REPLACE THE PROVIDED CODE BY YOUR OWN CODE HERE
-     * **********************************************************************
-     */
-    myfile.fpdb = fopen(filename, "rb");
-    if (myfile.fpdb == NULL) {
-        return ERR_IO;
+    int fail = do_open(filename, "rb", &myfile);
+    if(fail == 0) {
+        do_list(&myfile);
+        do_close(&myfile);
     }
-    fread(&myfile.header , sizeof(struct pictdb_header),             1, myfile.fpdb);
-    fread(myfile.metadata, sizeof(struct pict_metadata), MAX_MAX_FILES, myfile.fpdb);
-
-    do_list(myfile);
-    return 0;
+    return fail;
 }
 
 /********************************************************************//**
@@ -53,14 +41,23 @@ do_create_cmd (const char* filename)
     const uint16_t small_res = 256;
 
     puts("Create");
-	struct pictdb_header header = {"", 0, 0, max_files, {small_res, thumb_res, 0}, 0, 0};
-    struct pictdb_file fichier;
-    fichier.header = header;
-    fichier.fpdb = fopen(filename, "wb");
+    struct pictdb_file myfile;
+    myfile.header = (struct pictdb_header) {
+        "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
+    };
     
-    int error = do_create(filename, fichier);
-    
-    return error;
+    int errcode = 0;
+    myfile.fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
+    if(myfile.fpdb == NULL) {
+        errcode = ERR_FILE_NOT_FOUND;
+	} else {
+		errcode = do_create(filename, &myfile);
+		if(errcode == 0) {
+			print_header(&myfile.header);
+		}
+		do_close(&myfile);
+	}
+	return errcode;
 }
 
 /********************************************************************//**
@@ -73,20 +70,26 @@ help (void)
     printf("\thelp: displays this help.\n");
     printf("\tlist <dbfilename>: list pictDB content.\n");
     printf("\tcreate <dbfilename>: create a new pictDB.\n");
+    printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
 
 /********************************************************************//**
  * Deletes a picture from the database.
- */
+ ********************************************************************* */
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
-    /* **********************************************************************
-     * TODO WEEK 06: WRITE YOUR CODE HERE (and change the return if needed).
-     * **********************************************************************
-     */
-    return 0;
+    if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
+        return ERR_INVALID_PICID;
+    }
+    struct pictdb_file myfile;
+    int errcode = do_open(filename, "r+b", &myfile); //try to open
+    if(errcode == 0) { 
+        errcode = do_delete(pictID, &myfile); //if opening worked, try to delete
+        do_close(&myfile); //indepently of delete, always close the stream
+    }
+    return errcode;
 }
 
 /********************************************************************//**
@@ -103,7 +106,8 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-        argc--; argv++; // skips command call name
+        argc--;
+        argv++; // skips command call name
         if (!strcmp("list", argv[0])) {
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;

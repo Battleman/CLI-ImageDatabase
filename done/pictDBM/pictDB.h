@@ -24,6 +24,7 @@
 #include <stdio.h> // for FILE
 #include <stdint.h> // for uint32_t, uint64_t
 #include <openssl/sha.h> // for SHA256_DIGEST_LENGTH
+#include <string.h>
 
 #define CAT_TXT "EPFL PictDB binary"
 
@@ -47,43 +48,38 @@ extern "C" {
 #endif
 
 
-/* **********************************************************************
- * TODO WEEK 04: DEFINE YOUR STRUCTS HERE.
- * **********************************************************************
- */
- 
-struct pictdb_header{
-	 char db_name[MAX_DB_NAME + 1];
-	 uint32_t db_version;
-	 uint32_t num_files;
-	 uint32_t max_files;
-	 uint16_t res_resized[2*(NB_RES - 1)];
-	 uint32_t unused_32;
-	 uint64_t unused_64;
- };
- 
- struct pict_metadata{
-	 char pict_id[MAX_PIC_ID + 1];
-	 unsigned char SHA[SHA256_DIGEST_LENGTH];
-	 uint32_t res_orig[RES_ORIG];
-	 uint32_t size[NB_RES];
-	 uint64_t offset[NB_RES];
-	 uint16_t is_valid;
-	 uint16_t unused_16;
- };
- 
- struct pictdb_file{
-	 FILE* fpdb;
-	 struct pictdb_header header;
-	 struct pict_metadata metadata[MAX_MAX_FILES];
- };
+struct pictdb_header {
+    char db_name[MAX_DB_NAME + 1];
+    uint32_t db_version;
+    uint32_t num_files;
+    uint32_t max_files;
+    uint16_t res_resized[2*(NB_RES - 1)];
+    uint32_t unused_32;
+    uint64_t unused_64;
+};
+
+struct pict_metadata {
+    char pict_id[MAX_PIC_ID + 1];
+    unsigned char SHA[SHA256_DIGEST_LENGTH];
+    uint32_t res_orig[RES_ORIG];
+    uint32_t size[NB_RES];
+    uint64_t offset[NB_RES];
+    uint16_t is_valid;
+    uint16_t unused_16;
+};
+
+struct pictdb_file {
+    FILE* fpdb;
+    struct pictdb_header header;
+    struct pict_metadata metadata[MAX_MAX_FILES];
+};
 
 /**
  * @brief Prints database header informations.
  *
  * @param header The header to be displayed.
  */
-void print_header(const struct pictdb_header header);
+void print_header(const struct pictdb_header* header);
 
 
 /**
@@ -91,15 +87,15 @@ void print_header(const struct pictdb_header header);
  *
  * @param metadata The metadata of one picture.
  */
-void print_metadata (const struct pict_metadata metadata);
+void print_metadata (const struct pict_metadata* metadata);
 
 /**
  * @brief Displays (on stdout) pictDB metadata.
  *
- * @param db_file In memory structure with header and metadata.
+ * @param myfile In memory structure with header and metadata.
  */
 
-void do_list(struct pictdb_file myfile);
+void do_list(struct pictdb_file* myfile);
 
 
 /**
@@ -108,12 +104,38 @@ void do_list(struct pictdb_file myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-int do_create(const char* filename, struct pictdb_file db_file);
+int do_create(const char* filename, struct pictdb_file* db_file);
 
-/* **********************************************************************
- * TODO WEEK 06: ADD THE PROTOTYPE OF do_delete HERE.
- * **********************************************************************
+/**
+ * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)
+ *
+ * @param filename name of the file to open
+ * @param mode opening (r/w (b)...)
+ * @param db_file In memory structure ; where to stock the read file
+ *
+ * @return 0 if success; a non-null integer if fail (corresponds to an
+ * 			error code, defined in error.h
+ **/
+int do_open(const char* filename, const char* mode, struct pictdb_file* db_file);
+
+/**
+ * @brief Closes a file (if possible)
+ *
+ * @param db_file The file to close
  */
+
+void do_close(struct pictdb_file* db_file);
+
+/**
+ * @brief Deletes a specified entry in the database of the specified file
+ *
+ * @param picname The ID of the pic to be deleted
+ * @param file The file (already opened) in which delete the image
+ *
+ * @return 0 if success; else a non-null integer (corresponds to an
+ * 			error code defined in error.h)
+ **/
+int do_delete(const char* picname, struct pictdb_file* file);
 
 /* **********************************************************************
  * TODO WEEK 09: ADD THE PROTOTYPE OF resolution_atoi HERE.
