@@ -25,6 +25,7 @@
 #include <stdint.h> // for uint32_t, uint64_t
 #include <openssl/sha.h> // for SHA256_DIGEST_LENGTH
 #include <string.h>
+#include <stdlib.h>
 
 #define CAT_TXT "EPFL PictDB binary"
 
@@ -71,7 +72,7 @@ struct pict_metadata {
 struct pictdb_file {
     FILE* fpdb;
     struct pictdb_header header;
-    struct pict_metadata metadata[MAX_MAX_FILES];
+    struct pict_metadata* metadata;
 };
 
 /**
