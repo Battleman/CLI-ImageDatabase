@@ -5,8 +5,8 @@
 #include "error.h"
 #include "pictDB.h"
 
-int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table);
-int modify_header(FILE* fpdb, struct pictdb_header* header);
+static int modify_reference(const char* filename, FILE* fpdb, struct pict_metadata* meta_table);
+static int modify_header(FILE* fpdb, struct pictdb_header* header);
 
 int do_delete(const char* pic_name, struct pictdb_file* file)
 {
@@ -17,7 +17,7 @@ int do_delete(const char* pic_name, struct pictdb_file* file)
     return err;
 }
 
-int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* meta_table)
+static int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* meta_table)
 {
     size_t index = 0;
     int valid = 0;
@@ -44,7 +44,7 @@ int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* met
     return 0;
 }
 
-int modify_header(FILE* fpdb, struct pictdb_header* header)
+static int modify_header(FILE* fpdb, struct pictdb_header* header)
 {
     header->num_files--; //réduction du nombre de fichiers
     header->db_version++; //version suivante
