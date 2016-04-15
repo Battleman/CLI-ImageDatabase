@@ -6,7 +6,6 @@ int create_picture(FILE* file, struct pict_metadata* meta);
 int update_file(struct pictdb_file* file, int res, size_t index, size_t size, size_t offset);
 
 int lazily_resize(int res, struct pictdb_file* file, size_t index){
-	int valid;
 	size_t size = 0, offset = 0;
 	
 	if(res != RES_ORIG || res != RES_SMALL || res != RES_THUMB || file == NULL || index < 0 || index > (file -> header.max_files)){
@@ -16,7 +15,7 @@ int lazily_resize(int res, struct pictdb_file* file, size_t index){
 	if(file -> metadata[index].size[res] != 0){
 		return 0;
 	} else {
-		valid = create_picture(file -> fpdb, &file -> metadata[index]);
+		int valid = create_picture(file -> fpdb, &file -> metadata[index]);
 		return valid ? update_file(file, res, index, size, offset) : ERR_IO;
 	}
 }
