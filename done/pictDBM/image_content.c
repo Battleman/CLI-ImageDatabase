@@ -2,7 +2,7 @@
 #include "pictDB.h"
 #include "image_content.h"
 
-int create_picture(FILE* file, struct pict_metadata* meta);
+int create_derivative(FILE* file, struct pict_metadata* meta);
 int update_file(struct pictdb_file* file, int res, size_t index, size_t size, size_t offset);
 
 int lazily_resize(int res, struct pictdb_file* file, size_t index){
@@ -15,7 +15,7 @@ int lazily_resize(int res, struct pictdb_file* file, size_t index){
 	if(file -> metadata[index].size[res] != 0){
 		return 0;
 	} else {
-		int valid = create_picture(file -> fpdb, &file -> metadata[index]);
+		int valid = create_derivative(file -> fpdb, &file -> metadata[index]);
 		return valid ? update_file(file, res, index, size, offset) : ERR_IO;
 	}
 }
