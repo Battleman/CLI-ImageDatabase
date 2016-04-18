@@ -1,4 +1,5 @@
-CFLAGS += -std=c99 -lssl -lcrypto
+CFLAGS += -std=c99 -lssl -lcrypto $$(pkg-config vips —- cflags)
+LDLIBS += $$(pkg-config vips -- libs) -lm
 
 all: pictDBM
 
