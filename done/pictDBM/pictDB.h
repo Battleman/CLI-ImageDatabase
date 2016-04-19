@@ -26,6 +26,7 @@
 #include <openssl/sha.h> // for SHA256_DIGEST_LENGTH
 #include <string.h>
 #include <stdlib.h>
+#include <vips/vips.h>
 
 #define CAT_TXT "EPFL PictDB binary"
 

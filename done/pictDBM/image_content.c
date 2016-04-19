@@ -37,3 +37,8 @@ int update_file(struct pictdb_file* file, int res, size_t index, size_t size, si
 	
 	return valid ? 1 : ERR_IO;
 }
+
+int create_derivative(FILE* file, struct pict_metadata* meta) {
+	
+	return 0;
+}

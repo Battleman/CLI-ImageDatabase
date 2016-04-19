@@ -1,5 +1,8 @@
-CFLAGS += -std=c99 -lssl -lcrypto $$(pkg-config vips —- cflags)
-LDLIBS += $$(pkg-config vips -- libs) -lm
+CFLAGS += -std=c99 -lssl -lcrypto 
+CFLAGS += $$(pkg-config vips --cflags)
+LDLIBS += $$(pkg-config vips --libs) -lm
+#CFLAGS += -I/usr/include/glib-2.0/
+#CFLAGS += -I/usr/lib/x86_64-linux-gnu/glib-2.0/include/
 
 all: pictDBM
 

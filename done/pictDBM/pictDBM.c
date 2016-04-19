@@ -106,6 +106,7 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
+        char* filename = argv[0];
         argc--;
         argv++; // skips command call name
         if (!strcmp("list", argv[0])) {
@@ -118,7 +119,9 @@ int main (int argc, char* argv[])
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
             } else {
-                ret = do_create_cmd(argv[1]);
+				VIPS_INIT(filename);
+				ret = do_create_cmd(argv[1]);
+				vips_shutdown();
             }
         } else if (!strcmp("delete", argv[0])) {
             if (argc < 3) {
