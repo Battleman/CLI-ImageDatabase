@@ -14,7 +14,7 @@
  * Creates the database called db_filename. Writes the header and the
  * preallocated empty metadata array to database file.
  */
-int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t thumb_res, uint16_t small_res)
+int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t[] thumb_res, uint16_t[] small_res)
 {
     pictdb_header header = db_file -> header;
     
