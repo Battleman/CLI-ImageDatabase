@@ -9,7 +9,6 @@
  */
 
 #include "pictDB.h"
-#include <vips/vips.h> // for obvious reasons ;-)
 
 #include <stdlib.h>
 #include <string.h>
@@ -46,19 +45,11 @@ do_create_cmd (const char* filename)
     myfile.header = (struct pictdb_header) {
         "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
     };
-    
-    int errcode = 0;
-    myfile.fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
-    if(myfile.fpdb == NULL) {
-        errcode = ERR_FILE_NOT_FOUND;
-	} else {
-		errcode = do_create(filename, &myfile);
-		if(errcode == 0) {
-			print_header(&myfile.header);
-		}
-		do_close(&myfile);
+    int errcode = do_create(filename, &myfile);
+    if(errcode == 0) {
+		print_header(&myfile.header);
 	}
-	return errcode;
+    return errcode;
 }
 
 /********************************************************************//**
@@ -81,15 +72,20 @@ help (void)
 int
 do_delete_cmd (const char* filename, const char* pictID)
 {
+    //int errcode = 0;
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
     struct pictdb_file myfile;
-    int errcode = do_open(filename, "r+b", &myfile); //try to open
-    if(errcode == 0) { 
-        errcode = do_delete(pictID, &myfile); //if opening worked, try to delete
-        do_close(&myfile); //indepently of delete, always close the stream
+    /*if((errcode = do_open(filename, "r+b", &myfile)) || (errcode = do_delete(pictID, &myfile))) { //utilisation de la lazy evaluation
+        return errcode;
     }
+    do_close(&myfile);*/
+    int errcode = do_open(filename, "r+b", &myfile);
+    if(errcode == 0){
+		errcode = do_delete(pictID, &myfile);
+		do_close(&myfile);
+	}
     return errcode;
 }
 
@@ -107,7 +103,6 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-        char* filename = argv[0];
         argc--;
         argv++; // skips command call name
         if (!strcmp("list", argv[0])) {
@@ -120,16 +115,7 @@ int main (int argc, char* argv[])
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
             } else {
-<<<<<<< HEAD
-				VIPS_INIT(argv[0]);
                 ret = do_create_cmd(argv[1]);
-                    vips_shutdown();
-
-=======
-				VIPS_INIT(filename);
-				ret = do_create_cmd(argv[1]);
-				vips_shutdown();
->>>>>>> develop
             }
         } else if (!strcmp("delete", argv[0])) {
             if (argc < 3) {

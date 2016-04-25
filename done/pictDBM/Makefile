@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 CFLAGS += -std=c99 -lssl -lcrypto
 CFLAGS += $$(pkg-config vips --cflags)
 LDLIBS += $$(pkg-config vips --libs) -lm
+=======
+CFLAGS += -std=c99 -lssl -lcrypto 
+CFLAGS += $$(pkg-config vips --cflags)
+LDLIBS += $$(pkg-config vips --libs) -lm
+#CFLAGS += -I/usr/include/glib-2.0/
+#CFLAGS += -I/usr/lib/x86_64-linux-gnu/glib-2.0/include/
+>>>>>>> develop
 
 all: pictDBM
 
@@ -9,11 +17,19 @@ db_list.o: db_list.c pictDB.h error.h
 db_create.o: db_create.c pictDB.h
 db_utils.o: db_utils.c pictDB.h error.h
 db_delete.o: db_delete.c pictDB.h error.h
+<<<<<<< HEAD
 pictDBM.o: pictDBM.c pictDB.h error.h
 
 
 pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o
 	gcc -g -o $@ $^ $(CFLAGS) $(LDLIBS)
+=======
+pictDBM.o: pictDBM.c pictDB.h error.h 
+image_content.o : image_content.c image_content.h pictDB.h error.h 
+
+pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o image_content.o
+	gcc -g -o $@ $^ $(CFLAGS)	
+>>>>>>> develop
 	
 #afew scripts to facilitate cleaning and purging#
 #################################################
