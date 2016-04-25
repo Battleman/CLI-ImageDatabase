@@ -20,14 +20,18 @@ int do_create(const char* filename, struct pictdb_file* db_file)
     strncpy	(db_file -> header.db_name, CAT_TXT,  MAX_DB_NAME); //copie du nom par défaut
     (db_file -> header).db_name[MAX_DB_NAME] = '\0'; //la "string" doit se terminer par \0
 
-
-	unsigned int sum = 0;
-	sum += fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb);
-	db_file->metadata = calloc(0, sizeof(struct pict_metadata)); //pas de metadata à la création de la db
-	if(sum == 1) { //no metadata + 1 header
+	
+	if(1 == fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)) { //no metadata + 1 header
 		printf("%u item(s) written\n", sum);
 	} else {
-		return ERR_MAX_FILES; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore
+		return ERR_IO; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore (??!)
 	}
+	
+	int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES;
+	
+	if (NULL == db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata))){
+		return  ERR_OUT_OF_MEMORY;
+	}
+	
     return 0; //no error;
 }
