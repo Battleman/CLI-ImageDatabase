@@ -1,4 +1,6 @@
 CFLAGS += -std=c99 -lssl -lcrypto
+CFLAGS += $$(pkg-config vips --cflags)
+LDLIBS += $$(pkg-config vips --libs) -lm
 
 all: pictDBM
 
@@ -8,10 +10,10 @@ db_create.o: db_create.c pictDB.h
 db_utils.o: db_utils.c pictDB.h error.h
 db_delete.o: db_delete.c pictDB.h error.h
 pictDBM.o: pictDBM.c pictDB.h error.h
- 
+
 
 pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o
-	gcc -g -o $@ $^ $(CFLAGS)	
+	gcc -g -o $@ $^ $(CFLAGS) $(LDLIBS)
 	
 #afew scripts to facilitate cleaning and purging#
 #################################################

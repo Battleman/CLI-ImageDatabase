@@ -9,6 +9,7 @@
  */
 
 #include "pictDB.h"
+#include <vips/vips.h> // for obvious reasons ;-)
 
 #include <stdlib.h>
 #include <string.h>
@@ -118,7 +119,10 @@ int main (int argc, char* argv[])
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
             } else {
+				VIPS_INIT(argv[0]);
                 ret = do_create_cmd(argv[1]);
+                    vips_shutdown();
+
             }
         } else if (!strcmp("delete", argv[0])) {
             if (argc < 3) {
