@@ -33,7 +33,7 @@
 /* constraints */
 #define MAX_DB_NAME 31  // max. size of a PictDB name
 #define MAX_PIC_ID 127  // max. size of a picture id
-#define MAX_MAX_FILES 10  // will be increased later in the project
+#define MAX_MAX_FILES 100000  // max. size of the db
 
 /* For is_valid in pictdb_metadata */
 #define EMPTY 0
@@ -106,7 +106,7 @@ void do_list(struct pictdb_file* myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-int do_create(const char* filename, struct pictdb_file* db_file);
+int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t thumb_res, uint16_t small_res);
 
 /**
  * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)

@@ -72,15 +72,24 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     if((db_file -> fpdb = fopen(filename, mode)) == NULL) {	
         return ERR_FILE_NOT_FOUND;
     } 
+    
 	if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
-		return   ERR_IO;
+		return ERR_IO;
 	} 
-	if(NULL == (db_file->metadata = calloc(db_file->header.num_files, sizeof(struct pict_metadata)))){
+	
+	int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES;
+	
+	if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))){
 		return  ERR_OUT_OF_MEMORY;
 	} 
-	int read_struct = 0; struct pict_metadata temp;
-	while(read_struct < db_file->header.num_files) {
-		if(1 != fread(&temp, sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
+	
+	int read_struct = 0; 
+	struct pict_metadata temp;
+	while(read_struct < db_file -> header.max_files) {
+		if(1 == fread(&temp, sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
+			db_file -> metadata[read_struct] = temp;
+			++read_struct;
+		} else {
 			return ERR_IO;
 		}
 	}

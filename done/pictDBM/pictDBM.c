@@ -15,10 +15,26 @@
 #include <string.h>
 
 /********************************************************************//**
+ * Definition of the types allowing us to modularise the main.
+ ********************************************************************** */
+
+#define NB_COMMANDS 4
+
+typedef int (*command)(int args, char *argv[]);
+
+typedef struct {
+	const char* name;
+	command cmd;
+} command_mapping;
+
+command_mapping commands[NB_COMMANDS] = {command_mapping{"list", do_list_cmd}, command_mapping{"create", do_create_cmd},
+	command_mapping{"help", help}, command_mapping{"delete", do_delete_cmd}};
+
+/********************************************************************//**
  * Opens pictDB file and calls do_list command.
  ********************************************************************** */
 int
-do_list_cmd (const char* filename)
+do_list_cmd (int args, char *argv[])
 {
     struct pictdb_file myfile;
 
@@ -34,7 +50,7 @@ do_list_cmd (const char* filename)
  * Prepares and calls do_create command.
 ********************************************************************** */
 int
-do_create_cmd (const char* filename)
+do_create_cmd (int args, char *argv[])
 {
     // This will later come from the parsing of command line arguments
     const uint32_t max_files =  10;
@@ -65,12 +81,22 @@ do_create_cmd (const char* filename)
  * Displays some explanations.
  ********************************************************************** */
 int
-help (void)
+help (int args, char *argv[])
 {
     printf("pictDBM [COMMAND] [ARGUMENTS]\n");
     printf("\thelp: displays this help.\n");
     printf("\tlist <dbfilename>: list pictDB content.\n");
-    printf("\tcreate <dbfilename>: create a new pictDB.\n");
+    printf("\tcreate <dbfilename> [options]: create a new pictDB.\n");
+    printf("\t\t\toptions are:\n");
+    printf("\t\t\t\t\t-max_files <MAX_FILES>: maximum number of files.\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
+    printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\default value is 64x64n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\maximum value is 128x128n");
+    printf("\t\t\t\t\t\-small_res <X_RES> <Y_RES>: resolution for small images.n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
@@ -79,7 +105,7 @@ help (void)
  * Deletes a picture from the database.
  ********************************************************************* */
 int
-do_delete_cmd (const char* filename, const char* pictID)
+do_delete_cmd (int args, char *argv[])
 {
     if(strlen(pictID) > MAX_PIC_ID || strlen(pictID) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
@@ -110,7 +136,27 @@ int main (int argc, char* argv[])
         char* filename = argv[0];
         argc--;
         argv++; // skips command call name
-        if (!strcmp("list", argv[0])) {
+        
+        int index = 0, valid = 0;
+        
+        do {
+			if(!strcmp(commands[index] -> name, argv[0])){
+				if (argc < 2) {
+					ret = ERR_NOT_ENOUGH_ARGUMENTS;
+				} else {
+					ret = commands[index] -> cmd(argc, argv);
+				}
+				valid = 1;
+			} else {
+				++index;
+			}
+		} while(index < NB_COMMANDS && valid == 0);
+		
+		if(valid == 0){
+			ret = ERR_INVALID_COMMAND;
+		}
+        
+        /*if (!strcmp("list", argv[0])) {
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
             } else {
@@ -134,7 +180,7 @@ int main (int argc, char* argv[])
             ret = help();
         } else {
             ret = ERR_INVALID_COMMAND;
-        }
+        }*/
     }
 
     if (ret) {
