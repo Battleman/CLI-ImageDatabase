@@ -120,16 +120,9 @@ int main (int argc, char* argv[])
             if (argc < 2) {
                 ret = ERR_NOT_ENOUGH_ARGUMENTS;
             } else {
-<<<<<<< HEAD
-				VIPS_INIT(argv[0]);
-                ret = do_create_cmd(argv[1]);
-                    vips_shutdown();
-
-=======
 				VIPS_INIT(filename);
 				ret = do_create_cmd(argv[1]);
 				vips_shutdown();
->>>>>>> develop
             }
         } else if (!strcmp("delete", argv[0])) {
             if (argc < 3) {
