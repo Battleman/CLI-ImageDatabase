@@ -106,7 +106,7 @@ void do_list(struct pictdb_file* myfile);
  *
  * @param db_file In memory structure with header and metadata.
  */
-int do_create(const char* filename, struct pictdb_file* db_file);
+int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t thumb_res, uint16_t small_res);
 
 /**
  * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)
