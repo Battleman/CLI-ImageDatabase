@@ -10,10 +10,13 @@ static int modify_header(FILE* fpdb, struct pictdb_header* header);
 
 int do_delete(const char* pic_name, struct pictdb_file* file)
 {
-    int err = modify_reference(pic_name, file -> fpdb, file -> metadata);
-    if(err == 0) {
-        err = modify_header(file -> fpdb, &file -> header);
-    }
+    int err = 0;
+    if(file->header.num_files > 0) { //éviter des calculs si la base est vide
+		err = modify_reference(pic_name, file -> fpdb, file -> metadata);
+		if(err == 0) {
+			err = modify_header(file -> fpdb, &file -> header);
+		}
+	}
     return err;
 }
 
