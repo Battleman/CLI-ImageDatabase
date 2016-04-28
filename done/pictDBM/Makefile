@@ -31,6 +31,7 @@ clean:
 #ready to be graded.
 mrproper : clean
 	rm -rf $(EXEC)
+	rm *~
 	rm *.pictdb_static
 	rm -rf done/pictDBM/html #doxygen
 	rm -rf done/pictDBM/latex #doxygen

@@ -41,8 +41,8 @@ do_list_cmd (int args, char *argv[])
     int fail = do_open(filename, "rb", &myfile);
     if(fail == 0) {
         do_list(&myfile);
-        do_close(&myfile);
     }
+    do_close(&myfile);
     return fail;
 }
 
@@ -66,7 +66,7 @@ do_create_cmd (int args, char *argv[])
     int errcode = 0;
     myfile.fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
     if(myfile.fpdb == NULL) {
-        errcode = ERR_FILE_NOT_FOUND;
+        errcode = ERR_IO;
 	} else {
 		errcode = do_create(filename, &myfile);
 		if(errcode == 0) {
