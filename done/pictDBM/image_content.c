@@ -2,55 +2,24 @@
 #include "pictDB.h"
 #include "image_content.h"
 
-int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_new);
-int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset);
-
-int lazily_resize(int res, struct pictdb_file* file, size_t index){
-	size_t size = 0, offset = 0, size = 0;
-	
-	if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || file == NULL || index < 0 || index > (file -> header.max_files)){
-		return ERR_INVALID_ARGUMENT;
-	}
-	
-	if(file -> metadata[index].size[res] != 0){
-		return 0;
-	} else {
-		int valid = create_derivative(file -> fpdb, &file -> metadata[index], res, &size);
-		if(valid != ERR_IO){
-			return update_file(file, res, index, size, offset, valid);
-		}
-		return valid ? update_file(file, res, index, size, offset) : ERR_IO;
-	}
-}
-
-int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset){
+static int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset){
 	struct pictdb_header header = file -> header;
 	header.db_version++;
 	struct pict_metadata metadata = file -> metadata[index];
-	metadata.size[res] = size;
-	metadata.offset[res] = deriv_offset;
-	
+	metadata.size[res] = size; //taille de l'image redimensionnée
+	metadata.offset[res] = deriv_offset; //la distance depuis le début du fichier 
 	
 	int valid = 1;
 	
-	rewind(file -> fpdb);
-	valid &= fwrite(&header, sizeof(struct pictdb_header), 1, file -> fpdb);
-	fseek(file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR);
-	valid &= fwrite(&metadata, sizeof(struct pict_metadata), 1, file -> fpdb);
+	rewind(file -> fpdb); //retour au début pour se positionner sur le header
+	valid &= fwrite(&header, sizeof(struct pictdb_header), 1, file -> fpdb); //réecriture du header
+	fseek(file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR); //déplacement à la bonne metadata
+	valid &= fwrite(&metadata, sizeof(struct pict_metadata), 1, file -> fpdb); //overwrite de la metadata
 	
 	return valid ? 1 : ERR_IO;
 }
 
-/**
- * @brief Computes the shrinking factor (keeping aspect ratio)
- *	
- * @author J.-C. Chappelier
- * 
- * @param image The image to be resized.
- * @param max_thumbnail_width The maximum width allowed for thumbnail creation.
- * @param max_thumbnail_height The maximum height allowed for thumbnail creation.
- */
-double
+static double
 shrink_value(VipsImage *image, int max_thumb_width, int max_thumb_height)
 {
     const double h_shrink = (double) max_thumb_width  / (double) image->Xsize ;
@@ -58,7 +27,7 @@ shrink_value(VipsImage *image, int max_thumb_width, int max_thumb_height)
     return h_shrink > v_shrink ? v_shrink : h_shrink ;
 }
 
-long create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_new) {
+static long create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_new) {
 	fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 	
 	/*Déclarations*/
@@ -88,4 +57,21 @@ long create_derivative(FILE* file, struct pictdb_header* header, struct pict_met
 		return curr_pos;
 	}
 	return ERR_IO; //sinon erreur
+}
+
+int lazily_resize(int res, struct pictdb_file* file, size_t index){
+	size_t size = 0, offset = 0, size = 0;
+	
+	
+	/*Vérification des input*/
+	if(res == RES_ORIG || file -> metadata[index].size[res] != 0){//on ne fait rien si l'image a déjà été resized ou si on veut la resize à l'origine
+		return 0;
+	}
+	if((res != RES_SMALL && res != RES_THUMB) || file == NULL || index < 0 || index > (file -> header.max_files)){
+		return ERR_INVALID_ARGUMENT;
+	}
+
+	int valid = create_derivative(file -> fpdb, &file -> metadata[index], res, &size); //size est modifié
+	return valid ? update_file(file, res, index, size, offset) : ERR_IO;
+	
 }

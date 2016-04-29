@@ -14,7 +14,7 @@ pictDBM.o: pictDBM.c pictDB.h error.h
 image_content.o : image_content.c image_content.h pictDB.h error.h 
 
 pictDBM: pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o image_content.o
-	gcc -g -o $@ $^ $(CFLAGS) $(LDLIBS)
+	#gcc -g -o $@ $^ $(CFLAGS) $(LDLIBS)
 
 	
 #afew scripts to facilitate cleaning and purging#
