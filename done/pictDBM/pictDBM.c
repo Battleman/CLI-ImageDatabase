@@ -85,8 +85,8 @@ help (int args, char *argv[])
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
     printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\default value is 64x64n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\maximum value is 128x128n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128n");
     printf("\t\t\t\t\t\-small_res <X_RES> <Y_RES>: resolution for small images.n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");

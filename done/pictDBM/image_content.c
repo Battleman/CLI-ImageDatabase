@@ -55,7 +55,7 @@ shrink_value(VipsImage *image, int max_thumb_width, int max_thumb_height)
     return h_shrink > v_shrink ? v_shrink : h_shrink ;
 }
 
-int create_derivative(FILE* file, struct pict_metadata* meta, int res) {
+long create_derivative(FILE* file, struct pict_metadata* meta, int res) {
 	fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 	VipsImage* original;
 	size_t size_of_orig= sizeof(meta->size[RES_ORIG]);
@@ -75,7 +75,10 @@ int create_derivative(FILE* file, struct pict_metadata* meta, int res) {
 	if(0 != vips_jpegsave_buffer(original, &buffer, &size_of_new, NULL)) {
 		return ERR_VIPS;
 	}
-	fseek(file, meta->offset[res], SEEK_SET);
-	fwrite(buffer, size_of_new, 1, file);
-	return 0;
+	fseek(file, 0, SEEK_END);
+	long curr_pos = ftell(file);
+	if(1 == fwrite(buffer, size_of_new, 1, file)) {
+		return curr_pos;
+	}
+	return ERR_IO;
 }
