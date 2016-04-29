@@ -63,16 +63,9 @@ do_create_cmd (int args, char *argv[])
         "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
     };
     
-    int errcode = 0;
-    myfile.fpdb = fopen(filename, "wb"); //n'est pas remplacé par do_open, car la lecture du fichier qu'on crée ne nous intéresse pas
-    if(myfile.fpdb == NULL) {
-        errcode = ERR_IO;
-	} else {
-		errcode = do_create(filename, &myfile);
-		if(errcode == 0) {
-			print_header(&myfile.header);
-		}
-		do_close(&myfile);
+    int errcode = do_create(filename, &myfile);
+	if(errcode == 0) {
+		print_header(&myfile.header);
 	}
 	return errcode;
 }

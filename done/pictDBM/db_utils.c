@@ -70,7 +70,7 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
     
     if((db_file -> fpdb = fopen(filename, mode)) == NULL) {	
-        return ERR_FILE_NOT_FOUND;
+        return ERR_IO;
     } 
     
 	if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
