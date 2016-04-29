@@ -52,18 +52,50 @@ do_list_cmd (int args, char *argv[])
 int
 do_create_cmd (int args, char *argv[])
 {
-    // This will later come from the parsing of command line arguments
-    const uint32_t max_files =  10;
-    const uint16_t thumb_res =  64;
-    const uint16_t small_res = 256;
+    // This will later come from the parsing of command line arguments 
+    uint32_t max_files = 10;
+    uint16_t thumb_res_X = thumb_res_Y = 64;
+    uint16_t small_res_X = small_res_Y = 256;
 
     puts("Create");
     struct pictdb_file myfile;
-    myfile.header = (struct pictdb_header) {
-        "", 0, 0, max_files, {thumb_res, thumb_res, small_res, small_res}, 0, 0
-    };
     
-    int errcode = do_create(filename, &myfile);
+	char* filename = argv[0];
+	argc--; argv++;
+	
+	while(argc != 0){
+		if(strcmp("-max_files", argv[0])){
+			if(argc > 1){
+				max_files = (argv[1] < MAX_MAX_FILES) ? atouint32(argv[1]) : MAX_MAX_FILES;
+				argc -= 2;
+				argv += 2;
+			} else {
+				return ERR_NOT_ENOUGH_ARGUMENTS;
+			}
+		} else if(strcmp("-thumb_res", argv[0])){
+			if(argc > 3){
+				thumb_res_X = (argv[1] < thumb_res_X) ? atouint12(argv[1]) : MAX_THUMB_SIZE;
+				thumb_res_Y = (argv[1] < thumb_res_Y) ? atouint12(argv[2]) : MAX_THUMB_SIZE;
+				argc -= 3;
+				argv += 3;
+			} else {
+				return ERR_NOT_ENOUGH_ARGUMENTS;
+			}
+		} else if(strcmp("-small_res", argv[0])){
+			if(argc > 3){
+				small_res_X = (argv[1] < small_res_X) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
+				small_res_Y = (argv[1] < small_res_Y) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
+				argc -= 3;
+				argv += 3;
+			} else {
+				return ERR_NOT_ENOUGH_ARGUMENTS;
+			}
+		} else {
+			return ERR_INVALID_;
+		}
+	}
+	
+    int errcode = do_create(filename, &myfile, max_files, thumb_res_X, thumb_res_Y, small_res_X, small_res_Y);
 	if(errcode == 0) {
 		print_header(&myfile.header);
 	}
