@@ -6,7 +6,7 @@ int create_derivative(FILE* file, struct pict_metadata* meta, int res);
 int update_file(struct pictdb_file* file, int res, size_t index, size_t size, size_t offset);
 
 int lazily_resize(int res, struct pictdb_file* file, size_t index){
-	size_t size = 0, offset = 0;
+	size_t size = 0, offset = 0, new_size = 0;
 	
 	if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || file == NULL || index < 0 || index > (file -> header.max_files)){
 		return ERR_INVALID_ARGUMENT;
@@ -15,7 +15,7 @@ int lazily_resize(int res, struct pictdb_file* file, size_t index){
 	if(file -> metadata[index].size[res] != 0){
 		return 0;
 	} else {
-		int valid = create_derivative(file -> fpdb, &file -> metadata[index], res);
+		int valid = create_derivative(file -> fpdb, &file -> metadata[index], res, &new_size);
 		return valid ? update_file(file, res, index, size, offset) : ERR_IO;
 	}
 }
@@ -55,13 +55,13 @@ shrink_value(VipsImage *image, int max_thumb_width, int max_thumb_height)
     return h_shrink > v_shrink ? v_shrink : h_shrink ;
 }
 
-long create_derivative(FILE* file, struct pict_metadata* meta, int res) {
+long create_derivative(FILE* file, struct pict_metadata* meta, int res, size_t* size_new) {
 	fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 	VipsImage* original;
-	size_t size_of_orig= sizeof(meta->size[RES_ORIG]);
+	size_t size= sizeof(meta->size[RES_ORIG]);
 	void* buffer = NULL;
 	fread(buffer, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
-	if(0 != vips_jpegload_buffer(buffer, size_of_orig, &original, NULL)) {
+	if(0 != vips_jpegload_buffer(buffer, size, &original, NULL)) {
 		return ERR_VIPS;
 	} 
 	//maintenant l'image est lue à travers un buffer, alors on la travaille
@@ -70,11 +70,11 @@ long create_derivative(FILE* file, struct pict_metadata* meta, int res) {
     double ratio = shrink_value(original, meta->size[res], meta->size[res]);
 	
 	vips_resize(original, &small[0], ratio, NULL);
-	//la VIpsimage est modifiée, on l'écrit
-	size_t size_of_new = sizeof(meta->size[res]);
-	if(0 != vips_jpegsave_buffer(original, &buffer, &size_of_new, NULL)) {
+	//la Vipsimage est modifiée, on l'écrit
+	if(0 != vips_jpegsave_buffer(original, &buffer, &size_of_new, NULL)) { //size contient maintenant la taille de la petite image
 		return ERR_VIPS;
 	}
+	*size_new = size; //on renvoie la nouvelle taille pour la mise à jour
 	fseek(file, 0, SEEK_END);
 	long curr_pos = ftell(file);
 	if(1 == fwrite(buffer, size_of_new, 1, file)) {
