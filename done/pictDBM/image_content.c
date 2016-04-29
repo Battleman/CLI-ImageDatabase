@@ -2,11 +2,11 @@
 #include "pictDB.h"
 #include "image_content.h"
 
-int create_derivative(FILE* file, struct pict_metadata* meta, int res);
-int update_file(struct pictdb_file* file, int res, size_t index, size_t size, size_t offset);
+int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res);
+int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset);
 
 int lazily_resize(int res, struct pictdb_file* file, size_t index){
-	size_t size = 0, offset = 0;
+	size_t size = 0;
 	
 	if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || file == NULL || index < 0 || index > (file -> header.max_files)){
 		return ERR_INVALID_ARGUMENT;
@@ -16,16 +16,19 @@ int lazily_resize(int res, struct pictdb_file* file, size_t index){
 		return 0;
 	} else {
 		int valid = create_derivative(file -> fpdb, &file -> metadata[index], res);
+		if(valid != ERR_IO){
+			return update_file(file, res, index, size, offset, valid);
+		}
 		return valid ? update_file(file, res, index, size, offset) : ERR_IO;
 	}
 }
 
-int update_file(struct pictdb_file* file, int res, size_t index, size_t size, size_t offset){
+int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset){
 	struct pictdb_header header = file -> header;
 	header.db_version++;
 	struct pict_metadata metadata = file -> metadata[index];
 	metadata.size[res] = size;
-	metadata.offset[res] = offset;
+	metadata.offset[res] = deriv_offset;
 	
 	
 	int valid = 1;
@@ -55,10 +58,10 @@ shrink_value(VipsImage *image, int max_thumb_width, int max_thumb_height)
     return h_shrink > v_shrink ? v_shrink : h_shrink ;
 }
 
-long create_derivative(FILE* file, struct pict_metadata* meta, int res) {
+long create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res) {
 	fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 	VipsImage* original;
-	size_t size_of_orig= sizeof(meta->size[RES_ORIG]);
+	size_t size_of_orig= sizeof(meta -> size[RES_ORIG]);
 	void* buffer = NULL;
 	fread(buffer, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
 	if(0 != vips_jpegload_buffer(buffer, size_of_orig, &original, NULL)) {
@@ -67,11 +70,11 @@ long create_derivative(FILE* file, struct pict_metadata* meta, int res) {
 	//maintenant l'image est lue à travers un buffer, alors on la travaille
     VipsObject* process = VIPS_OBJECT( vips_image_new() );
     VipsImage** small = (VipsImage**) vips_object_local_array( process, 1 );
-    double ratio = shrink_value(original, meta->size[res], meta->size[res]);
+    double ratio = shrink_value(original, header -> res_resized[2*res], header -> res_resized[2*res + 1]);
 	
 	vips_resize(original, &small[0], ratio, NULL);
 	//la VIpsimage est modifiée, on l'écrit
-	size_t size_of_new = sizeof(meta->size[res]);
+	size_t size_of_new = sizeof(header -> size[res]);
 	if(0 != vips_jpegsave_buffer(original, &buffer, &size_of_new, NULL)) {
 		return ERR_VIPS;
 	}
