@@ -17,6 +17,12 @@
 int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t[] thumb_res, uint16_t[] small_res)
 {
     pictdb_header header = db_file -> header;
+    db_file -> fpdb = fopen(filename, "wb");
+    int errcode = 0;
+    
+    if(NULL == db_file -> fpdb){
+		return ERR_IO;
+	}
     
     //initialisation des valeurs par défaut
     strncpy	(header.db_name, CAT_TXT,  MAX_DB_NAME); //copie du nom par défaut
@@ -31,12 +37,14 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
 	if(1 == fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)) {
 		printf("%u item(s) written\n", sum);
 	} else {
-		return ERR_IO; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore (??!)
+		errcode = ERR_IO; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore (??!)
 	}
 	
-	if (NULL == db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata))){
-		return  ERR_OUT_OF_MEMORY;
+	if (errcode == 0 && NULL == db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata))){
+		errcode = ERR_OUT_OF_MEMORY;
 	}
 	
-    return 0; //no error;
+	do_close(db_file);
+	
+    return errcode; // retourne l'erreur;
 }
