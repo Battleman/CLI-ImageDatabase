@@ -100,7 +100,9 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 
 void do_close(struct pictdb_file* db_file)
 {
-    if((db_file == NULL) || (0 != fclose(db_file -> fpdb))) {
+    if(db_file == NULL) {
         fprintf(stderr, "ERR: impossible de fermer un fichier (null ou non-ouvert)");
-    }
+    } else {
+		fclose(db_file -> fpdb);
+	}
 }

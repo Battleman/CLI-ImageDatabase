@@ -97,7 +97,7 @@ void print_metadata (const struct pict_metadata* metadata);
  * @param myfile In memory structure with header and metadata.
  */
 
-void do_list(struct pictdb_file* myfile);
+void do_list(const struct pictdb_file* myfile);
 
 
 /**
