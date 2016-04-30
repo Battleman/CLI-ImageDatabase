@@ -9,8 +9,8 @@
  */
 
 #include "pictDB.h"
+#include "image_content.h"
 #include <vips/vips.h> // for obvious reasons ;-)
-
 #include <stdlib.h>
 #include <string.h>
 #include "pictDBM_tools.h"
@@ -28,6 +28,7 @@ do_list_cmd (int argc, char *argv[])
         fail = do_open(argv[0], "rb", &myfile);
         if(fail == 0) {
             do_list(&myfile);
+            lazily_resize(RES_SMALL, &myfile, 1);
         }
         do_close(&myfile);
     }

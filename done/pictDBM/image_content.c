@@ -34,29 +34,30 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 
     /*Déclarations*/
-    VipsImage* original;
+    VipsObject* process = VIPS_OBJECT( vips_image_new() );
+    VipsImage** curr_image = (VipsImage**) vips_object_local_array( process, 1 );
     size_t size_of_orig = sizeof(meta -> size[RES_ORIG]);
-    void* buffer1 = malloc(size_of_orig);
-	void* buffer2 = NULL;
-    fread(buffer1, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
-    if(0 != vips_jpegload_buffer(buffer1, size_of_orig, &original, NULL)) {
+    void* buffer_lect = malloc(size_of_orig);
+	void** buffer_writ = NULL;
+	
+	/*Lecture de l'image vers le buffer de lecture*/
+    fread(buffer_lect, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
+    if(0 != vips_jpegload_buffer(buffer_lect, size_of_orig, curr_image, NULL)) {
         return ERR_VIPS;
     }
 
     /*maintenant l'image est lue à travers un buffer, alors on la travaille*/
-    VipsObject* process = VIPS_OBJECT( vips_image_new() );
-    VipsImage** small = (VipsImage**) vips_object_local_array( process, 1 );
-    double ratio = shrink_value(original, header -> res_resized[2*res], header -> res_resized[2*res + 1]);
-    vips_resize(original, &small[0], ratio, NULL);
+     double ratio = shrink_value(curr_image, header -> res_resized[2*res], header -> res_resized[2*res + 1]);
+    vips_resize(curr_image, &curr_image[0], ratio, NULL);
 
     /*la Vipsimage est modifiée, on l'écrit*/
-    if(0 != vips_jpegsave_buffer(original, &buffer2, size_of_new, NULL)) { //size contient maintenant la taille de la petite image
+    if(0 != vips_jpegsave_buffer(curr_image, &buffer_writ, size_of_new, NULL)) { //size contient maintenant la taille de la petite image
         return ERR_VIPS;
     }
-    free(buffer1);
+    free(buffer_lect);
     fseek(file, 0, SEEK_END); //déplacement en fin de fichier, pour écrire l'image redimensionnée
     uint64_t curr_pos = ftell(file); //getter de la position, pour l'écrire plus tard
-    if(1 == fwrite(buffer2, *size_of_new, 1, file)) { //si l'écriture a réussi, on peut retourner la position
+    if(1 == fwrite(buffer_writ, *size_of_new, 1, file)) { //si l'écriture a réussi, on peut retourner la position
         *offset = curr_pos;
         return 0;
     }

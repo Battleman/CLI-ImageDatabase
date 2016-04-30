@@ -17,11 +17,11 @@ db_create.o: db_create.c pictDBM_tools.h pictDB.h
 db_utils.o: db_utils.c pictDB.h error.h
 db_delete.o: db_delete.c pictDB.h error.h
 pictDBM_tools.o : pictDBM.c pictDB.h pictDB.h error.h
-pictDBM.o: pictDBM.c pictDB.h pictDBM_tools.h error.h 
+pictDBM.o: pictDBM.c pictDB.h pictDBM_tools.h image_content.h error.h
 image_content.o : image_content.c image_content.h pictDB.h error.h 
 dedup.o : dedup.c dedup.h error.h pictDB.h
 
-$(MAIN_EXEC): pictDBM.o image_content.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o
+$(MAIN_EXEC): image_content.o pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o
 
 # scripts to facilitate cleaning and purging#
 #################################################
