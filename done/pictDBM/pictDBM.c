@@ -16,23 +16,6 @@
 #include "pictDBM_tools.h"
 
 /********************************************************************//**
- * Definition of the types allowing us to modularise the main.
- ********************************************************************** */
-
-#define NB_COMMANDS 4
-
-typedef int (*command)(int args, char *argv[]);
-
-typedef struct {
-    const char* name;
-    command cmd;
-} command_mapping;
-
-command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (int (*)(int, char*))do_list_cmd}, (command_mapping){"create", (int (*)(int, char*))do_create_cmd},
-                                         (command_mapping){"help", (int (*)(int, char*))help}, (command_mapping){"delete", (int (*)(int, char*))do_delete_cmd}
-                                        };
-
-/********************************************************************//**
  * Opens pictDB file and calls do_list command.
  ********************************************************************** */
 int
@@ -153,6 +136,23 @@ do_delete_cmd (int argc, char *argv[])
     }
     return errcode;
 }
+
+/********************************************************************//**
+ * Definition of the types allowing us to modularise the main.
+ ********************************************************************** */
+
+#define NB_COMMANDS 4
+
+typedef int (*command)(int args, char *argv[]);
+
+typedef struct {
+    const char* name;
+    command cmd;
+} command_mapping;
+
+command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (int (*)(int, char*))do_list_cmd}, (command_mapping){"create", (int (*)(int, char*))do_create_cmd},
+                                         (command_mapping){"help", (int (*)(int, char*))help}, (command_mapping){"delete", (int (*)(int, char*))do_delete_cmd}
+                                        };
 
 /********************************************************************//**
  * MAIN
