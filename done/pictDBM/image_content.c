@@ -39,7 +39,7 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
     void* buffer = NULL;
 
     fread(buffer, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
-    if(0 != vips_jpegload_buffer(buffer, size, &original, NULL)) {
+    if(0 != vips_jpegload_buffer(buffer, size_of_orig, &original, NULL)) {
         return ERR_VIPS;
     }
 
@@ -50,13 +50,12 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
     vips_resize(original, &small[0], ratio, NULL);
 
     /*la Vipsimage est modifiée, on l'écrit*/
-    if(0 != vips_jpegsave_buffer(original, &buffer, &size_of_new, NULL)) { //size contient maintenant la taille de la petite image
+    if(0 != vips_jpegsave_buffer(original, &buffer, size_of_new, NULL)) { //size contient maintenant la taille de la petite image
         return ERR_VIPS;
     }
-    *size_new = size; //on renvoie la nouvelle taille pour la mise à jour
     fseek(file, 0, SEEK_END); //déplacement en fin de fichier, pour écrire l'image redimensionnée
     long curr_pos = ftell(file); //getter de la position, pour l'écrire plus tard
-    if(1 == fwrite(buffer, size_of_new, 1, file)) { //si l'écriture a réussi, on peut retourner la position
+    if(1 == fwrite(buffer, *size_of_new, 1, file)) { //si l'écriture a réussi, on peut retourner la position
         *offset = curr_pos;
         return 0;
     }
