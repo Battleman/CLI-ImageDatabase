@@ -83,31 +83,34 @@ static int update_file(struct pictdb_file* db_file, int res, size_t index, size_
 
 
     rewind(db_file -> fpdb); //retour au début pour se positionner sur le header
-    if(1 != fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) { //réecriture du header
-        return valid;
-    }
     /*Déplacement à la bonne position et overwrite de la métadonnée*/
-    if(0 != fseek(db_file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR) ||
-       1 != fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb)) { 
+    if(	1 != fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
+		0 != fseek(db_file -> fpdb, index * sizeof(struct pict_metadata), SEEK_CUR) ||
+		1 != fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb)
+	) { 
         return ERR_IO;
     }
     
     return 0;
 }
-int lazily_resize(int res, struct pictdb_file* file, size_t index)
+/**@brief Effectue un redimensionnement d'une image, l'écrit à la fin et met à jour la métadonnée et le header concernés
+ * 
+ * @param res Le code de résolution de l'image redimensionnée
+ * @param file
+ */
+int lazily_resize(int res, struct pictdb_file* db_file, size_t index)
 {
-    size_t size = 0, offset = 0, size = 0;
-
-
+    size_t size = 0, offset = 0;
+    
     /*Vérification des input*/
-    if(res == RES_ORIG || file -> metadata[index].size[res] != 0) { //on ne fait rien si l'image a déjà été resized ou si on veut la resize à l'origine
-        return 0;
-    }
-    if((res != RES_SMALL && res != RES_THUMB) || file == NULL || index < 0 || index > (file -> header.max_files)) {
+    if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || db_file == NULL || index < 0 || index > (file -> header.max_files)) {
         return ERR_INVALID_ARGUMENT;
     }
+    if(res == RES_ORIG || db_file -> metadata[index].size[res] != 0) { //on ne fait rien si l'image a déjà été resized ou si on veut la resize à l'origine
+        return 0;
+    }
 
-    int valid = create_derivative(file -> fpdb, &file -> metadata[index], res, &size); //size est modifié
-    return (valid == 0) ? update_file(file, res, index, size, offset) : valid;
+    int valid = create_derivative(db_file -> fpdb, &db_file -> metadata[index], res, &size); //size est modifié
+    return (valid == 0) ? update_file(db_file, res, index, size, offset) : valid;
 
 }
