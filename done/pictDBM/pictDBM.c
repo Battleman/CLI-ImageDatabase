@@ -36,12 +36,13 @@ command_mapping commands[NB_COMMANDS] = (command_mapping){command_mapping{"list"
  * Opens pictDB file and calls do_list command.
  ********************************************************************** */
 int
-do_list_cmd (int args, char *argv[])
+do_list_cmd (int argc, char *argv[])
 {
-    struct pictdb_file myfile;
+   int fail; 
+   struct pictdb_file myfile;
 
     if(argc > 0){
-		int fail = do_open(argv[0], "rb", &myfile);
+		fail = do_open(argv[0], "rb", &myfile);
 		if(fail == 0) {
 			do_list(&myfile);
 		}
