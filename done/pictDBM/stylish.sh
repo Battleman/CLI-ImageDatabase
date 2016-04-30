@@ -1,6 +1,6 @@
 for i in *.c
 do
-	echo -e"-----------------------\n"
+	echo -e "-----------------------\n"
 	echo "Making $i sooo stylish"
 	astyle -A8 $i
 done

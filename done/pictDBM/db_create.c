@@ -31,7 +31,7 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
 
     header.db_version = 0;
     header.num_files = 0;
-    header.db_max_files = max_files;
+    header.max_files = max_files;
 
     header.res_resized[2 * RES_THUMB] = thumb_res_X;
     header.res_resized[2 * RES_THUMB + 1] = thumb_res_Y;
@@ -39,13 +39,11 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
     header.res_resized[2 * RES_SMALL + 1] = small_res_Y;
 
     //initialisation du fichier et de la mémoire
-    if(1 == fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)) {
-        printf("%u item(s) written\n", sum);
-    } else {
+    if(1 != fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)) {
         errcode = ERR_IO; //couldn't write all the elements (or wrote too much) -> don't return 0 anymore (??!)
     }
 
-    if (errcode == 0 && NULL == db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata))) {
+    if (errcode == 0 && NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
         errcode = ERR_OUT_OF_MEMORY;
     }
 

@@ -29,7 +29,7 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
  *
  * @return 0 en cas de réussite, un code d'erreur sinon
  */
-static int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_of_new, long* offset)
+static int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_of_new, uint64_t* offset)
 {
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 
@@ -54,7 +54,7 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
         return ERR_VIPS;
     }
     fseek(file, 0, SEEK_END); //déplacement en fin de fichier, pour écrire l'image redimensionnée
-    long curr_pos = ftell(file); //getter de la position, pour l'écrire plus tard
+    uint64_t curr_pos = ftell(file); //getter de la position, pour l'écrire plus tard
     if(1 == fwrite(buffer, *size_of_new, 1, file)) { //si l'écriture a réussi, on peut retourner la position
         *offset = curr_pos;
         return 0;
@@ -72,7 +72,7 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
  *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-static int update_file(struct pictdb_file* db_file, int res, size_t index, size_t* size_resize, long* deriv_offset)
+static int update_file(struct pictdb_file* db_file, int res, size_t index, size_t* size_resize, uint64_t* deriv_offset)
 {
     struct pictdb_header header = db_file -> header;
     header.db_version++;
@@ -99,7 +99,8 @@ static int update_file(struct pictdb_file* db_file, int res, size_t index, size_
  */
 int lazily_resize(int res, struct pictdb_file* db_file, size_t index)
 {
-    size_t size = 0, offset = 0;
+    size_t size = 0;
+    uint64_t offset = 0;
 
     /*Vérification des input*/
     if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || db_file == NULL || index < 0 || index > (db_file -> header.max_files)) {
