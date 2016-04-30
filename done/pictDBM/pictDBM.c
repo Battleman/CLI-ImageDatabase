@@ -28,8 +28,8 @@ typedef struct {
     command cmd;
 } command_mapping;
 
-command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (*command)do_list_cmd}, (command_mapping){"create", (*command)do_create_cmd},
-                                         (command_mapping){"help", (*command)help}, (command_mapping){"delete", (*command)do_delete_cmd}
+command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (int (*)(int, char*))do_list_cmd}, (command_mapping){"create", (int (*)(int, char*))do_create_cmd},
+                                         (command_mapping){"help", (int (*)(int, char*))help}, (command_mapping){"delete", (int (*)(int, char*))do_delete_cmd}
                                         };
 
 /********************************************************************//**
