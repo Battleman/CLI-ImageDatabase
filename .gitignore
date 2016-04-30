@@ -86,6 +86,6 @@ Thumbs.db
 
 # Décommenter pour faire le rendu #
 ###################################
-.sh
-/astyle_orig/
+*.sh
+*/astyle_orig/
 doxyfile
