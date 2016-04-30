@@ -141,8 +141,6 @@ do_delete_cmd (int argc, char *argv[])
  * Definition of the types allowing us to modularise the main.
  ********************************************************************** */
 
-#define NB_COMMANDS 4
-
 typedef int (*command)(int args, char *argv[]);
 
 typedef struct {
@@ -150,17 +148,19 @@ typedef struct {
     command cmd;
 } command_mapping;
 
-command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (int (*)(int, char* argv[]))do_list_cmd}, 
-										 (command_mapping){"create", (int (*)(int, char* argv[]))do_create_cmd},
-                                         (command_mapping){"help", (int (*)(int, char* argv[]))help}, 
-                                         (command_mapping){"delete", (int (*)(int, char* argv[]))do_delete_cmd}
-                                        };
 
 /********************************************************************//**
  * MAIN
  */
 int main (int argc, char* argv[])
 {
+    command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
+    (command_mapping){"create", do_create_cmd},
+    (command_mapping){"help", help},
+    (command_mapping) {
+        "delete", do_delete_cmd
+    }
+                                            };
     int ret = 0;
 
     if (argc < 2) {

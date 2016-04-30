@@ -84,23 +84,23 @@ static int update_file(struct pictdb_file* db_file, int res, size_t index, size_
     rewind(db_file -> fpdb); //retour au début pour se positionner sur le header
     /*Déplacement à la bonne position et overwrite de la métadonnée*/
     if(	1 != fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb) ||
-		0 != fseek(db_file -> fpdb, index * sizeof(struct pict_metadata), SEEK_CUR) ||
-		1 != fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb)
-	) { 
+        0 != fseek(db_file -> fpdb, index * sizeof(struct pict_metadata), SEEK_CUR) ||
+        1 != fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb)
+      ) {
         return ERR_IO;
     }
-    
+
     return 0;
 }
 /**@brief Effectue un redimensionnement d'une image, l'écrit à la fin et met à jour la métadonnée et le header concernés
- * 
+ *
  * @param res Le code de résolution de l'image redimensionnée
  * @param file
  */
 int lazily_resize(int res, struct pictdb_file* db_file, size_t index)
 {
     size_t size = 0, offset = 0;
-    
+
     /*Vérification des input*/
     if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || db_file == NULL || index < 0 || index > (db_file -> header.max_files)) {
         return ERR_INVALID_ARGUMENT;

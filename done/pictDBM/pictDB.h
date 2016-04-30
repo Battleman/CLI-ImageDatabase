@@ -47,6 +47,9 @@
 #define RES_ORIG  2
 #define NB_RES    3
 
+/*Amount of defined commands*/
+#define NB_COMMANDS 4
+
 #ifdef __cplusplus
 extern "C" {
 #endif
