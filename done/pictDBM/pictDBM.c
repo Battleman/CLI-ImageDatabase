@@ -46,7 +46,7 @@ do_create_cmd (int argc, char *argv[])
 
     puts("Create");
     struct pictdb_file myfile;
-	
+
     //argv = "filename"
     const char* filename = argv[0];
     argc--;
@@ -169,19 +169,19 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-         
+
         argc--;
         argv++; // skips command call name
 
         int index = 0, valid = 0;
-		
+
         do {
             if(!strcmp(commands[index].name, argv[0])) {
                 if (argc < 1) { //au moins 1, pour help
                     ret = ERR_NOT_ENOUGH_ARGUMENTS;
                 } else {
-					argc--;
-					argv++;
+                    argc--;
+                    argv++;
                     ret = commands[index].cmd(argc, argv);
                 }
                 valid = 1;

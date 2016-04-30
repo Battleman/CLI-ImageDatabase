@@ -21,7 +21,7 @@
 int
 do_list_cmd (int argc, char *argv[])
 {
-    int fail;
+    int fail = 1;
     struct pictdb_file myfile;
 
     if(argc > 0) {
@@ -40,15 +40,15 @@ do_list_cmd (int argc, char *argv[])
 int
 do_create_cmd (int argc, char *argv[])
 {
-    // This will later come from the parsing of command line arguments
     uint32_t max_files = 10;
     uint16_t thumb_res_X = 64, thumb_res_Y = 64;
     uint16_t small_res_X = 256, small_res_Y = 256;
 
     puts("Create");
     struct pictdb_file myfile;
-
-    char* filename = argv[0];
+	
+    //argv = "filename"
+    const char* filename = argv[0];
     argc--;
     argv++;
 
@@ -154,13 +154,14 @@ typedef struct {
  */
 int main (int argc, char* argv[])
 {
-	command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd}, 
-										 (command_mapping){"create", do_create_cmd},
-                                         (command_mapping){"help", help}, 
-                                         (command_mapping){"delete", do_delete_cmd}
-                                        };
+    command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
+    (command_mapping){"create", do_create_cmd},
+    (command_mapping){"help", help},
+    (command_mapping) {
+        "delete", do_delete_cmd
+    }
+                                            };
     int ret = 0;
-
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
     } else {
@@ -168,17 +169,19 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-        char* filename = argv[0];
+         
         argc--;
         argv++; // skips command call name
 
         int index = 0, valid = 0;
-
+		
         do {
             if(!strcmp(commands[index].name, argv[0])) {
-                if (argc < 2) {
+                if (argc < 1) { //au moins 1, pour help
                     ret = ERR_NOT_ENOUGH_ARGUMENTS;
                 } else {
+					argc--;
+					argv++;
                     ret = commands[index].cmd(argc, argv);
                 }
                 valid = 1;
@@ -196,6 +199,5 @@ int main (int argc, char* argv[])
         fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
         (void)help(argc, argv);
     }
-
     return ret;
 }

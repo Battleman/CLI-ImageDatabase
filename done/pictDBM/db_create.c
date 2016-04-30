@@ -37,7 +37,7 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
     header.res_resized[2 * RES_THUMB + 1] = thumb_res_Y;
     header.res_resized[2 * RES_SMALL] = small_res_X;
     header.res_resized[2 * RES_SMALL + 1] = small_res_Y;
-    
+
     db_file -> header = header;
 
     //initialisation du fichier et de la mémoire
