@@ -63,23 +63,25 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
     return ERR_IO; //sinon erreur
 }
 
-/**
+/**@brief mise à jour de la métadonnée concernée et du header (overwrite des deux)
+ * 
+ * @param db_file la base de donnée 
  * 
  */
-static int update_file(struct pictdb_file* file, int res, size_t index, size_t size, long deriv_offset)
+static int update_file(struct pictdb_file* db_file, int res, size_t index, size_t size, long deriv_offset)
 {
-    struct pictdb_header header = file -> header;
+    struct pictdb_header header = db_file -> header;
     header.db_version++;
-    struct pict_metadata metadata = file -> metadata[index];
+    struct pict_metadata metadata = db_file -> metadata[index];
     metadata.size[res] = size; //taille de l'image redimensionnée
     metadata.offset[res] = deriv_offset; //la distance depuis le début du fichier
 
     int valid = 1;
 
-    rewind(file -> fpdb); //retour au début pour se positionner sur le header
-    valid &= fwrite(&header, sizeof(struct pictdb_header), 1, file -> fpdb); //réecriture du header
-    fseek(file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR); //déplacement à la bonne metadata
-    valid &= fwrite(&metadata, sizeof(struct pict_metadata), 1, file -> fpdb); //overwrite de la metadata
+    rewind(db_file -> fpdb); //retour au début pour se positionner sur le header
+    valid &= fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb); //réecriture du header
+    fseek(db_file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR); //déplacement à la bonne metadata
+    valid &= fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb); //overwrite de la metadata
 
     return valid ? 1 : ERR_IO;
 }
