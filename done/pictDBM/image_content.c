@@ -29,13 +29,13 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
  *
  * @return 0 en cas de réussite, un code d'erreur sinon
  */
-static int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_new, long* offset)
+static int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_of_new, long* offset)
 {
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
 
     /*Déclarations*/
     VipsImage* original;
-    size_t size = sizeof(meta -> size[RES_ORIG]);
+    size_t size_of_orig = sizeof(meta -> size[RES_ORIG]);
     void* buffer = NULL;
 
     fread(buffer, size_of_orig , 1, file); //on crée une image et on la lit, de la taille spécifiée
@@ -103,14 +103,14 @@ int lazily_resize(int res, struct pictdb_file* db_file, size_t index)
     size_t size = 0, offset = 0;
     
     /*Vérification des input*/
-    if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || db_file == NULL || index < 0 || index > (file -> header.max_files)) {
+    if((res != RES_ORIG && res != RES_SMALL && res != RES_THUMB) || db_file == NULL || index < 0 || index > (db_file -> header.max_files)) {
         return ERR_INVALID_ARGUMENT;
     }
     if(res == RES_ORIG || db_file -> metadata[index].size[res] != 0) { //on ne fait rien si l'image a déjà été resized ou si on veut la resize à l'origine
         return 0;
     }
 
-    int valid = create_derivative(db_file -> fpdb, &db_file -> metadata[index], res, &size); //size est modifié
+    int valid = create_derivative(db_file -> fpdb, db_file -> header, &db_file -> metadata[index], res, &size); //size est modifié
     return (valid == 0) ? update_file(db_file, res, index, size, offset) : valid;
 
 }
