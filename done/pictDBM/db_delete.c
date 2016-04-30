@@ -12,11 +12,11 @@ int do_delete(const char* pic_name, struct pictdb_file* file)
 {
     int err = 0;
     if(file->header.num_files > 0) { //éviter des calculs si la base est vide
-		err = modify_reference(pic_name, file -> fpdb, file -> metadata, file -> header.max_files);
-		if(err == 0) {
-			err = modify_header(file -> fpdb, &file -> header);
-		}
-	}
+        err = modify_reference(pic_name, file -> fpdb, file -> metadata, file -> header.max_files);
+        if(err == 0) {
+            err = modify_header(file -> fpdb, &file -> header);
+        }
+    }
     return err;
 }
 
@@ -51,10 +51,10 @@ static int modify_header(FILE* fpdb, struct pictdb_header* header)
     header->num_files--; //réduction du nombre de fichiers
     header->db_version++; //version suivante
     rewind(fpdb); //retour au début du fichier pour écrire sur le header
-    
-    if(1 != fwrite(header, sizeof(struct pictdb_header), 1, fpdb)){
-		return ERR_IO;
-	}
+
+    if(1 != fwrite(header, sizeof(struct pictdb_header), 1, fpdb)) {
+        return ERR_IO;
+    }
 
     return 0;
 }

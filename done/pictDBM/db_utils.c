@@ -68,33 +68,33 @@ print_metadata (const struct pict_metadata* metadata)
  */
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
-    
-    if((db_file -> fpdb = fopen(filename, mode)) == NULL) {	
+
+    if((db_file -> fpdb = fopen(filename, mode)) == NULL) {
         return ERR_IO;
-    } 
-    
-	if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
-		return ERR_IO;
-	} 
-	
-	int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES;
-	
-	if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))){
-		return  ERR_OUT_OF_MEMORY;
-	} 
-	
-	int read_struct = 0; 
-	struct pict_metadata temp;
-	while(read_struct < db_file -> header.max_files) {
-		if(1 == fread(&temp, sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
-			db_file -> metadata[read_struct] = temp;
-			++read_struct;
-		} else {
-			return ERR_IO;
-		}
-	}
-	
-    
+    }
+
+    if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
+        return ERR_IO;
+    }
+
+    int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES;
+
+    if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
+        return  ERR_OUT_OF_MEMORY;
+    }
+
+    int read_struct = 0;
+    struct pict_metadata temp;
+    while(read_struct < db_file -> header.max_files) {
+        if(1 == fread(&temp, sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
+            db_file -> metadata[read_struct] = temp;
+            ++read_struct;
+        } else {
+            return ERR_IO;
+        }
+    }
+
+
     return 0;
 }
 
@@ -103,6 +103,6 @@ void do_close(struct pictdb_file* db_file)
     if(db_file == NULL) {
         fprintf(stderr, "ERR: impossible de fermer un fichier (null ou non-ouvert)");
     } else {
-		fclose(db_file -> fpdb);
-	}
+        fclose(db_file -> fpdb);
+    }
 }
