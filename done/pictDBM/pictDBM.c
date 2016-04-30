@@ -51,7 +51,7 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-
+	
     while(argc != 0) {
         if(strcmp("-max_files", argv[0])) {
             if(argc > 1) {
@@ -169,17 +169,18 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-
+		const char* app_name = argv[0]; //pour vips
         argc--;
         argv++; // skips command call name
 
         int index = 0, valid = 0;
-
+		VIPS_INIT(app_name);
         do {
             if(!strcmp(commands[index].name, argv[0])) {
                 if (argc < 1) { //au moins 1, pour help
                     ret = ERR_NOT_ENOUGH_ARGUMENTS;
                 } else {
+					
                     argc--;
                     argv++;
                     ret = commands[index].cmd(argc, argv);
@@ -189,7 +190,7 @@ int main (int argc, char* argv[])
                 ++index;
             }
         } while(index < NB_COMMANDS && valid == 0);
-
+		vips_shutdown();
         if(valid == 0) {
             ret = ERR_INVALID_COMMAND;
         }
