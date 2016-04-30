@@ -68,9 +68,10 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
  * @param db_file la base de donnée 
  * @param res le code de la résolution de l'image redimensionnée
  * @param index L'index de la métadonnée concernée dans la base de donnée
- * @param size_resize La taille (en octet) de l'image redimensionnée en fin de fichier
- * @param deriv_offset 
+ * @param size_resize Pointeur vers la taille (en octet) de l'image redimensionnée en fin de fichier
+ * @param deriv_offset Pointeur vers distance entre le début du fichier et le début de l'image redimensionnée (offset)
  * 
+ * @
  */
 static int update_file(struct pictdb_file* db_file, int res, size_t index, size_t* size_resize, long* deriv_offset)
 {
