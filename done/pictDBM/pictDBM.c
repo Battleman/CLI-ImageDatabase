@@ -39,11 +39,13 @@ do_list_cmd (int args, char *argv[])
 {
     struct pictdb_file myfile;
 
-    int fail = do_open(filename, "rb", &myfile);
-    if(fail == 0) {
-        do_list(&myfile);
-    }
-    do_close(&myfile);
+    if(argc > 0){
+		int fail = do_open(argv[0], "rb", &myfile);
+		if(fail == 0) {
+			do_list(&myfile);
+		}
+		do_close(&myfile);
+	}
     return fail;
 }
 
