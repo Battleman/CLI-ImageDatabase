@@ -21,16 +21,16 @@
 int
 do_list_cmd (int argc, char *argv[])
 {
-   int fail; 
-   struct pictdb_file myfile;
+    int fail;
+    struct pictdb_file myfile;
 
-    if(argc > 0){
-		fail = do_open(argv[0], "rb", &myfile);
-		if(fail == 0) {
-			do_list(&myfile);
-		}
-		do_close(&myfile);
-	}
+    if(argc > 0) {
+        fail = do_open(argv[0], "rb", &myfile);
+        if(fail == 0) {
+            do_list(&myfile);
+        }
+        do_close(&myfile);
+    }
     return fail;
 }
 
@@ -121,10 +121,10 @@ help (int argc, char *argv[])
 int
 do_delete_cmd (int argc, char *argv[])
 {
-    if(argc < 2){
-		return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
-    
+    if(argc < 2) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+
     if(strlen(argv[1]) > MAX_PIC_ID || strlen(argv[1]) == 0) { //first of all, test validity
         return ERR_INVALID_PICID;
     }
@@ -151,7 +151,9 @@ typedef struct {
 } command_mapping;
 
 command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", (int (*)(int, char*))do_list_cmd}, (command_mapping){"create", (int (*)(int, char*))do_create_cmd},
-                                         (command_mapping){"help", (int (*)(int, char*))help}, (command_mapping){"delete", (int (*)(int, char*))do_delete_cmd}
+(command_mapping){"help", (int (*)(int, char*))help}, (command_mapping) {
+    "delete", (int (*)(int, char*))do_delete_cmd
+}
                                         };
 
 /********************************************************************//**

@@ -2,13 +2,13 @@
 #include "pictDB.h"
 #include "image_content.h"
 
-/**@brief Petit utilitaire pour retourner le ratio réduit d'une image 
- * 
+/**@brief Petit utilitaire pour retourner le ratio réduit d'une image
+ *
  * @param image Pointeur vers une VipsImage, pour trouver ses dimensions
  * @param max_thumb_width Largeur maximale que peut avoir l'image redimensionnée
  * @param max_thumb_height Hauteur maximale que peut avoir l'image redimensionnée
- * 
- * @return Le plus petit ratio entre une des dimension originale et sa dimension réduite 
+ *
+ * @return Le plus petit ratio entre une des dimension originale et sa dimension réduite
  */
 static double
 shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
@@ -19,16 +19,16 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
 }
 
 /**@brief Crée une version réduite d'une image, et l'écrit en fin de fichier.
- *  
+ *
  * @param file Le fichier dans lequel écrire l'image
  * @param header Le header de la base de donnée
  * @param meta La métadonnée de l'image concernée
  * @param res Le code de la résolution que doit avoir l'image redimensionnée
  * @param size_new Pointeur vers la taille qu'à la nouvelle image, pour mettre à jour la métadonnée
  * @param offset Pointeur vers taille du offset de l'image redimensionnée, pour mettre à jour la métadonnée
- * 
+ *
  * @return 0 en cas de réussite, un code d'erreur sinon
- */ 
+ */
 static int create_derivative(FILE* file, struct pictdb_header* header, struct pict_metadata* meta, int res, size_t* size_new, long* offset)
 {
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement de la tête de lecture au début de l'image concernée
@@ -64,14 +64,14 @@ static int create_derivative(FILE* file, struct pictdb_header* header, struct pi
 }
 
 /**@brief mise à jour de la métadonnée concernée et du header (overwrite des deux)
- * 
- * @param db_file la base de donnée 
+ *
+ * @param db_file la base de donnée
  * @param res le code de la résolution de l'image redimensionnée
  * @param index L'index de la métadonnée concernée dans la base de donnée
  * @param size_resize Pointeur vers la taille (en octet) de l'image redimensionnée en fin de fichier
  * @param deriv_offset Pointeur vers distance entre le début du fichier et le début de l'image redimensionnée (offset)
- * 
- * @
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
  */
 static int update_file(struct pictdb_file* db_file, int res, size_t index, size_t* size_resize, long* deriv_offset)
 {
@@ -81,14 +81,18 @@ static int update_file(struct pictdb_file* db_file, int res, size_t index, size_
     metadata.size[res] = *size_resize; //taille de l'image redimensionnée
     metadata.offset[res] = *deriv_offset; //la distance depuis le début du fichier
 
-    int valid = 1;
 
     rewind(db_file -> fpdb); //retour au début pour se positionner sur le header
-    valid &= fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb); //réecriture du header
-    fseek(db_file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR); //déplacement à la bonne metadata
-    valid &= fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb); //overwrite de la metadata
-
-    return valid ? 1 : ERR_IO;
+    if(1 != fwrite(&header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) { //réecriture du header
+        return valid;
+    }
+    /*Déplacement à la bonne position et overwrite de la métadonnée*/
+    if(0 != fseek(db_file -> fpdb, index * sizeof(struct pictdb_header), SEEK_CUR) ||
+       1 != fwrite(&metadata, sizeof(struct pict_metadata), 1, db_file -> fpdb)) { 
+        return ERR_IO;
+    }
+    
+    return 0;
 }
 int lazily_resize(int res, struct pictdb_file* file, size_t index)
 {
