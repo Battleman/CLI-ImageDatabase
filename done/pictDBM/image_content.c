@@ -109,7 +109,7 @@ int lazily_resize(int res, struct pictdb_file* db_file, size_t index)
         return 0;
     }
 
-    int valid = create_derivative(db_file -> fpdb, db_file -> header, &db_file -> metadata[index], res, &size); //size est modifié
-    return (valid == 0) ? update_file(db_file, res, index, size, offset) : valid;
+    int valid = create_derivative(db_file -> fpdb, &db_file -> header, &db_file -> metadata[index], res, &size, &offset); //size est modifié
+    return (valid == 0) ? update_file(db_file, res, index, &size, &offset) : valid;
 
 }
