@@ -85,6 +85,36 @@ void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metad
 	copy -> unused_16 = metadata -> unused_16;
 }*/
 
+int overwrite_header(FILE* file, struct pictdb_header* header){
+	int errcode = 0;
+	
+	if(file == NULL || header == NULL){
+		errcode = ERR_INVALID_ARGUMENT;
+	}
+	
+	rewind(file);
+	if(0 != errcode && 1 != fwrite(header, sizeof(struct pictdb_header), 1, file)){
+		errcode = ERROR_IO;
+	}
+	
+	return errcode;
+}
+
+int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index){
+	int errcode = 0;
+	
+	if(file == NULL || metadata == NULL){
+		errcode = ERR_INVALID_ARGUMENT;
+	}
+	
+	fseek(file, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
+	if(0 != errcode && 1 != fwrite(metadata, sizeof(struct pict_metadata), 1, file)){
+		errcode = ERROR_IO;
+	}
+	
+	return errcode;
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */
