@@ -158,6 +158,7 @@ void do_close(struct pictdb_file* db_file)
     if(db_file == NULL || db_file -> fpdb == NULL) {
         fprintf(stderr, "ERR: impossible de fermer un fichier (null ou non-ouvert)");
     } else {
+		free(db_file->metadata);
         fclose(db_file -> fpdb);
     }
 }
