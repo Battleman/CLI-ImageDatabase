@@ -106,10 +106,8 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     }
 
     int read_struct = 0;
-    struct pict_metadata temp;
-    while(read_struct < db_file -> header.max_files) {
-        if(1 == fread(&temp, sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
-            db_file -> metadata[read_struct] = temp;
+    while(read_struct < max_files) {
+        if(1 == fread(&(db_file->metadata[read_struct]), sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
             ++read_struct;
         } else {
             return ERR_IO;

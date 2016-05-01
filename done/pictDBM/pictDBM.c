@@ -185,7 +185,6 @@ int main (int argc, char* argv[])
                 if (argc < 1) { //au moins 1, pour help
                     ret = ERR_NOT_ENOUGH_ARGUMENTS;
                 } else {
-					
                     argc--;
                     argv++;
                     ret = commands[index].cmd(argc, argv);

@@ -48,7 +48,7 @@ int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index) {
 			
 		size_t size_of_orig = db_file->metadata[index].size[RES_ORIG]; //la taille à lire de l'image originale
 		//Allocations nécessaires
-		if (NULL == (size_of_small= malloc(sizeof(size_t))) || //où on aura la taille de l'image réduite
+		if (NULL == (size_of_small= malloc(sizeof(size_t))) || //ou on aura la taille de l'image réduite
 			NULL == (buffer_in = malloc(size_of_orig)) || //le buffer read l'image
 			NULL == (buffer_out = malloc(sizeof(void*)))) { //le buffer depuis lequel write l'image
 				errcode = ERR_OUT_OF_MEMORY;
@@ -82,7 +82,6 @@ int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index) {
 						if(	!fwrite(&db_file->header, sizeof(struct pictdb_header), 1, file) || 
 							fseek(file, index*sizeof(struct pict_metadata), SEEK_CUR) ||
 							!fwrite(&db_file->metadata[index], sizeof(struct pict_metadata), 1, file) ) {
-							
 							errcode = ERR_IO;
 						}
 					}	
