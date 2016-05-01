@@ -85,13 +85,8 @@ void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metad
 	copy -> unused_16 = metadata -> unused_16;
 }*/
 
-/**
- * @brief Remplacement du header (par overwrite) sur le fichier spécifié. N'influence pas la tête de lecture.
- *
- * @param file Le fichier sur lequel remplacer le header
- * @param header Le header à réécrire
- *
- * @return 0 en cas de succès, un code d'erreur sinon
+/**********************************
+ * Remplacement du header
  */
 int overwrite_header(FILE* file, struct pictdb_header* header)
 {
@@ -109,14 +104,8 @@ int overwrite_header(FILE* file, struct pictdb_header* header)
     fseek(file, backup_position, SEEK_SET); //on revient de toute manière à la position avant l'appel
     return errcode;
 }
-/**
- * @brief Remplacement d'une metadata (par overwrite) à un index spécifié sur le fichier spécifié. N'influence pas la tête de lecture.
- *
- * @param file Le fichier sur lequel remplacer la métadonnée
- * @param metadata La métadonnée à utiliser pour le remplacement
- * @param index L'index dans le fichier de la métadonnée à remplacer
- *
- * @return 0 en cas de succès, un code d'erreur sinon
+/**********************************
+ * Remplacement d'UNE métadonnée
  */
 int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
 {
@@ -141,10 +130,10 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
 
     if( (db_file -> fpdb = fopen(filename, mode)) == NULL ||
-		1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
+        1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
         return ERR_IO;
     }
-    
+
     int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES; //selectionne le min entre MAX_MAX et le max spécifié
 
     if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {

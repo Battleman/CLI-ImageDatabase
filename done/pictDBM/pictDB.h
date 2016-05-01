@@ -145,6 +145,27 @@ void do_close(struct pictdb_file* db_file);
  **/
 int do_delete(const char* picname, struct pictdb_file* file);
 
+/**
+ * @brief Remplacement du header (par overwrite) sur le fichier spécifié. N'influence pas la tête de lecture.
+ *
+ * @param file Le fichier sur lequel remplacer le header
+ * @param header Le header à réécrire
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
+ */
+int overwrite_header(FILE* file, struct pictdb_header* header);
+
+/**
+ * @brief Remplacement d'une metadata (par overwrite) à un index spécifié sur le fichier spécifié. N'influence pas la tête de lecture.
+ *
+ * @param file Le fichier sur lequel remplacer la métadonnée
+ * @param metadata La métadonnée à utiliser pour le remplacement
+ * @param index L'index dans le fichier de la métadonnée à remplacer
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
+ */
+int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index);
+
 //Ne pas prendre en compte les deux fonctions suivantes. c.f. note dans db_utils.c.
 /**
  * @brief Méthode additionnelle pour la copie profonde d'un header dans un autre.

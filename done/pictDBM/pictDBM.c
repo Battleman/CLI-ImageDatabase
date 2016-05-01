@@ -23,19 +23,23 @@ do_list_cmd (int argc, char *argv[])
 {
     int fail = 1;
     struct pictdb_file myfile;
+    struct pictdb_file myfile2;
 
     if(argc > 0) {
         fail = do_open(argv[0], "r+b", &myfile);
         if(fail == 0) {
             printf("-----------------------------\nAvant modification :\n");
             do_list(&myfile);
-            fail = lazily_resize(RES_SMALL, &myfile, 0);
+            fail = lazily_resize(RES_THUMB, &myfile, 0);
             printf("-----------------------------\nAprès modification :\n");
-            fflush(stdout);
             do_list(&myfile);
-            printf("-----------------------------\n");
+            printf("-----------------------------\nAprès Réouverture");
+            do_close(&myfile);
+            do_open(argv[0], "r+b", &myfile2);
+            do_list(&myfile2);
+            do_close(&myfile2);
         }
-        do_close(&myfile);
+        //do_close(&myfile);
     }
     return fail;
 }
