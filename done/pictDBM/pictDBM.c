@@ -27,10 +27,11 @@ do_list_cmd (int argc, char *argv[])
     if(argc > 0) {
         fail = do_open(argv[0], "r+b", &myfile);
         if(fail == 0) {
-			printf("-----------------------------\nAvant modification :\n");	
+            printf("-----------------------------\nAvant modification :\n");
             do_list(&myfile);
             fail = lazily_resize(RES_SMALL, &myfile, 0);
-            printf("-----------------------------\nAprès modification :\n"); fflush(stdout);
+            printf("-----------------------------\nAprès modification :\n");
+            fflush(stdout);
             do_list(&myfile);
             printf("-----------------------------\n");
         }
@@ -56,7 +57,7 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-	
+
     while(argc != 0) {
         if(strcmp("-max_files", argv[0])) {
             if(argc > 1) {
@@ -174,12 +175,12 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-		const char* app_name = argv[0]; //pour vips
+        const char* app_name = argv[0]; //pour vips
         argc--;
         argv++; // skips command call name
 
         int index = 0, valid = 0;
-		VIPS_INIT(app_name);
+        VIPS_INIT(app_name);
         do {
             if(!strcmp(commands[index].name, argv[0])) {
                 if (argc < 1) { //au moins 1, pour help
@@ -194,7 +195,7 @@ int main (int argc, char* argv[])
                 ++index;
             }
         } while(index < NB_COMMANDS && valid == 0);
-		vips_shutdown();
+        vips_shutdown();
         if(valid == 0) {
             ret = ERR_INVALID_COMMAND;
         }

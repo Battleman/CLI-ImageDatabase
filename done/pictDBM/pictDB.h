@@ -148,7 +148,7 @@ int do_delete(const char* picname, struct pictdb_file* file);
 //Ne pas prendre en compte les deux fonctions suivantes. c.f. note dans db_utils.c.
 /**
  * @brief Méthode additionnelle pour la copie profonde d'un header dans un autre.
- * 
+ *
  * @param copy Le header à mettre à jour
  * @param header Le header à copier
  */
@@ -156,7 +156,7 @@ int do_delete(const char* picname, struct pictdb_file* file);
 
 /**
  * @brief Méthode additionnelle pour la copie profonde d'une métadonnée dans une autre.
- * 
+ *
  * @param copy La metadata à mettre à jour
  * @param header La metadata à copier
  */

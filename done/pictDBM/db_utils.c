@@ -87,49 +87,51 @@ void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metad
 
 /**
  * @brief Remplacement du header (par overwrite) sur le fichier spécifié. N'influence pas la tête de lecture.
- * 
+ *
  * @param file Le fichier sur lequel remplacer le header
  * @param header Le header à réécrire
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-int overwrite_header(FILE* file, struct pictdb_header* header){
-	//Vérification des input
-	if(file == NULL || header == NULL){
-		return ERR_INVALID_ARGUMENT;
-	}
-	
-	long backup_position = ftell(file); //sauvegarde de la position actuelle	
-	int errcode = 0;
-	rewind(file);
-	if(1 != fwrite(header, sizeof(struct pictdb_header), 1, file)){
-		errcode = ERR_IO;
-	}
-	fseek(file, backup_position, SEEK_SET); //on revient de toute manière à la position avant l'appel
-	return errcode;
+int overwrite_header(FILE* file, struct pictdb_header* header)
+{
+    //Vérification des input
+    if(file == NULL || header == NULL) {
+        return ERR_INVALID_ARGUMENT;
+    }
+
+    long backup_position = ftell(file); //sauvegarde de la position actuelle
+    int errcode = 0;
+    rewind(file);
+    if(1 != fwrite(header, sizeof(struct pictdb_header), 1, file)) {
+        errcode = ERR_IO;
+    }
+    fseek(file, backup_position, SEEK_SET); //on revient de toute manière à la position avant l'appel
+    return errcode;
 }
 /**
  * @brief Remplacement d'une metadata (par overwrite) à un index spécifié sur le fichier spécifié. N'influence pas la tête de lecture.
- * 
+ *
  * @param file Le fichier sur lequel remplacer la métadonnée
  * @param metadata La métadonnée à utiliser pour le remplacement
  * @param index L'index dans le fichier de la métadonnée à remplacer
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index){
-	//Vérification des input
-	if(file == NULL || metadata == NULL){
-		return = ERR_INVALID_ARGUMENT;
-	}
-	int errcode = 0;
-	long backup_position = ftell(file); //sauvegarde de la position actuelle
-	fseek(file, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
-	if(0 != errcode && 1 != fwrite(metadata, sizeof(struct pict_metadata), 1, file)){
-		errcode = ERR_IO;
-	}
-	fseek(file, backup_position, SEEK_SET); //on revient à la position avant l'appel
-	return errcode;
+int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
+{
+    //Vérification des input
+    if(file == NULL || metadata == NULL) {
+        return = ERR_INVALID_ARGUMENT;
+    }
+    int errcode = 0;
+    long backup_position = ftell(file); //sauvegarde de la position actuelle
+    fseek(file, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
+    if(0 != errcode && 1 != fwrite(metadata, sizeof(struct pict_metadata), 1, file)) {
+        errcode = ERR_IO;
+    }
+    fseek(file, backup_position, SEEK_SET); //on revient à la position avant l'appel
+    return errcode;
 }
 
 /******************************************//**
