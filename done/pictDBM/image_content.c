@@ -27,6 +27,7 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
  */
 int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index) {
 	
+	/*Vérification des input*/
 	if(RES < 0 || RES >= NB_RES) {
 		return ERR_RESOLUTIONS;
 	}
