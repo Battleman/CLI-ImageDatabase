@@ -63,6 +63,27 @@ print_metadata (const struct pict_metadata* metadata)
     printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata -> res_orig[0], metadata -> res_orig[1]);
     printf("*****************************************\n");
 }
+
+void copy_header(struct pictdb_header* copy, const struct pictdb_header* header){
+	memcpy(&copy -> db_name, &header -> db_name, MAX_DB_NAME + 1);
+	memcpy(&copy -> res_resized, &header -> res_resized, 2*(NB_RES - 1));
+	copy -> db_version = header -> db_version;
+	copy -> num_files = header -> num_files;
+	copy -> max_files = header -> max_files;
+	copy -> unused_32 = header -> unused_32;
+	copy -> unused_64 = header -> unused_64;
+}
+
+void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metadata){
+	memcpy(&copy -> pict_id, &metadata -> pict_id, MAX_PIC_ID + 1);
+	memcpy(&copy -> SHA, &metadata -> SHA, SHA256_DIGEST_LENGTH);
+	memcpy(&copy -> res_orig, &metadata -> res_orig, RES_ORIG);
+	memcpy(&copy -> size, &metadata -> size, NB_RES);
+	memcpy(&copy -> offset, &metadata -> offset, NB_RES);
+	copy -> is_valid = header -> is_valid;
+	copy -> unused_16 = header -> unused_16;
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */

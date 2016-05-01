@@ -74,7 +74,9 @@ int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index) {
 						header.db_version++;
 						rewind(file);
 						fwrite(&header, sizeof(struct pictdb_header), 1, file);
+						copy_header(&db_file -> header, header);
 						fseek(file, index*sizeof(struct pict_metadata), SEEK_CUR);
+						copy_metadata(&db_file->metadata[index], meta);
 						fwrite(&meta, sizeof(struct pict_metadata), 1, file);
 					}	
 				}
