@@ -1,3 +1,3 @@
 #include "pictDB.h"
 
-int lazily_resize(int res, struct pictdb_file* file, size_t index);
+int lazily_resize(const int res, struct pictdb_file* file, size_t index);
