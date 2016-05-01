@@ -122,7 +122,7 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
 {
     //Vérification des input
     if(file == NULL || metadata == NULL) {
-        return = ERR_INVALID_ARGUMENT;
+        return ERR_INVALID_ARGUMENT;
     }
     int errcode = 0;
     long backup_position = ftell(file); //sauvegarde de la position actuelle
@@ -140,18 +140,15 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
 
-    if((db_file -> fpdb = fopen(filename, mode)) == NULL) {
+    if( (db_file -> fpdb = fopen(filename, mode)) == NULL ||
+		1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
         return ERR_IO;
     }
-
-    if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
-        return ERR_IO;
-    }
-
-    int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES;
+    
+    int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES; //selectionne le min entre MAX_MAX et le max spécifié
 
     if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
-        return  ERR_OUT_OF_MEMORY;
+        return ERR_OUT_OF_MEMORY;
     }
 
     int read_struct = 0;
