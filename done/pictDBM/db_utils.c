@@ -63,7 +63,8 @@ print_metadata (const struct pict_metadata* metadata)
     printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata -> res_orig[0], metadata -> res_orig[1]);
     printf("*****************************************\n");
 }
-
+/* ces fonctions ne sont pas utilisées pour le moment, et sont probablement fausses, mais si
+ * nécessaire, elles seront revues et décommentées. A ne pas lire/coriger pour le moment, merci :)
 void copy_header(struct pictdb_header* copy, const struct pictdb_header* header){
 	memcpy(&copy -> db_name, &header -> db_name, MAX_DB_NAME + 1);
 	memcpy(&copy -> res_resized, &header -> res_resized, 2*(NB_RES - 1));
@@ -80,9 +81,9 @@ void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metad
 	memcpy(&copy -> res_orig, &metadata -> res_orig, RES_ORIG);
 	memcpy(&copy -> size, &metadata -> size, NB_RES);
 	memcpy(&copy -> offset, &metadata -> offset, NB_RES);
-	copy -> is_valid = header -> is_valid;
-	copy -> unused_16 = header -> unused_16;
-}
+	copy -> is_valid = metadata -> is_valid;
+	copy -> unused_16 = metadata -> unused_16;
+}*/
 
 /******************************************//**
  * File opening and header/metadata reading
