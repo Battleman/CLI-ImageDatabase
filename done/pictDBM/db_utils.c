@@ -123,6 +123,14 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
     return errcode;
 }
 
+int resolution_atoi(const char* res_id){
+	if(res_id == NULL) return -1;
+	if(!strcmp(res_id, "small")) return RES_SMALL;
+	if(!strcmp(res_id, "orig") || !strcmp(res_id, "original")) return RES_ORIG;
+	if(!strcmp(res_id, "thumb") || !strcmp(res_id, "thumbnail")) return RES_THUMB;
+	return -1;
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */
