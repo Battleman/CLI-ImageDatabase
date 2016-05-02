@@ -183,20 +183,11 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
  */
 //void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metadata);
 
-/* **********************************************************************
- * TODO WEEK 09: ADD THE PROTOTYPE OF resolution_atoi HERE.
- * **********************************************************************
- */
+int resolution_atoi(const char* res_id);
 
-/* **********************************************************************
- * TODO WEEK 09: ADD THE PROTOTYPE OF do_read HERE.
- * **********************************************************************
- */
+int do_read(const char[] pict_id, int res, (unsigned char)** img, uint32_t size, struct pictdb_file file);
 
-/* **********************************************************************
- * TODO WEEK 09: ADD THE PROTOTYPE OF do_insert HERE.
- * **********************************************************************
- */
+int do_insert(const char[] pict_id, (unsigned char)* img, size_t size, struct pictdb_file file);
 
 #ifdef __cplusplus
 }
