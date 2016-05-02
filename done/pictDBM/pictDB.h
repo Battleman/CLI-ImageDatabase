@@ -185,7 +185,7 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
 
 int resolution_atoi(const char* res_id);
 
-int do_read(const char pict_id[], int res, char** img, uint32_t size, struct pictdb_file file);
+int do_read(const char pict_id[], const int RES, const char** image_buffer, uint32_t image_size, struct pictdb_file file);
 
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file file);
 

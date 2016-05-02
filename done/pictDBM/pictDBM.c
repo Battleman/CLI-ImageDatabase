@@ -137,6 +137,14 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
+int do_insert_cmd(int argc, char *argv[]){
+	
+}
+
+int do_read_cmd(int argc, char *argv[]){
+	
+}
+
 /********************************************************************//**
  * Definition of the types allowing us to modularise the main.
  ********************************************************************** */
