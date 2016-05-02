@@ -189,6 +189,7 @@ int do_read(const char pict_id[], int res, char** img, uint32_t size, struct pic
 
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file file);
 
+
 #ifdef __cplusplus
 }
 #endif
