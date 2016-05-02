@@ -46,9 +46,9 @@ mrproper : clean
 	@cp ../../provided/week04/testDB01.pictdb_static .
 	@cp ../../provided/week04/testDB02.pictdb_static .
 	@cp ../../provided/week07/testDB02.pictdb_dynamic .
-#	@cp ../../provided/week09/coquelicots.jpg
-#	@cp ../../provided/week09/foret.jpg
-#	@cp ../../provided/week09/papillon.jpg
+	@cp ../../provided/week09/coquelicots.jpg .
+	@cp ../../provided/week09/foret.jpg .
+	@cp ../../provided/week09/papillon.jpg .
 	@echo "Réinitialisation des images et bases de donnée"
 	@rm -rf *~
 	@echo "Suppression de fichiers de sauvegarde"
