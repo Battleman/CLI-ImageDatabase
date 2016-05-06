@@ -25,7 +25,7 @@ do_list_cmd (int argc, char *argv[])
     struct pictdb_file myfile;
 
     if(argc > 0) {
-        fail = do_open(argv[0], "r+b", &myfile);
+        fail = do_open(argv[0], "rb", &myfile);
         if(fail == 0) {
             do_list(&myfile);
         }

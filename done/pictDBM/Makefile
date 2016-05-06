@@ -1,12 +1,12 @@
 DEBUG=yes
 CC=gcc
-CFLAGS += -Wall -pedantic -g -std=c99 -lssl -lcrypto
+CFLAGS += -Wall -pedantic -g -std=c99 
 CFLAGS += $$(pkg-config vips --cflags)
 ifeq ($(DEBUG), yes)
 	CFLAGS += -g
 endif
 MAIN_EXEC = pictDBM	
-LDLIBS += $$(pkg-config vips --libs) -lm
+LDLIBS += $$(pkg-config vips --libs) -lm -lssl -lcrypto
 
 
 all: $(MAIN_EXEC)
@@ -19,9 +19,10 @@ db_delete.o: db_delete.c pictDB.h error.h
 pictDBM_tools.o : pictDBM.c pictDB.h pictDB.h error.h
 pictDBM.o: pictDBM.c pictDB.h pictDBM_tools.h image_content.h error.h
 image_content.o : image_content.c pictDB.h image_content.h  error.h 
-dedup.o : dedup.c dedup.h error.h pictDB.h
+dedup.o : dedup.c dedup.h pictDB.h error.h
+db_insert.o : db_insert.c pictDB.h error.h 
 
-$(MAIN_EXEC): image_content.o pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o
+$(MAIN_EXEC): image_content.o pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o
 
 # scripts to facilitate cleaning and purging#
 #################################################
