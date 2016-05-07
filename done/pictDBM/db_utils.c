@@ -141,6 +141,18 @@ int resolution_atoi(const char* res_id){
 	return -1;
 }
 
+int read_disk_image(){
+	return 0;
+}
+
+int write_disk_image(){
+	return 0;
+}
+
+int create_name(){
+	return 0;
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */

@@ -143,6 +143,23 @@ do_delete_cmd (int argc, char *argv[])
 }
 
 int do_insert_cmd(int argc, char *argv[]){
+	if(argc < 3){
+		return ERR_NOT_ENOUGH_ARGUMENTS;
+	}
+	
+	struct pictdb_file* file = malloc(sizeof(pictdb_file));
+	do_open(argv[0], "r+", file);
+	
+	int errcode = 0;
+	if(file -> header.num_files >= file -> header.max_files){
+		errcode = ERR_FULL_DATABASE;
+	} else {
+		size_t size = 0; // how to get the size of the picture besides VIPS ?
+		errcode = do_insert(argv[1], argv[2], size, file);
+	}
+	
+	
+	
 	return 0;
 }
 
