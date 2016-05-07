@@ -30,6 +30,16 @@ sha_to_string (const unsigned char* SHA,
     sha_string[2*SHA256_DIGEST_LENGTH] = '\0';
 }
 
+int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
+{
+    for(int i = 0; i < size; i++) {
+        if(orig[i] != comp[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /********************************************************************//**
  * pictDB header display.
  */
