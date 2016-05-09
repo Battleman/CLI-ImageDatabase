@@ -176,7 +176,7 @@ int do_read_cmd(int argc, char *argv[]){
 	int errcode = 0;
 	int res = RES_ORIG;
 	if(argc >= 3){
-		if(-1 == (res = resolution_atoi(argc[2]))){
+		if(-1 == (res = resolution_atoi(argv[2]))){
 			errcode = ERR_RESOLUTIONS;
 		}
 		

@@ -191,6 +191,11 @@ int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
 
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* file);
 
+int create_name(const char* pict_id, char* filename, int res);
+
+int read_disk_image(char* filename, void* buffer, size_t* size);
+
+int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, char* filename);
 
 #ifdef __cplusplus
 }
