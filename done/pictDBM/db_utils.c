@@ -186,7 +186,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 	size_t index = 0;
     int valid = 0;
     do {
-        if(meta_table[index].is_valid != 1 || strcmp(pic_name, meta_table[index].pict_id) != 0) {
+        if(file -> metadata[index].is_valid != 1 || strcmp(pict_id, file -> metadata[index].pict_id) != 0) {
             index++;
         } else {
             valid = 1;
@@ -197,12 +197,12 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
         return ERR_FILE_NOT_FOUND;
     }
 	
-	size_t size = file -> size[index].size[res];
+	size_t size = file -> metadata[index].size[res];
 	if(size == 0){
 		errcode = ERR_RESOLUTIONS;
 	} else {
-		fseek(file, file -> metadata[index].offset[res], SEEK_SET);
-		if(1 != fread(buffer, &size, 1, file)){
+		fseek(file -> fpdb, file -> metadata[index].offset[res], SEEK_SET);
+		if(1 != fread(buffer, size, 1, file -> fpdb)){
 			errcode = ERR_IO;
 		}
 	}
@@ -210,7 +210,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 	VipsObject* process = VIPS_OBJECT(vips_image_new());
     VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
     
-    if(vips_jpegload_buffer(buffer, size, image, NULL)){
+    if(vips_jpegload_buffer(buffer, &size, image, NULL)){
 		errcode = ERR_VIPS;
 	} else {
 		if(vips_jpegsave(image[0], filename, NULL)){
