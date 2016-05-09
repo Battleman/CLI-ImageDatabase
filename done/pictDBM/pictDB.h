@@ -48,7 +48,7 @@
 #define NB_RES    3
 
 /*Amount of defined commands*/
-#define NB_COMMANDS 4
+#define NB_COMMANDS 6
 
 #ifdef __cplusplus
 extern "C" {
