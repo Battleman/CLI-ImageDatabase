@@ -68,7 +68,7 @@ struct pictdb_header {
 struct pict_metadata {
     char pict_id[MAX_PIC_ID + 1];
     unsigned char SHA[SHA256_DIGEST_LENGTH];
-    uint32_t res_orig[RES_ORIG];
+    uint32_t res_orig[2]; //de taille 2, car toujours 2 dimensions (on va pas réinventer la roue)
     uint32_t size[NB_RES];
     uint64_t offset[NB_RES];
     uint16_t is_valid;
@@ -187,6 +187,7 @@ int resolution_atoi(const char* res_id);
 
 int do_read(const char pict_id[], const int RES, const char** image_buffer, uint32_t image_size, struct pictdb_file* file);
 
+int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
 
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* file);
 
