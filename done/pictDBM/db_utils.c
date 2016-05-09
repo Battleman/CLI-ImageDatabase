@@ -210,7 +210,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 	VipsObject* process = VIPS_OBJECT(vips_image_new());
     VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
     
-    if(vips_jpegload_buffer(buffer, &size, image, NULL)){
+    if(vips_jpegload_buffer(buffer, size, image, NULL)){
 		errcode = ERR_VIPS;
 	} else {
 		if(vips_jpegsave(image[0], filename, NULL)){
