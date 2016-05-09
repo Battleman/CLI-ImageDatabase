@@ -1,4 +1,4 @@
-DEBUG=no
+DEBUG=yes
 CC=gcc
 CFLAGS += -Wall -pedantic -g -std=c99 
 CFLAGS += $$(pkg-config vips --cflags)

@@ -212,7 +212,8 @@ int main (int argc, char* argv[])
 											 (command_mapping){"help", help},
 											 (command_mapping){"delete", do_delete_cmd},
 											 (command_mapping){"read", do_read_cmd},
-											 (command_mapping){"insert", do_insert_cmd}};
+											 (command_mapping){"insert", do_insert_cmd}
+											};
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
