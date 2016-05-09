@@ -2,16 +2,6 @@
 #include "pictDB.h"
 #include "image_content.h"
 
-int sha_compare(unsigned char orig_sha[], unsigned char comp_sha[])
-{
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-        if(orig_sha[i] != comp_sha[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
 {
     if(db_file == NULL) {
@@ -24,7 +14,7 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
         if((0 != db_file -> metadata[i].is_valid) && (i != index)) {
             if(0 == strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
                 return ERR_DUPLICATE_ID;
-            } else if(0 == sha_compare(db_file -> metadata[index].SHA, db_file -> metadata[i].SHA)) {
+            } else if(0 == table_compare(db_file -> metadata[index].SHA, db_file -> metadata[i].SHA, SHA256_DIGEST_LENGTH)) {
                 db_file -> metadata[index].offset[RES_ORIG] = db_file -> metadata[i].offset[RES_ORIG];
                 db_file -> metadata[index].offset[RES_THUMB] = db_file -> metadata[i].offset[RES_THUMB];
                 db_file -> metadata[index].offset[RES_SMALL] = db_file -> metadata[i].offset[RES_SMALL];

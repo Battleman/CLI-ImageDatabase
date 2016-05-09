@@ -30,6 +30,16 @@ sha_to_string (const unsigned char* SHA,
     sha_string[2*SHA256_DIGEST_LENGTH] = '\0';
 }
 
+int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
+{
+    for(int i = 0; i < size; i++) {
+        if(orig[i] != comp[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /********************************************************************//**
  * pictDB header display.
  */
@@ -129,6 +139,18 @@ int resolution_atoi(const char* res_id){
 	if(!strcmp(res_id, "orig") || !strcmp(res_id, "original")) return RES_ORIG;
 	if(!strcmp(res_id, "thumb") || !strcmp(res_id, "thumbnail")) return RES_THUMB;
 	return -1;
+}
+
+int read_disk_image(){
+	return 0;
+}
+
+int write_disk_image(){
+	return 0;
+}
+
+int create_name(){
+	return 0;
 }
 
 /******************************************//**
