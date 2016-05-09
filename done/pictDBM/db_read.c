@@ -5,7 +5,9 @@ int do_read(const char pict_id[], const int RES, const char** image_buffer, uint
 	int valid = 0, errcode = 0;
 	
 	while(valid == 0 && index < file -> header.max_files){
-		if(1 == file -> metadata[index].is_valid && 0 == strncmp(&pict_id[0], &file -> metadata[index].pict_id[0], MAX_PIC_ID + 1))
+		if(	1 == file -> metadata[index].is_valid && 
+			!strncmp(&pict_id[0], &file -> metadata[index].pict_id[0], MAX_PIC_ID + 1)
+			) //if the image is valid and the the names match
 			valid = 1;
 		else 
 			++index;

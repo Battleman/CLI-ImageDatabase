@@ -53,7 +53,7 @@ do_create_cmd (int argc, char *argv[])
     argv++;
 
     while(argc != 0) {
-        if(strcmp(argv[0], "-max_files")) {
+        if(!strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
                 max_files = (atouint32(argv[1]) < MAX_MAX_FILES) ? atouint32(argv[1]) : MAX_MAX_FILES;
                 argc -= 2;
@@ -61,19 +61,19 @@ do_create_cmd (int argc, char *argv[])
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp(argv[0], "-thumb_res")) {
-            if(argc > 3) {
-                thumb_res_X = (atouint16(argv[1]) < thumb_res_X) ? atouint16(argv[1]) : MAX_THUMB_SIZE;
-                thumb_res_Y = (atouint16(argv[2]) < thumb_res_Y) ? atouint16(argv[2]) : MAX_THUMB_SIZE;
+        } else if(!strcmp(argv[0], "-thumb_res")) {
+            if(argc > 2) {
+                thumb_res_X = (atouint16(argv[1]) < MAX_THUMB_SIZE) ? atouint16(argv[1]) : MAX_THUMB_SIZE;
+                thumb_res_Y = (atouint16(argv[2]) < MAX_THUMB_SIZE) ? atouint16(argv[2]) : MAX_THUMB_SIZE;
                 argc -= 3;
                 argv += 3;
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp(argv[0], "-small_res")) {
-            if(argc > 3) {
-                small_res_X = (atouint16(argv[1]) < small_res_X) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
-                small_res_Y = (atouint16(argv[2]) < small_res_Y) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
+        } else if(!strcmp(argv[0], "-small_res")) {
+            if(argc > 2) {
+                small_res_X = (atouint16(argv[1]) < MAX_SMALL_SIZE) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
+                small_res_Y = (atouint16(argv[2]) < MAX_SMALL_SIZE) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
                 argc -= 3;
                 argv += 3;
             } else {
@@ -169,17 +169,16 @@ int do_read_cmd(int argc, char *argv[]){
 	if(argc < 2){
 		return ERR_NOT_ENOUGH_ARGUMENTS;
 	}
-	
-	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
-	do_open(argv[0], "r+", file);
-	
 	int errcode = 0;
+	struct pictdb_file* file = NULL;
+	if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
+	if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
+	
 	int res = RES_ORIG;
 	if(argc >= 3){
 		if(-1 == (res = resolution_atoi(argv[2]))){
 			errcode = ERR_RESOLUTIONS;
-		}
-		
+		}	
 	}
 	
 	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));

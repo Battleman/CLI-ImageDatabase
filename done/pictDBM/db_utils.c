@@ -148,7 +148,7 @@ int create_name(const char* pict_id, char* filename, int res){
 	} 
 	
 	filename[MAX_PIC_ID + 11] = '\0';
-	strncpy(filename, pict_id, strlen(pict_id));
+	strncpy(filename, pict_id, MAX_PIC_ID);
 	switch(res){
 		case RES_THUMB: strcpy(&filename[strlen(pict_id)], "_thumb.jpg"); break;
 		case RES_SMALL: strcpy(&filename[strlen(pict_id)], "_small.jpg"); break;
@@ -179,6 +179,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 	int errcode = 0;
 	void* buffer = NULL;
 	
+	
 	if(file -> header.num_files == 0){
 		return ERR_FILE_NOT_FOUND;
 	}
@@ -198,6 +199,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
     }
 	
 	size_t size = file -> metadata[index].size[res];
+	if(NULL == (buffer = malloc(size))) return ERR_IO;
 	if(size == 0){
 		errcode = ERR_RESOLUTIONS;
 	} else {
@@ -217,7 +219,7 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 			errcode = ERR_VIPS;
 		}
 	}
-	
+	g_free(buffer);
 	return errcode;
 }
 
