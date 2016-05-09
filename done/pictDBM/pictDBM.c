@@ -53,7 +53,7 @@ do_create_cmd (int argc, char *argv[])
     argv++;
 
     while(argc != 0) {
-        if(strcmp("-max_files", argv[0])) {
+        if(strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
                 max_files = (atouint32(argv[1]) < MAX_MAX_FILES) ? atouint32(argv[1]) : MAX_MAX_FILES;
                 argc -= 2;
@@ -61,7 +61,7 @@ do_create_cmd (int argc, char *argv[])
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp("-thumb_res", argv[0])) {
+        } else if(strcmp(argv[0], "-thumb_res")) {
             if(argc > 3) {
                 thumb_res_X = (atouint16(argv[1]) < thumb_res_X) ? atouint16(argv[1]) : MAX_THUMB_SIZE;
                 thumb_res_Y = (atouint16(argv[2]) < thumb_res_Y) ? atouint16(argv[2]) : MAX_THUMB_SIZE;
@@ -70,7 +70,7 @@ do_create_cmd (int argc, char *argv[])
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp("-small_res", argv[0])) {
+        } else if(strcmp(argv[0], "-small_res")) {
             if(argc > 3) {
                 small_res_X = (atouint16(argv[1]) < small_res_X) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
                 small_res_Y = (atouint16(argv[2]) < small_res_Y) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
