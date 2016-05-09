@@ -141,16 +141,84 @@ int resolution_atoi(const char* res_id){
 	return -1;
 }
 
-int read_disk_image(){
-	return 0;
+int create_name(const char* pict_id, char* filename, int res){
+	int errcode = 0;
+	if(filename == NULL){
+		errcode = ERR_IO;
+	} 
+	
+	filename[MAX_PIC_ID + 11] = '\0';
+	strncpy(filename, pict_id, strlen(pict_id));
+	switch(res){
+		case RES_THUMB: strcpy(&filename[strlen(pict_id)], "_thumb.jpg"); break;
+		case RES_SMALL: strcpy(&filename[strlen(pict_id)], "_small.jpg"); break;
+		case RES_ORIG: strcpy(&filename[strlen(pict_id)], "_orig.jpg"); break;
+		default: errcode = ERR_RESOLUTIONS; break;
+	}
+	
+	return errcode;
 }
 
-int write_disk_image(){
-	return 0;
+int read_disk_image(char* filename, void* buffer, size_t* size){
+	VipsObject* process = VIPS_OBJECT(vips_image_new());
+    VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
+    
+    int errcode = 0;
+    if(vips_jpegload(filename, image, NULL)){
+		errcode = ERR_VIPS;
+	} else {
+		if(vips_jpegsave_buffer(image[0], &buffer, size, NULL)){
+			errcode = ERR_VIPS;
+		}
+	}
+	
+	return errcode;
 }
 
-int create_name(){
-	return 0;
+int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, char* filename){	
+	int errcode = 0;
+	void* buffer = NULL;
+	
+	if(file -> header.num_files == 0){
+		return ERR_FILE_NOT_FOUND;
+	}
+	
+	size_t index = 0;
+    int valid = 0;
+    do {
+        if(meta_table[index].is_valid != 1 || strcmp(pic_name, meta_table[index].pict_id) != 0) {
+            index++;
+        } else {
+            valid = 1;
+        }
+    } while(valid == 0 && index < file -> header.max_files); //itération jusq'à la taille de meta_table ou jusqu'à trouver un match
+
+    if(valid == 0) {
+        return ERR_FILE_NOT_FOUND;
+    }
+	
+	size_t size = file -> size[index].size[res];
+	if(size == 0){
+		errcode = ERR_RESOLUTIONS;
+	} else {
+		fseek(file, file -> metadata[index].offset[res], SEEK_SET);
+		if(1 != fread(buffer, &size, 1, file)){
+			errcode = ERR_IO;
+		}
+	}
+	
+	VipsObject* process = VIPS_OBJECT(vips_image_new());
+    VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
+    
+    if(vips_jpegload_buffer(buffer, size, image, NULL)){
+		errcode = ERR_VIPS;
+	} else {
+		if(vips_jpegsave(image[0], filename, NULL)){
+			errcode = ERR_VIPS;
+		}
+	}
+	
+	return errcode;
 }
 
 /******************************************//**

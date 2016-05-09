@@ -147,24 +147,47 @@ int do_insert_cmd(int argc, char *argv[]){
 		return ERR_NOT_ENOUGH_ARGUMENTS;
 	}
 	
-	struct pictdb_file* file = malloc(sizeof(pictdb_file));
+	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
 	do_open(argv[0], "r+", file);
 	
 	int errcode = 0;
 	if(file -> header.num_files >= file -> header.max_files){
 		errcode = ERR_FULL_DATABASE;
 	} else {
-		size_t size = 0; // how to get the size of the picture besides VIPS ?
-		errcode = do_insert(argv[1], argv[2], size, file);
+		size_t size = 0;
+		void* buffer = NULL;
+		errcode = read_disk_image(argv[2], buffer, &size);
+		if(errcode == 0 && size !=  0 && buffer != NULL){
+			errcode = do_insert(argv[1], buffer, size, file);
+		}
 	}
 	
-	
-	
-	return 0;
+	return errcode;
 }
 
 int do_read_cmd(int argc, char *argv[]){
-	return 0;
+	if(argc < 2){
+		return ERR_NOT_ENOUGH_ARGUMENTS;
+	}
+	
+	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
+	do_open(argv[0], "r+", file);
+	
+	int errcode = 0;
+	int res = RES_ORIG;
+	if(argc >= 3){
+		if(-1 == (res = resolution_atoi(argc[2]))){
+			errcode = ERR_RESOLUTIONS;
+		}
+		
+	}
+	
+	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
+	if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
+		errcode = write_disk_image(file, (const char*)argv[1], res, filename);
+	}
+	
+	return errcode;
 }
 
 /********************************************************************//**
