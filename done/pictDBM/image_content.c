@@ -111,8 +111,8 @@ int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, 
 	if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
-		*width = image -> Xsize;
-		*height = image -> Ysize;
+		*width = (*image)->Xsize;
+		*height = (*image)->Ysize;
 	}
 	
 	return errcode;

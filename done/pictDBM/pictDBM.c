@@ -147,7 +147,7 @@ int do_insert_cmd(int argc, char *argv[]){
 		return ERR_NOT_ENOUGH_ARGUMENTS;
 	}
 	
-	struct pictdb_file* file = malloc(sizeof(pictdb_file));
+	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
 	do_open(argv[0], "r+", file);
 	
 	int errcode = 0;
