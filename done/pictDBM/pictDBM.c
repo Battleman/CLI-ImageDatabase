@@ -106,10 +106,15 @@ help (int argc, char *argv[])
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
     printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128n");
-    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128\n");
+    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
+    printf("\tread\t<dbfilename> <pictID> [original|orig|thumbnail|thumb|small]:\n");
+    printf("\t\tread an image from the pictDB and save it to a file.\n");
+    printf("\t\tdefault resolution is 'original'.\n");
+    printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
@@ -137,6 +142,14 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
+int do_insert_cmd(int argc, char *argv[]){
+	return 0;
+}
+
+int do_read_cmd(int argc, char *argv[]){
+	return 0;
+}
+
 /********************************************************************//**
  * Definition of the types allowing us to modularise the main.
  ********************************************************************** */
@@ -155,12 +168,11 @@ typedef struct {
 int main (int argc, char* argv[])
 {
     command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
-    (command_mapping){"create", do_create_cmd},
-    (command_mapping){"help", help},
-    (command_mapping) {
-        "delete", do_delete_cmd
-    }
-                                            };
+											 (command_mapping){"create", do_create_cmd},
+											 (command_mapping){"help", help},
+											 (command_mapping){"delete", do_delete_cmd},
+											 (command_mapping){"read", do_read_cmd},
+											 (command_mapping){"insert", do_insert_cmd}};
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;

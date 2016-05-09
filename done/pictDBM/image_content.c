@@ -103,4 +103,17 @@ int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index)
     return 0;
 }
 
-
+int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, size_t image_size){
+	int errcode = 0;
+	VipsObject* process = VIPS_OBJECT( vips_image_new() );
+    VipsImage** image = (VipsImage**) vips_object_local_array( process, 1 );
+	
+	if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
+        errcode = ERR_VIPS;
+    } else {
+		*width = image -> Xsize;
+		*height = image -> Ysize;
+	}
+	
+	return errcode;
+}
