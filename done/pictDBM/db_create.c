@@ -41,16 +41,16 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
     db_file -> header = header;
 
     //initialisation du fichier et de la mémoire
-    if(1 != fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)) 
-		errcode = ERR_IO;
-    
+    if(1 != fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb))
+        errcode = ERR_IO;
+
 
     if(	errcode == 0) {
-		db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata));
-		if(db_file->metadata == NULL) 
-			errcode = ERR_OUT_OF_MEMORY;
-	}
-	
+        db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata));
+        if(db_file->metadata == NULL)
+            errcode = ERR_OUT_OF_MEMORY;
+    }
+
     do_close(db_file);
 
     return errcode; // retourne l'erreur;

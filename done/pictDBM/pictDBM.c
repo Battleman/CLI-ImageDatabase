@@ -142,52 +142,54 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
-int do_insert_cmd(int argc, char *argv[]){
-	if(argc < 3){
-		return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
-	
-	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
-	do_open(argv[0], "r+", file);
-	
-	int errcode = 0;
-	if(file -> header.num_files >= file -> header.max_files){
-		errcode = ERR_FULL_DATABASE;
-	} else {
-		size_t size = 0;
-		void* buffer = NULL;
-		errcode = read_disk_image(argv[2], buffer, &size);
-		if(errcode == 0 && size !=  0 && buffer != NULL){
-			errcode = do_insert(argv[1], buffer, size, file);
-		}
-	}
-	
-	return errcode;
+int do_insert_cmd(int argc, char *argv[])
+{
+    if(argc < 3) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+
+    struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
+    do_open(argv[0], "r+", file);
+
+    int errcode = 0;
+    if(file -> header.num_files >= file -> header.max_files) {
+        errcode = ERR_FULL_DATABASE;
+    } else {
+        size_t size = 0;
+        void* buffer = NULL;
+        errcode = read_disk_image(argv[2], buffer, &size);
+        if(errcode == 0 && size !=  0 && buffer != NULL) {
+            errcode = do_insert(argv[1], buffer, size, file);
+        }
+    }
+
+    return errcode;
 }
 
-int do_read_cmd(int argc, char *argv[]){
-	if(argc < 2){
-		return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
-	int errcode = 0;
-	struct pictdb_file* file = NULL;
-	if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
-	if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
-	
-	int res = RES_ORIG;
-	if(argc >= 3){
-		if(-1 == (res = resolution_atoi(argv[2]))){
-			errcode = ERR_RESOLUTIONS;
-		}	
-	}
-	//utiliser do_read ??
-	/*
-	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
-	if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
-		errcode = write_disk_image(file, (const char*)argv[1], res, filename);
-	}*/
-	
-	return errcode;
+int do_read_cmd(int argc, char *argv[])
+{
+    if(argc < 2) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+    int errcode = 0;
+    struct pictdb_file* file = NULL;
+    if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
+    if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
+
+    int res = RES_ORIG;
+    if(argc >= 3) {
+        if(-1 == (res = resolution_atoi(argv[2]))) {
+            errcode = ERR_RESOLUTIONS;
+        }
+    }
+    //utiliser do_read ??
+    /*
+    char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
+    if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
+    	errcode = write_disk_image(file, (const char*)argv[1], res, filename);
+    }*/
+
+    return errcode;
 }
 
 /********************************************************************//**
@@ -208,12 +210,14 @@ typedef struct {
 int main (int argc, char* argv[])
 {
     command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
-											 (command_mapping){"create", do_create_cmd},
-											 (command_mapping){"help", help},
-											 (command_mapping){"delete", do_delete_cmd},
-											 (command_mapping){"read", do_read_cmd},
-											 (command_mapping){"insert", do_insert_cmd}
-											};
+    (command_mapping){"create", do_create_cmd},
+    (command_mapping){"help", help},
+    (command_mapping){"delete", do_delete_cmd},
+    (command_mapping){"read", do_read_cmd},
+    (command_mapping)
+    {"insert", do_insert_cmd
+    }
+                                            };
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;

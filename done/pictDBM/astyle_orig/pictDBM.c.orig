@@ -25,14 +25,9 @@ do_list_cmd (int argc, char *argv[])
     struct pictdb_file myfile;
 
     if(argc > 0) {
-        fail = do_open(argv[0], "r+b", &myfile);
+        fail = do_open(argv[0], "rb", &myfile);
         if(fail == 0) {
-			printf("-----------------------------\nAvant modification :\n");	
             do_list(&myfile);
-            fail = lazily_resize(RES_SMALL, &myfile, 0);
-            printf("-----------------------------\nAprès modification :\n"); fflush(stdout);
-            do_list(&myfile);
-            printf("-----------------------------\n");
         }
         do_close(&myfile);
     }
@@ -56,9 +51,9 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-	
+
     while(argc != 0) {
-        if(strcmp("-max_files", argv[0])) {
+        if(!strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
                 max_files = (atouint32(argv[1]) < MAX_MAX_FILES) ? atouint32(argv[1]) : MAX_MAX_FILES;
                 argc -= 2;
@@ -66,19 +61,19 @@ do_create_cmd (int argc, char *argv[])
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp("-thumb_res", argv[0])) {
-            if(argc > 3) {
-                thumb_res_X = (atouint16(argv[1]) < thumb_res_X) ? atouint16(argv[1]) : MAX_THUMB_SIZE;
-                thumb_res_Y = (atouint16(argv[2]) < thumb_res_Y) ? atouint16(argv[2]) : MAX_THUMB_SIZE;
+        } else if(!strcmp(argv[0], "-thumb_res")) {
+            if(argc > 2) {
+                thumb_res_X = (atouint16(argv[1]) < MAX_THUMB_SIZE) ? atouint16(argv[1]) : MAX_THUMB_SIZE;
+                thumb_res_Y = (atouint16(argv[2]) < MAX_THUMB_SIZE) ? atouint16(argv[2]) : MAX_THUMB_SIZE;
                 argc -= 3;
                 argv += 3;
             } else {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
-        } else if(strcmp("-small_res", argv[0])) {
-            if(argc > 3) {
-                small_res_X = (atouint16(argv[1]) < small_res_X) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
-                small_res_Y = (atouint16(argv[2]) < small_res_Y) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
+        } else if(!strcmp(argv[0], "-small_res")) {
+            if(argc > 2) {
+                small_res_X = (atouint16(argv[1]) < MAX_SMALL_SIZE) ? atouint16(argv[1]) : MAX_SMALL_SIZE;
+                small_res_Y = (atouint16(argv[2]) < MAX_SMALL_SIZE) ? atouint16(argv[2]) : MAX_SMALL_SIZE;
                 argc -= 3;
                 argv += 3;
             } else {
@@ -111,10 +106,15 @@ help (int argc, char *argv[])
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
     printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128n");
-    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128\n");
+    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
+    printf("\tread\t<dbfilename> <pictID> [original|orig|thumbnail|thumb|small]:\n");
+    printf("\t\tread an image from the pictDB and save it to a file.\n");
+    printf("\t\tdefault resolution is 'original'.\n");
+    printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
     printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
@@ -142,6 +142,54 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
+int do_insert_cmd(int argc, char *argv[]){
+	if(argc < 3){
+		return ERR_NOT_ENOUGH_ARGUMENTS;
+	}
+	
+	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
+	do_open(argv[0], "r+", file);
+	
+	int errcode = 0;
+	if(file -> header.num_files >= file -> header.max_files){
+		errcode = ERR_FULL_DATABASE;
+	} else {
+		size_t size = 0;
+		void* buffer = NULL;
+		errcode = read_disk_image(argv[2], buffer, &size);
+		if(errcode == 0 && size !=  0 && buffer != NULL){
+			errcode = do_insert(argv[1], buffer, size, file);
+		}
+	}
+	
+	return errcode;
+}
+
+int do_read_cmd(int argc, char *argv[]){
+	if(argc < 2){
+		return ERR_NOT_ENOUGH_ARGUMENTS;
+	}
+	int errcode = 0;
+	struct pictdb_file* file = NULL;
+	if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
+	if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
+	
+	int res = RES_ORIG;
+	if(argc >= 3){
+		if(-1 == (res = resolution_atoi(argv[2]))){
+			errcode = ERR_RESOLUTIONS;
+		}	
+	}
+	//utiliser do_read ??
+	/*
+	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
+	if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
+		errcode = write_disk_image(file, (const char*)argv[1], res, filename);
+	}*/
+	
+	return errcode;
+}
+
 /********************************************************************//**
  * Definition of the types allowing us to modularise the main.
  ********************************************************************** */
@@ -160,12 +208,12 @@ typedef struct {
 int main (int argc, char* argv[])
 {
     command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
-    (command_mapping){"create", do_create_cmd},
-    (command_mapping){"help", help},
-    (command_mapping) {
-        "delete", do_delete_cmd
-    }
-                                            };
+											 (command_mapping){"create", do_create_cmd},
+											 (command_mapping){"help", help},
+											 (command_mapping){"delete", do_delete_cmd},
+											 (command_mapping){"read", do_read_cmd},
+											 (command_mapping){"insert", do_insert_cmd}
+											};
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
@@ -174,12 +222,12 @@ int main (int argc, char* argv[])
          * TODO WEEK 08: THIS PART SHALL BE REVISED THEN (WEEK 09) EXTENDED.
          * **********************************************************************
          */
-		const char* app_name = argv[0]; //pour vips
+        const char* app_name = argv[0]; //pour vips
         argc--;
         argv++; // skips command call name
 
         int index = 0, valid = 0;
-		VIPS_INIT(app_name);
+        VIPS_INIT(app_name);
         do {
             if(!strcmp(commands[index].name, argv[0])) {
                 if (argc < 1) { //au moins 1, pour help
@@ -194,7 +242,7 @@ int main (int argc, char* argv[])
                 ++index;
             }
         } while(index < NB_COMMANDS && valid == 0);
-		vips_shutdown();
+        vips_shutdown();
         if(valid == 0) {
             ret = ERR_INVALID_COMMAND;
         }

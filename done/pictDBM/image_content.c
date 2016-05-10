@@ -25,14 +25,14 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     int errcode = 0;
     size_t size_of_small = 0;
     void* buffer_in = NULL;
-    void** buffer_out = NULL; 
+    void** buffer_out = NULL;
     ///////////////////////////////////////
     //TODO :: PAS DE MALLOC NÉCESSAIRE POUR BUFFER_OUT ?///
     ///////////////////////////////////////
-    
+
     //Allocations nécessaires
-	if(	NULL == (buffer_in = malloc(size_of_orig))) return ERR_OUT_OF_MEMORY;
-    
+    if(	NULL == (buffer_in = malloc(size_of_orig))) return ERR_OUT_OF_MEMORY;
+
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement au niveau de l'image originale
     if(1 != fread(buffer_in, size_of_orig, 1, file)) return ERR_IO; //lecture de l'image originale dans le buffer
 
@@ -43,10 +43,10 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     if(vips_jpegload_buffer(buffer_in, size_of_orig, image, NULL)) errcode = ERR_VIPS;
     else {
         double ratio = shrink_value(*image, header->res_resized[2*RES], header->res_resized[2*RES+1]);
-	    VipsImage** image_small = (VipsImage**) vips_object_local_array( process, 1 );
+        VipsImage** image_small = (VipsImage**) vips_object_local_array( process, 1 );
 
         vips_resize(image[0], &image_small[0], ratio, NULL); //redimensionnement de l'image
-        
+
         if(vips_jpegsave_buffer(image_small[0], buffer_out, &size_of_small, NULL)) errcode = ERR_VIPS;
         else {
             fseek(file, 0, SEEK_END); //déplacement en fin de fichier pour l'écriture
@@ -103,17 +103,18 @@ int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index)
     return 0;
 }
 
-int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, size_t image_size){
-	int errcode = 0;
-	VipsObject* process = VIPS_OBJECT( vips_image_new() );
+int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, size_t image_size)
+{
+    int errcode = 0;
+    VipsObject* process = VIPS_OBJECT( vips_image_new() );
     VipsImage** image = (VipsImage**) vips_object_local_array( process, 1 );
-	
-	if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
+
+    if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
-		*width = (*image)->Xsize;
-		*height = (*image)->Ysize;
-	}
-	
-	return errcode;
+        *width = (*image)->Xsize;
+        *height = (*image)->Ysize;
+    }
+
+    return errcode;
 }
