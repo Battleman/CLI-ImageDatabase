@@ -119,7 +119,6 @@ help (int argc, char *argv[])
     printf("\t   read an image from the pictDB and save it to a file.\n");
     printf("\t   default resolution is 'original'.\n");
     printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
-    //printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
