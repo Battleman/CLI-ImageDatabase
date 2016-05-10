@@ -105,13 +105,11 @@ int overwrite_header(FILE* file, struct pictdb_header* header)
         return ERR_INVALID_ARGUMENT;
     }
 
-    long backup_position = ftell(file); //sauvegarde de la position actuelle
     int errcode = 0;
     rewind(file);
     if(1 != fwrite(header, sizeof(struct pictdb_header), 1, file)) {
         errcode = ERR_IO;
     }
-    fseek(file, backup_position, SEEK_SET); //on revient de toute manière à la position avant l'appel
     return errcode;
 }
 /**********************************
@@ -124,12 +122,10 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
         return ERR_INVALID_ARGUMENT;
     }
     int errcode = 0;
-    long backup_position = ftell(file); //sauvegarde de la position actuelle
     fseek(file, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
     if(0 != errcode && 1 != fwrite(metadata, sizeof(struct pict_metadata), 1, file)) {
         errcode = ERR_IO;
     }
-    fseek(file, backup_position, SEEK_SET); //on revient à la position avant l'appel
     return errcode;
 }
 
@@ -229,36 +225,41 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
 
-    if( (db_file -> fpdb = fopen(filename, mode)) == NULL ||
-        1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb)) {
+    db_file -> fpdb = fopen(filename, mode);
+    if(db_file->fpdb == NULL) return ERR_IO;
+    if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb))
         return ERR_IO;
-    }
+    
 
     int max_files = (MAX_MAX_FILES > db_file -> header.max_files) ? db_file -> header.max_files : MAX_MAX_FILES; //selectionne le min entre MAX_MAX et le max spécifié
 
     if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
         return ERR_OUT_OF_MEMORY;
     }
-
-    int read_struct = 0;
-    while(read_struct < max_files) {
-        if(1 == fread(&(db_file->metadata[read_struct]), sizeof(struct pict_metadata), 1, db_file -> fpdb)) {
-            ++read_struct;
-        } else {
-            return ERR_IO;
-        }
-    }
-
+	/////////////////
+	////EST-CE QUE CETTE MÉTHODE EST BONNE ?
+	//////////////////
+	if(db_file->header.max_files != fread(	db_file->metadata, 
+											sizeof(struct pict_metadata), 
+											db_file->header.max_files, 
+											db_file -> fpdb)) {
+		return ERR_IO;										
+	}
 
     return 0;
 }
 
 void do_close(struct pictdb_file* db_file)
 {
-    if(db_file == NULL || db_file -> fpdb == NULL) {
-        fprintf(stderr, "ERR: impossible de fermer un fichier (null ou non-ouvert)");
+    if(db_file == NULL) {
+        fprintf(stderr, "ERR: impossible de fermer un fichier (base de donnée inexistante)");
     } else {
-        free(db_file->metadata);
-        fclose(db_file -> fpdb);
-    }
+		free(db_file->metadata);
+		if(db_file -> fpdb == NULL) {
+			fprintf(stderr, "ERR: impossible de fermer le fichire fichier (non-ouvert ou inexistant)");
+		} else {
+			fclose(db_file -> fpdb);
+		}
+	}
+    
 }

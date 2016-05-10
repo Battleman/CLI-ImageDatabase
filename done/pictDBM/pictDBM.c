@@ -180,11 +180,12 @@ int do_read_cmd(int argc, char *argv[]){
 			errcode = ERR_RESOLUTIONS;
 		}	
 	}
-	
+	//utiliser do_read ??
+	/*
 	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
 	if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
 		errcode = write_disk_image(file, (const char*)argv[1], res, filename);
-	}
+	}*/
 	
 	return errcode;
 }
