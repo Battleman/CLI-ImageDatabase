@@ -30,7 +30,9 @@ do_list_cmd (int argc, char *argv[])
             do_list(&myfile);
         }
         do_close(&myfile);
-    }
+    } else {
+		return ERR_NOT_ENOUGH_ARGUMENTS;
+	}
     return fail;
 }
 
@@ -51,7 +53,9 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-
+	////////////////////
+	//TODO : IL FAUT FAIRE QUOI LÀ ?
+	////////////////////
     while(argc != 0) {
         if(!strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
@@ -102,20 +106,20 @@ help (int argc, char *argv[])
     printf("\tlist <dbfilename>: list pictDB content.\n");
     printf("\tcreate <dbfilename> [options]: create a new pictDB.\n");
     printf("\t\t\toptions are:\n");
-    printf("\t\t\t\t\t-max_files <MAX_FILES>: maximum number of files.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
-    printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128\n");
-    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
+    printf("\t\t\t-max_files <MAX_FILES>: maximum number of files.\n");
+    printf("\t\t\t\t\t\tdefault value is 10\n");
+    printf("\t\t\t\t\t\tmaximum value is 100000\n");
+    printf("\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
+    printf("\t\t\t\t\t\tdefault value is 64x64\n");
+    printf("\t\t\t\t\t\tmaximum value is 128x128\n");
+    printf("\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
+    printf("\t\t\t\t\t\tdefault value is 256x256\n");
+    printf("\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tread\t<dbfilename> <pictID> [original|orig|thumbnail|thumb|small]:\n");
-    printf("\t\tread an image from the pictDB and save it to a file.\n");
-    printf("\t\tdefault resolution is 'original'.\n");
+    printf("\t   read an image from the pictDB and save it to a file.\n");
+    printf("\t   default resolution is 'original'.\n");
     printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
+    //printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
