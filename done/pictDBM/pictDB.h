@@ -183,10 +183,32 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
  */
 //void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metadata);
 
+/**
+ * @brief "Change" un texte (comme option de commande) en son code de résolution asosicé
+ * 
+ * e.g. change "small" dans la constante RES_SMALL. 
+ * 
+ * @param res_id Le texte de la résolution
+ * 
+ * @return Le code de résolution de l'image (défini dans ce fichier)
+ */
 int resolution_atoi(const char* res_id);
+
 
 int do_read(const char pict_id[], const int RES, const char** image_buffer, uint32_t image_size, struct pictdb_file* file);
 
+/**
+ * @brief compare les @p size  premières entrées de deux tableaux
+ * 
+ * Les deux tableaux doivent contenir des char (e.g. comparaison de SHA). @p Size doit 
+ * être plus petit que la taille du plus petit tableau. Si les tailles sont différentes,
+ * aucune erreur n'est retournée. 
+ * @param orig Le premier tableau à comparer
+ * @param comp Le second tableau à comparer
+ * @param size La taille (normalement des tableaux) sur laquelle comparer les tableaux
+ * 
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
 int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
 
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* file);

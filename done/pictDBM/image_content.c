@@ -58,9 +58,8 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
         }
     }
     g_object_unref(process);
-    //g_free(size_of_small);
     g_free(buffer_in);
-    g_free(buffer_out);
+    //g_free(buffer_out);
     return errcode;
 }
 

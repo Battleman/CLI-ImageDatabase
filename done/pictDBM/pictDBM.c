@@ -21,7 +21,7 @@
 int
 do_list_cmd (int argc, char *argv[])
 {
-    int fail = 1;
+    int fail = ERR_NOT_ENOUGH_ARGUMENTS; //sera retourné si le premier if échoue
     struct pictdb_file myfile;
 
     if(argc > 0) {
@@ -30,9 +30,7 @@ do_list_cmd (int argc, char *argv[])
             do_list(&myfile);
         }
         do_close(&myfile);
-    } else {
-		return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
+    } 
     return fail;
 }
 

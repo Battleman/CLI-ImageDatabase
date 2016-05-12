@@ -30,6 +30,9 @@ sha_to_string (const unsigned char* SHA,
     sha_string[2*SHA256_DIGEST_LENGTH] = '\0';
 }
 
+/********************************************************************//**
+ * Comparaison entre deux tableaux
+ */
 int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
 {
     for(int i = 0; i < size; i++) {
@@ -129,6 +132,9 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
     return errcode;
 }
 
+/********************************************************************//**
+ * Transformation de la dénomination de la résolution dans son code associé
+ */
 int resolution_atoi(const char* res_id)
 {
     if(res_id == NULL) return -1;
@@ -138,6 +144,9 @@ int resolution_atoi(const char* res_id)
     return -1;
 }
 
+/********************************************************************//**
+ * "Concatène" des caractères pour former un nom selon nos standards
+ */
 int create_name(const char* pict_id, char* filename, int res)
 {
     int errcode = 0;
@@ -164,7 +173,9 @@ int create_name(const char* pict_id, char* filename, int res)
 
     return errcode;
 }
-
+/********************************************************************//**
+ * Lecture d'une image.
+ */
 int read_disk_image(char* filename, void* buffer, size_t* size)
 {
     VipsObject* process = VIPS_OBJECT(vips_image_new());
@@ -182,6 +193,9 @@ int read_disk_image(char* filename, void* buffer, size_t* size)
     return errcode;
 }
 
+/********************************************************************//**
+ * Écriture d'une image
+ */
 int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, char* filename)
 {
     int errcode = 0;
@@ -248,9 +262,6 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
         return ERR_OUT_OF_MEMORY;
     }
-    /////////////////
-    ////EST-CE QUE CETTE MÉTHODE EST BONNE ?
-    //////////////////
     if(db_file->header.max_files != fread(	db_file->metadata,
                                             sizeof(struct pict_metadata),
                                             db_file->header.max_files,
@@ -261,6 +272,9 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     return 0;
 }
 
+/********************************************************************//**
+ * Fermeture de fichier
+ */
 void do_close(struct pictdb_file* db_file)
 {
     if(db_file == NULL) {
