@@ -6,12 +6,12 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
 {
     if(db_file == NULL) {
         return ERR_IO;
-    } else if(0 == (db_file -> metadata[index].is_valid)) {
+    } else if(EMPTY	 == (db_file -> metadata[index].is_valid)) {
         return 0;
     }
 
     for(int i = 0; i < db_file -> header.max_files; i++) {
-        if((0 != db_file -> metadata[i].is_valid) && (i != index)) {
+        if((NON_EMPTY == db_file -> metadata[i].is_valid) && (i != index)) {
             if(0 == strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
                 return ERR_DUPLICATE_ID;
             } else if(0 == table_compare(db_file -> metadata[index].SHA, db_file -> metadata[i].SHA, SHA256_DIGEST_LENGTH)) {
@@ -20,7 +20,7 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
                 db_file -> metadata[index].offset[RES_SMALL] = db_file -> metadata[i].offset[RES_SMALL];
                 db_file -> metadata[index].size[RES_THUMB] = db_file -> metadata[i].size[RES_THUMB];
                 db_file -> metadata[index].size[RES_SMALL] = db_file -> metadata[i].size[RES_SMALL];
-                db_file -> metadata[i].is_valid = 0;
+                db_file -> metadata[i].is_valid = EMPTY;
                 return 0;
             }
         }
