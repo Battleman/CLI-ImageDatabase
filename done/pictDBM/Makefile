@@ -13,7 +13,8 @@ all: $(MAIN_EXEC)
 
 error.o: error.c
 db_list.o: db_list.c pictDB.h error.h
-db_create.o: db_create.c pictDBM_tools.h pictDB.h
+db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
+db_read.o : db_read.c image_content.h pictDB.h error.h
 db_utils.o: db_utils.c pictDB.h error.h
 db_delete.o: db_delete.c pictDB.h error.h
 pictDBM_tools.o : pictDBM.c pictDB.h pictDB.h error.h
@@ -22,7 +23,7 @@ image_content.o : image_content.c pictDB.h image_content.h dedup.h error.h
 dedup.o : dedup.c dedup.h pictDB.h error.h
 db_insert.o : db_insert.c pictDB.h image_content.h error.h 
 
-$(MAIN_EXEC): image_content.o pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o
+$(MAIN_EXEC): image_content.o pictDBM.o db_list.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o db_read.o
 
 # scripts to facilitate cleaning and purging#
 #################################################
@@ -58,3 +59,4 @@ mrproper : clean
 #used before handing back.
 stylish:
 	./stylish.sh
+

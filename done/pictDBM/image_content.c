@@ -25,10 +25,7 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     int errcode = 0;
     size_t size_of_small = 0;
     void* buffer_in = NULL;
-    void** buffer_out = NULL;
-    ///////////////////////////////////////
-    //TODO :: PAS DE MALLOC NÉCESSAIRE POUR BUFFER_OUT ?///
-    ///////////////////////////////////////
+    void* buffer_out = NULL;
 
     //Allocations nécessaires
     if(	NULL == (buffer_in = malloc(size_of_orig))) return ERR_OUT_OF_MEMORY;
@@ -47,19 +44,18 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
 
         vips_resize(image[0], &image_small[0], ratio, NULL); //redimensionnement de l'image
 
-        if(vips_jpegsave_buffer(image_small[0], buffer_out, &size_of_small, NULL)) errcode = ERR_VIPS;
+        if(vips_jpegsave_buffer(image_small[0], &buffer_out, &size_of_small, NULL)) errcode = ERR_VIPS;
         else {
             fseek(file, 0, SEEK_END); //déplacement en fin de fichier pour l'écriture
             meta->offset[RES] = ftell(file); //on sauve la position d'écriture
             meta->size[RES] = size_of_small;
-            if(!fwrite(*buffer_out, size_of_small, 1, file)) {
+            if(!fwrite(buffer_out, size_of_small, 1, file)) {
                 errcode = ERR_IO;
             }
         }
     }
     g_object_unref(process);
     g_free(buffer_in);
-    //g_free(buffer_out);
     return errcode;
 }
 

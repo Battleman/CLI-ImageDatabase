@@ -196,40 +196,39 @@ int read_disk_image(char* filename, void* buffer, size_t* size)
 /********************************************************************//**
  * Écriture d'une image
  */
-int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, char* filename)
+int write_disk_image(struct pictdb_file* db_file, const char* pict_id, int res, char* filename)
 {
-    int errcode = 0;
-    void* buffer = NULL;
-
-
-    if(file -> header.num_files == 0) {
+	if(db_file == NULL || pict_id == NULL || !strcmp(pict_id, "") || filename == NULL) return ERR_INVALID_ARGUMENT;
+    
+    if(db_file -> header.num_files == 0) {
         return ERR_FILE_NOT_FOUND;
     }
 
+	int errcode = 0;
+    void* buffer = NULL;
     size_t index = 0;
     int valid = 0;
+    
     do {
-        if(file -> metadata[index].is_valid != 1 || strcmp(pict_id, file -> metadata[index].pict_id) != 0) {
+        if(db_file -> metadata[index].is_valid == EMPTY || strcmp(pict_id, db_file -> metadata[index].pict_id)) { //image invalide ou non pas correspondant
             index++;
         } else {
             valid = 1;
         }
-    } while(valid == 0 && index < file -> header.max_files); //itération jusq'à la taille de meta_table ou jusqu'à trouver un match
+    } while(valid == 0 && index < db_file -> header.max_files); //itération jusq'à la taille de meta_table ou jusqu'à trouver un match
 
     if(valid == 0) {
         return ERR_FILE_NOT_FOUND;
     }
 
-    size_t size = file -> metadata[index].size[res];
+    size_t size = db_file -> metadata[index].size[res];
+    if(size == 0) return ERR_RESOLUTIONS;
     if(NULL == (buffer = malloc(size))) return ERR_IO;
-    if(size == 0) {
-        errcode = ERR_RESOLUTIONS;
-    } else {
-        fseek(file -> fpdb, file -> metadata[index].offset[res], SEEK_SET);
-        if(1 != fread(buffer, size, 1, file -> fpdb)) {
-            errcode = ERR_IO;
-        }
-    }
+        
+	fseek(db_file -> fpdb, db_file -> metadata[index].offset[res], SEEK_SET);
+	if(1 != fread(buffer, size, 1, db_file -> fpdb)) {
+		errcode = ERR_IO;
+	}
 
     VipsObject* process = VIPS_OBJECT(vips_image_new());
     VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
@@ -237,10 +236,12 @@ int write_disk_image(struct pictdb_file* file, const char* pict_id, int res, cha
     if(vips_jpegload_buffer(buffer, size, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
-        if(vips_jpegsave(image[0], filename, NULL)) {
+        if(vips_jpegsave(image[0], filename, NULL)) { //sauvegarde du fichier de l'image
             errcode = ERR_VIPS;
         }
     }
+    
+    g_object_unref(process);
     g_free(buffer);
     return errcode;
 }

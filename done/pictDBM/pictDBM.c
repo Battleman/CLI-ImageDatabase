@@ -143,6 +143,9 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
+/********************************************************************//**
+ * Insert a picture in the database.
+ ********************************************************************* */
 int do_insert_cmd(int argc, char *argv[])
 {
     if(argc < 3) {
@@ -167,16 +170,19 @@ int do_insert_cmd(int argc, char *argv[])
     return errcode;
 }
 
+/********************************************************************//**
+ * Read a database from the disk.
+ ********************************************************************* */
 int do_read_cmd(int argc, char *argv[])
 {
     if(argc < 2) {
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
+    
     int errcode = 0;
-    struct pictdb_file* file = NULL;
-    if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
-    if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
-
+    struct pictdb_file file;
+    //if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
+    if(0 != (errcode = do_open(argv[0], "r+", &file))) return errcode;
     int res = RES_ORIG;
     if(argc >= 3) {
         if(-1 == (res = resolution_atoi(argv[2]))) {
@@ -184,11 +190,15 @@ int do_read_cmd(int argc, char *argv[])
         }
     }
     //utiliser do_read ??
-    /*
-    char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
-    if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
-    	errcode = write_disk_image(file, (const char*)argv[1], res, filename);
-    }*/
+	char** image_buffer = NULL;
+	uint32_t image_size = 0;
+    errcode = do_read(argv[1], (const int)res, image_buffer, &image_size, &file);
+    if(errcode == 0) { 
+		char* filename = calloc(MAX_PIC_ID + 1, sizeof(char));
+		if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
+			errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+		}
+	}
 
     return errcode;
 }

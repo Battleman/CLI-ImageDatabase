@@ -1,8 +1,16 @@
+/**
+ * @file db_insert.c
+ * @brief pictDB library: do_insert implementation.
+ */
+
 #include "pictDB.h"
 #include "dedup.h"
 #include "image_content.h"
 #include <openssl/sha.h> // for SHA256_DIGEST_LENGTH
 
+/********************************************************************//**
+ * Insert an image
+ */
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* db_file)
 {
     if(db_file == NULL || db_file->metadata == NULL) return ERR_INVALID_ARGUMENT;
