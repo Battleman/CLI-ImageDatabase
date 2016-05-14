@@ -21,7 +21,7 @@
 int
 do_list_cmd (int argc, char *argv[])
 {
-    int fail = 1;
+    int fail = ERR_NOT_ENOUGH_ARGUMENTS; //sera retourné si le premier if échoue
     struct pictdb_file myfile;
 
     if(argc > 0) {
@@ -30,7 +30,7 @@ do_list_cmd (int argc, char *argv[])
             do_list(&myfile);
         }
         do_close(&myfile);
-    }
+    } 
     return fail;
 }
 
@@ -51,7 +51,9 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-
+	////////////////////
+	//TODO : IL FAUT FAIRE QUOI LÀ ?
+	////////////////////
     while(argc != 0) {
         if(!strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
@@ -102,20 +104,19 @@ help (int argc, char *argv[])
     printf("\tlist <dbfilename>: list pictDB content.\n");
     printf("\tcreate <dbfilename> [options]: create a new pictDB.\n");
     printf("\t\t\toptions are:\n");
-    printf("\t\t\t\t\t-max_files <MAX_FILES>: maximum number of files.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 10\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 100000\n");
-    printf("\t\t\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 64x64\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 128x128\n");
-    printf("\t\t\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tdefault value is 256x256\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
+    printf("\t\t\t-max_files <MAX_FILES>: maximum number of files.\n");
+    printf("\t\t\t\t\t\tdefault value is 10\n");
+    printf("\t\t\t\t\t\tmaximum value is 100000\n");
+    printf("\t\t\t-thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n");
+    printf("\t\t\t\t\t\tdefault value is 64x64\n");
+    printf("\t\t\t\t\t\tmaximum value is 128x128\n");
+    printf("\t\t\t-small_res <X_RES> <Y_RES>: resolution for small images.\n");
+    printf("\t\t\t\t\t\tdefault value is 256x256\n");
+    printf("\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tread\t<dbfilename> <pictID> [original|orig|thumbnail|thumb|small]:\n");
-    printf("\t\tread an image from the pictDB and save it to a file.\n");
-    printf("\t\tdefault resolution is 'original'.\n");
+    printf("\t   read an image from the pictDB and save it to a file.\n");
+    printf("\t   default resolution is 'original'.\n");
     printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
-    printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tmaximum value is 512x512\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
@@ -142,52 +143,66 @@ do_delete_cmd (int argc, char *argv[])
     return errcode;
 }
 
-int do_insert_cmd(int argc, char *argv[]){
-	if(argc < 3){
-		return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
-	
-	struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
-	do_open(argv[0], "r+", file);
-	
-	int errcode = 0;
-	if(file -> header.num_files >= file -> header.max_files){
-		errcode = ERR_FULL_DATABASE;
-	} else {
-		size_t size = 0;
-		void* buffer = NULL;
-		errcode = read_disk_image(argv[2], buffer, &size);
-		if(errcode == 0 && size !=  0 && buffer != NULL){
-			errcode = do_insert(argv[1], buffer, size, file);
+/********************************************************************//**
+ * Insert a picture in the database.
+ ********************************************************************* */
+int do_insert_cmd(int argc, char *argv[])
+{
+    if(argc < 3) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+
+    struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
+    do_open(argv[0], "r+", file);
+
+    int errcode = 0;
+    if(file -> header.num_files >= file -> header.max_files) {
+        errcode = ERR_FULL_DATABASE;
+    } else {
+        size_t size = 0;
+        void* buffer = NULL;
+        errcode = read_disk_image((const char*)argv[2], buffer, &size);
+        if(errcode == 0 && size !=  0 && buffer != NULL) {
+            errcode = do_insert(argv[1], buffer, size, file);
+        } else {
+			errcode = ERR_DEBUG;
 		}
-	}
-	
-	return errcode;
+    }
+
+    return errcode;
 }
 
-int do_read_cmd(int argc, char *argv[]){
-	if(argc < 2){
-		return ERR_NOT_ENOUGH_ARGUMENTS;
+/********************************************************************//**
+ * Read a database from the disk.
+ ********************************************************************* */
+int do_read_cmd(int argc, char *argv[])
+{
+    if(argc < 2) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+    
+    int errcode = 0;
+    struct pictdb_file file;
+    //if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
+    if(0 != (errcode = do_open(argv[0], "r+", &file))) return errcode;
+    int res = RES_ORIG;
+    if(argc >= 3) {
+        if(-1 == (res = resolution_atoi(argv[2]))) {
+            errcode = ERR_RESOLUTIONS;
+        }
+    }
+    //utiliser do_read ??
+	char** image_buffer = NULL;
+	uint32_t image_size = 0;
+    errcode = do_read(argv[1], (const int)res, image_buffer, &image_size, &file);
+    if(errcode == 0) { 
+		char* filename = calloc(MAX_PIC_ID + 1, sizeof(char));
+		if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
+			errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+		}
 	}
-	int errcode = 0;
-	struct pictdb_file* file = NULL;
-	if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
-	if(0 != (errcode = do_open(argv[0], "r+", file))) return errcode;
-	
-	int res = RES_ORIG;
-	if(argc >= 3){
-		if(-1 == (res = resolution_atoi(argv[2]))){
-			errcode = ERR_RESOLUTIONS;
-		}	
-	}
-	//utiliser do_read ??
-	/*
-	char* filename = calloc(MAX_PIC_ID + 11, sizeof(char));
-	if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
-		errcode = write_disk_image(file, (const char*)argv[1], res, filename);
-	}*/
-	
-	return errcode;
+	do_close(&file);
+    return errcode;
 }
 
 /********************************************************************//**
@@ -208,12 +223,14 @@ typedef struct {
 int main (int argc, char* argv[])
 {
     command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
-											 (command_mapping){"create", do_create_cmd},
-											 (command_mapping){"help", help},
-											 (command_mapping){"delete", do_delete_cmd},
-											 (command_mapping){"read", do_read_cmd},
-											 (command_mapping){"insert", do_insert_cmd}
-											};
+    (command_mapping){"create", do_create_cmd},
+    (command_mapping){"help", help},
+    (command_mapping){"delete", do_delete_cmd},
+    (command_mapping){"read", do_read_cmd},
+    (command_mapping)
+    {"insert", do_insert_cmd
+    }
+                                            };
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;

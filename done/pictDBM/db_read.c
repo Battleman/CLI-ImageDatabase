@@ -8,7 +8,7 @@
 
 /********************************************************************//**
  * Lecture d'une image dans la résolution souhaitée et retour dans un buffer
- */	
+ */
 int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file)
 {
     size_t index = 0;

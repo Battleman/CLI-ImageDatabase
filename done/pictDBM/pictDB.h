@@ -185,93 +185,93 @@ int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
 
 /**
  * @brief "Change" un texte (comme option de commande) en son code de résolution asosicé
- * 
- * e.g. change "small" dans la constante RES_SMALL. 
- * 
+ *
+ * e.g. change "small" dans la constante RES_SMALL.
+ *
  * @param res_id Le texte de la résolution
- * 
+ *
  * @return Le code de résolution de l'image (défini dans ce fichier) ou -1 en cas d'erreur
  */
 int resolution_atoi(const char* res_id);
 
 /**
  * @brief Lecture d'une résolution d'une image
- * 
+ *
  * Cherche une image dans la base de donnée. Si la résolution souhaitée n'existe pas,
- * les fonctions nécessaires sont appelées pour la créer. La l'image est alors 
+ * les fonctions nécessaires sont appelées pour la créer. La l'image est alors
  * retournée dans un argument de sortie.
- * 
+ *
  * @param pict_id Le nom de l'image
  * @param RES La résolution souhaitée de l'image
  * @param image_buffer Paramètre de sortie : Buffer dans lequelle stocker l'image
  * @param image_size Paramètre de sortie : taille de l'image
  * @param db_file La base de donnée
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file);
 
 /**
  * @brief compare les @p size  premières entrées de deux tableaux
- * 
- * Les deux tableaux doivent contenir des char (e.g. comparaison de SHA). @p Size doit 
+ *
+ * Les deux tableaux doivent contenir des char (e.g. comparaison de SHA). @p Size doit
  * être plus petit que la taille du plus petit tableau. Si les tailles sont différentes,
- * aucune erreur n'est retournée. 
+ * aucune erreur n'est retournée.
  * @param orig Le premier tableau à comparer
  * @param comp Le second tableau à comparer
  * @param size La taille (normalement des tableaux) sur laquelle comparer les tableaux
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
 int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
 
 /** @brief Insère une image dans la base de donnée
- * 
+ *
  * @param pict_id Le nom de l'image
  * @param img L'image
  * @param size La taille de l'image
  * @param db_file La DB dans laquelle insérer l'image
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon.
- */ 
+ */
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* db_file);
 
 /**@brief Crée un nom standardisé pour une image
- * 
+ *
  * @param pict_id Le nom de l'image
  * @param filename L'emplacement pour y écrire le nom
  * @param res Le code de la résolution
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 int create_name(const char* pict_id, char* filename, int res);
 
 /**@brief lit une image sur le disque
- * 
+ *
  * Lit sur le disque une image de type jpeg et la renvoie dans un argument de sortie
- * 
+ *
  * @param filename Le nom à donner à l'image
  * @param buffer L'emplacement dans lequelle mettre l'image
  * @param size La taille de l'image
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-int read_disk_image(char* filename, void* buffer, size_t* size);
+int read_disk_image(const char* filename, void* buffer, size_t* size);
 
 
 /**@brief Écrit une image sur le disque
- * 
+ *
  * Cherche une image dans la base de donnée (dans la résolution choisie) et l'écrit sur
  * le disque sous la formed'une image au format jpeg
- * 
+ *
  * @param db_file La base de donnée dans laquelle chercher l'image
  * @param pict_id Le nom de l'image a chercher
  * @param res La résolution de l'image a chercher
  * @param filename Le nom de l'image lors de l'écriture
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-int write_disk_image(struct pictdb_file* db_file, const char* pict_id, int res, char* filename);
+int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename);
 
 #ifdef __cplusplus
 }

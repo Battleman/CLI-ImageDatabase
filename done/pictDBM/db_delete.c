@@ -7,16 +7,16 @@
 
 /**
  * @brief suppression de l'image dans la metatable et réécriture de la metadata modifiée
- * 
+ *
  * Itère dans la table pour trouver une image correspondant au nom passé en argument.
- * Pose le bit de validité à EMPTY puis, si l'image est trouvée, réécriture de la 
+ * Pose le bit de validité à EMPTY puis, si l'image est trouvée, réécriture de la
  * metadata supprimée.
- * 
+ *
  * @param pic_name Nom de l'image à supprimer
  * @param fpdb Le fichier dans lequel écrire
  * @param meta_table La metatable dans laquelle chercher l'image
  * @param size Taille metatable
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 static int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metadata* meta_table, size_t size)
@@ -46,17 +46,17 @@ static int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metada
 }
 /**
  * @brief modification du header de la DB
- * 
+ *
  * Modifie le nombre de fichiers et la version (avec réécriture dans le fichier)
- * 
+ *
  * @param fpdb Le fichier (ouvert) dans lequel écrire
  * @param header Le header à modifier puis à réécrire
- * 
+ *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 static int modify_header(FILE* fpdb, struct pictdb_header* header)
 {
-	if(header == NULL) return ERR_INVALID_ARGUMENT; //robustesse
+    if(header == NULL) return ERR_INVALID_ARGUMENT; //robustesse
     header->num_files--; //réduction du nombre de fichiers
     header->db_version++; //version suivante
     rewind(fpdb); //retour au début du fichier pour écrire sur le header

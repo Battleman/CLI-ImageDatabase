@@ -30,7 +30,7 @@ do_list_cmd (int argc, char *argv[])
             do_list(&myfile);
         }
         do_close(&myfile);
-    } 
+    }
     return fail;
 }
 
@@ -51,9 +51,9 @@ do_create_cmd (int argc, char *argv[])
     const char* filename = argv[0];
     argc--;
     argv++;
-	////////////////////
-	//TODO : IL FAUT FAIRE QUOI LÀ ?
-	////////////////////
+    ////////////////////
+    //TODO : IL FAUT FAIRE QUOI LÀ ?
+    ////////////////////
     while(argc != 0) {
         if(!strcmp(argv[0], "-max_files")) {
             if(argc > 1) {
@@ -161,9 +161,11 @@ int do_insert_cmd(int argc, char *argv[])
     } else {
         size_t size = 0;
         void* buffer = NULL;
-        errcode = read_disk_image(argv[2], buffer, &size);
+        errcode = read_disk_image((const char*)argv[2], buffer, &size);
         if(errcode == 0 && size !=  0 && buffer != NULL) {
             errcode = do_insert(argv[1], buffer, size, file);
+        } else {
+            errcode = ERR_DEBUG;
         }
     }
 
@@ -178,7 +180,7 @@ int do_read_cmd(int argc, char *argv[])
     if(argc < 2) {
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
-    
+
     int errcode = 0;
     struct pictdb_file file;
     //if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
@@ -190,16 +192,16 @@ int do_read_cmd(int argc, char *argv[])
         }
     }
     //utiliser do_read ??
-	char** image_buffer = NULL;
-	uint32_t image_size = 0;
+    char** image_buffer = NULL;
+    uint32_t image_size = 0;
     errcode = do_read(argv[1], (const int)res, image_buffer, &image_size, &file);
-    if(errcode == 0) { 
-		char* filename = calloc(MAX_PIC_ID + 1, sizeof(char));
-		if(0 == (errcode = create_name((const char*)argv[1], filename, res))){
-			errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
-		}
-	}
-
+    if(errcode == 0) {
+        char* filename = calloc(MAX_PIC_ID + 1, sizeof(char));
+        if(0 == (errcode = create_name((const char*)argv[1], filename, res))) {
+            errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+        }
+    }
+    do_close(&file);
     return errcode;
 }
 
