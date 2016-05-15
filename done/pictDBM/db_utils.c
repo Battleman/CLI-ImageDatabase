@@ -176,9 +176,9 @@ int create_name(const char* pict_id, char* filename, int res)
 /********************************************************************//**
  * Lecture d'une image.
  */
-int read_disk_image(const char* filename, void* buffer, size_t* size)
+/*int read_disk_image(const char* filename, void** buffer, size_t* size)
 {
-    /*VipsObject* process = VIPS_OBJECT(vips_image_new());
+    VipsObject* process = VIPS_OBJECT(vips_image_new());
     VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
 
     int errcode = 0;
@@ -188,20 +188,26 @@ int read_disk_image(const char* filename, void* buffer, size_t* size)
         if(vips_jpegsave_buffer(image[0], &buffer, size, NULL)) {
             errcode = ERR_VIPS;
         }
-    }*/
+    }
     int errcode = 0;
-    VipsImage* original = vips_image_new_from_file(filename, NULL);
-    if (original == NULL) vips_error_exit("unable to read \"%s\"", filename);
-    if(vips_jpegsave_buffer(original, buffer, size, NULL)) errcode = ERR_VIPS;
-
-
+    VipsImage* in = vips_image_new_from_file(filename, NULL);
+    if (in == NULL) vips_error_exit("unable to read \"%s\"", filename);
+    if(vips_jpegsave_buffer(in, buffer, size, NULL)) errcode = ERR_VIPS;
+    
     return errcode;
+}*/
+int read_disk_image(FILE* file, char* image, size_t image_size) {
+	if(file == NULL || image_size == 0 || image == NULL) return ERR_INVALID_ARGUMENT;
+	rewind(file);
+	if(image_size != fread(image, sizeof(char), image_size, file)) return ERR_IO;
+	
+	return 0;
 }
 
 /********************************************************************//**
  * Écriture d'une image
  */
-int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename)
+/*int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename)
 {
     if(db_file == NULL || pict_id == NULL || !strcmp(pict_id, "") || filename == NULL) return ERR_INVALID_ARGUMENT;
 
@@ -249,8 +255,14 @@ int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, con
     g_object_unref(process);
     g_free(buffer);
     return errcode;
+}*/
+int write_disk_image(FILE* file, const char* image, uint32_t image_size) {
+	if(file == NULL || image_size == 0 || image == NULL || !strcmp(image, "")) return ERR_INVALID_ARGUMENT;
+	rewind(file);
+	if(image_size != fwrite(image, sizeof(char), image_size, file)) return ERR_IO;
+	
+	return 0;
 }
-
 /******************************************//**
  * File opening and header/metadata reading
  */

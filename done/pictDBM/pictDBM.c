@@ -152,21 +152,21 @@ int do_insert_cmd(int argc, char *argv[])
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
 
-    struct pictdb_file* file = malloc(sizeof(struct pictdb_file));
-    do_open(argv[0], "r+", file);
+    struct pictdb_file db_file;
+    do_open(argv[0], "r+b", &db_file);
 
     int errcode = 0;
-    if(file -> header.num_files >= file -> header.max_files) {
+    if(db_file.header.num_files >= db_file.header.max_files) {
         errcode = ERR_FULL_DATABASE;
     } else {
-        size_t size = 0;
-        void* buffer = NULL;
-        errcode = read_disk_image((const char*)argv[2], buffer, &size);
-        if(errcode == 0 && size !=  0 && buffer != NULL) {
-            errcode = do_insert(argv[1], buffer, size, file);
+        /*size_t size = 0;
+        void** buffer;
+		errcode = read_disk_image((const char*)argv[2], buffer, &size);
+        if(errcode == 0 && size !=  0) && buffer != NULL) {
+            errcode = do_insert(argv[1], (char *) *buffer, size, &db_file);
         } else {
             errcode = ERR_DEBUG;
-        }
+        }*/
     }
 
     return errcode;
@@ -184,7 +184,7 @@ int do_read_cmd(int argc, char *argv[])
     int errcode = 0;
     struct pictdb_file file;
     //if(NULL == (file = malloc(sizeof(struct pictdb_file)))) return ERR_IO;
-    if(0 != (errcode = do_open(argv[0], "r+", &file))) return errcode;
+    if(0 != (errcode = do_open(argv[0], "r+b", &file))) return errcode;
     int res = RES_ORIG;
     if(argc >= 3) {
         if(-1 == (res = resolution_atoi(argv[2]))) {
@@ -196,9 +196,15 @@ int do_read_cmd(int argc, char *argv[])
     uint32_t image_size = 0;
     errcode = do_read(argv[1], (const int)res, image_buffer, &image_size, &file);
     if(errcode == 0) {
-        char* filename = calloc(MAX_PIC_ID + 1, sizeof(char));
+        char* filename = calloc(MAX_PIC_ID + 11, sizeof(char)); //11 pour le max des small/.jpg/...
         if(0 == (errcode = create_name((const char*)argv[1], filename, res))) {
-            errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+            //errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+            FILE* file = fopen(filename, "wb") ;
+            if(file == NULL) {
+				return ERR_IO;
+			}
+			errcode = write_disk_image(file, image_buffer[0], image_size);
+			fclose(file);
         }
     }
     do_close(&file);

@@ -256,8 +256,8 @@ int create_name(const char* pict_id, char* filename, int res);
  *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-int read_disk_image(const char* filename, void* buffer, size_t* size);
-
+//int read_disk_image(const char* filename, void** buffer, size_t* size);
+int read_disk_image(FILE* file, char* image, size_t image_size);
 
 /**@brief Écrit une image sur le disque
  *
@@ -271,8 +271,8 @@ int read_disk_image(const char* filename, void* buffer, size_t* size);
  *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename);
-
+//int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename);
+int write_disk_image(FILE*, const char* image, uint32_t image_size);
 #ifdef __cplusplus
 }
 #endif
