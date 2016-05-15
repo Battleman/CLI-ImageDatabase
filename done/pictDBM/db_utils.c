@@ -219,10 +219,11 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     if(NULL == (db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)))) {
         return ERR_OUT_OF_MEMORY;
     }
-    if(db_file->header.max_files != fread(	db_file->metadata,
+    int read_file = 0;
+    if(db_file->header.max_files != (read_file = fread(	db_file->metadata,
                                             sizeof(struct pict_metadata),
                                             db_file->header.max_files,
-                                            db_file -> fpdb)) {
+                                            db_file -> fpdb))) {
         return ERR_IO;
     }
 
@@ -234,13 +235,9 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
  */
 void do_close(struct pictdb_file* db_file)
 {
-    if(db_file == NULL) {
-        fprintf(stderr, "ERR: impossible de fermer un fichier (base de donnée inexistante)");
-    } else {
+    if(db_file != NULL) {
         free(db_file->metadata);
-        if(db_file -> fpdb == NULL) {
-            fprintf(stderr, "ERR: impossible de fermer le fichire fichier (non-ouvert ou inexistant)");
-        } else {
+        if(db_file -> fpdb != NULL) {
             fclose(db_file -> fpdb);
         }
     }

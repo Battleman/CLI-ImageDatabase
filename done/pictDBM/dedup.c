@@ -20,6 +20,8 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
                 db_file -> metadata[index].offset[RES_SMALL] = db_file -> metadata[i].offset[RES_SMALL];
                 db_file -> metadata[index].size[RES_THUMB] = db_file -> metadata[i].size[RES_THUMB];
                 db_file -> metadata[index].size[RES_SMALL] = db_file -> metadata[i].size[RES_SMALL];
+                db_file -> metadata[index].res_orig[0] = db_file -> metadata[i].res_orig[0];
+                db_file -> metadata[index].res_orig[1] = db_file -> metadata[i].res_orig[1];
                 db_file -> metadata[i].is_valid = EMPTY;
                 doublon = 1;
             }
