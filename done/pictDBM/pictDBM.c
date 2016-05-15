@@ -162,11 +162,13 @@ int do_insert_cmd(int argc, char *argv[])
         size_t size = 0;
         void* buffer = NULL;
 		errcode = read_disk_image((const char*)argv[2], &buffer, &size);
-        if(errcode == 0 && size !=  0 && buffer != NULL) {
-            errcode = do_insert(argv[1], (char *) buffer, size, &db_file);
-        } else {
-            errcode = ERR_DEBUG;
-        }
+        if(errcode == 0) {
+			if(size !=  0 && buffer != NULL) {
+	            errcode = do_insert(argv[1], (char *) buffer, size, &db_file);
+	        } else {
+	           errcode = ERR_IO; 
+			}
+		}
     }
 
     return errcode;
