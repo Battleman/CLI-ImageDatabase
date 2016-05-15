@@ -118,15 +118,15 @@ int overwrite_header(FILE* file, struct pictdb_header* header)
 /**********************************
  * Remplacement d'UNE métadonnée
  */
-int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index)
+int overwrite_metadata(struct pictdb_file* db_file, size_t index)
 {
     //Vérification des input
-    if(file == NULL || metadata == NULL) {
+    if (db_file == NULL || db_file->fpdb == NULL || db_file->metadata == NULL || index < 0 || index >= db_file->header.max_files) {
         return ERR_INVALID_ARGUMENT;
     }
     int errcode = 0;
-    fseek(file, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
-    if(0 != errcode && 1 != fwrite(metadata, sizeof(struct pict_metadata), 1, file)) {
+    fseek(db_file->fpdb, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET);
+    if(1 != fwrite(&(db_file->metadata[index]), sizeof(struct pict_metadata), 1, db_file->fpdb)) {
         errcode = ERR_IO;
     }
     return errcode;

@@ -164,7 +164,7 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
  *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-int overwrite_metadata(FILE* file, struct pict_metadata* metadata, size_t index);
+int overwrite_metadata(struct pictdb_file* db_file, size_t index);
 
 //Ne pas prendre en compte les deux fonctions suivantes. c.f. note dans db_utils.c.
 /**

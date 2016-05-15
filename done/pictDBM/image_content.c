@@ -62,7 +62,7 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
 static int update_file(struct pictdb_file* db_file, size_t index)
 {
     int errcode = 0;
-    if(0 != (errcode = overwrite_metadata(db_file->fpdb, &db_file->metadata[index], index))) {
+    if(0 != (errcode = overwrite_metadata(db_file, index))) {
         errcode = ERR_IO;
     }
     return errcode;

@@ -6,11 +6,8 @@
  */
 int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
 {
-    if(db_file == NULL) {
-        return ERR_IO;
-    } else if(EMPTY	 == (db_file -> metadata[index].is_valid)) {
-        return 0;
-    }
+    if(db_file == NULL) return ERR_IO;
+    if(EMPTY == (db_file -> metadata[index].is_valid)) return 0;
     int doublon = 0;
     for(int i = 0; i < db_file -> header.max_files; i++) {
         if((i != index) && (NON_EMPTY == db_file -> metadata[i].is_valid)) {
