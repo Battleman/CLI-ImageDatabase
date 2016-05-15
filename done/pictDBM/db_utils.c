@@ -189,75 +189,12 @@ int read_disk_image(const char* filename, void** buffer, size_t* size)
             errcode = ERR_VIPS;
         }
     }
-    /*int errcode = 0;
-    VipsImage* in = vips_image_new_from_file(filename, NULL);
-	if(in == NULL) errcode = ERR_VIPS;
-	else {
-		if(vips_jpegsave_buffer(in, *buffer, size, NULL)) errcode = ERR_VIPS;
-	}
-	*/
     return errcode;
 }
-/*int read_disk_image(FILE* file, char* image, size_t image_size) {
-	if(file == NULL || image_size == 0 || image == NULL) return ERR_INVALID_ARGUMENT;
-	rewind(file);
-	if(image_size != fread(image, sizeof(char), image_size, file)) return ERR_IO;
-	
-	return 0;
-}*/
 
 /********************************************************************//**
  * Écriture d'une image
  */
-/*int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename)
-{
-    if(db_file == NULL || pict_id == NULL || !strcmp(pict_id, "") || filename == NULL) return ERR_INVALID_ARGUMENT;
-
-    if(db_file -> header.num_files == 0) {
-        return ERR_FILE_NOT_FOUND;
-    }
-
-    int errcode = 0;
-    void* buffer = NULL;
-    size_t index = 0;
-    int valid = 0;
-
-    do {
-        if(db_file -> metadata[index].is_valid == EMPTY || strcmp(pict_id, db_file -> metadata[index].pict_id)) { //image invalide ou non pas correspondant
-            index++;
-        } else {
-            valid = 1;
-        }
-    } while(valid == 0 && index < db_file -> header.max_files); //itération jusq'à la taille de meta_table ou jusqu'à trouver un match
-
-    if(valid == 0) {
-        return ERR_FILE_NOT_FOUND;
-    }
-
-    size_t size = db_file -> metadata[index].size[res];
-    if(size == 0) return ERR_RESOLUTIONS;
-    if(NULL == (buffer = malloc(size))) return ERR_IO;
-
-    fseek(db_file -> fpdb, db_file -> metadata[index].offset[res], SEEK_SET);
-    if(1 != fread(buffer, size, 1, db_file -> fpdb)) {
-        errcode = ERR_IO;
-    }
-
-    VipsObject* process = VIPS_OBJECT(vips_image_new());
-    VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
-
-    if(vips_jpegload_buffer(buffer, size, image, NULL)) {
-        errcode = ERR_VIPS;
-    } else {
-        if(vips_jpegsave(image[0], filename, NULL)) { //sauvegarde du fichier de l'image
-            errcode = ERR_VIPS;
-        }
-    }
-
-    g_object_unref(process);
-    g_free(buffer);
-    return errcode;
-}*/
 int write_disk_image(FILE* file, const char* image, uint32_t image_size) {
 	if(file == NULL || image_size == 0 || image == NULL || !strcmp(image, "")) return ERR_INVALID_ARGUMENT;
 	rewind(file);

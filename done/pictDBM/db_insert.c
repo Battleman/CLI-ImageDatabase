@@ -32,18 +32,25 @@ int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* 
     if(0 != (errcode = do_name_and_content_dedup(db_file, index))) return errcode;
     if(db_file->metadata[index].offset[RES_ORIG] == 0) {
         if(0 != (errcode = fseek(db_file->fpdb, 0, SEEK_END))) return errcode;
-        db_file->metadata[index].offset[RES_ORIG] = SEEK_END;
-        if(0 == fwrite(img, size, 1, db_file->fpdb)) return ERR_IO;
+        db_file->metadata[index].offset[RES_ORIG] = ftell(db_file->fpdb);
+        if(1 != fwrite(img, size, 1, db_file->fpdb)) return ERR_IO;
 
         if(0 != (errcode = get_resolution(	&db_file->metadata[index].res_orig[0],
-                                            &db_file->metadata[index].res_orig[0],
+                                            &db_file->metadata[index].res_orig[1],
                                             (const char*) img,
                                             size
                                          )
                 )
-          ) return errcode;
-    }
+          ) errcode = ERR_RESOLUTIONS;
+        db_file->metadata[index].is_valid = NON_EMPTY;
+        db_file->header.db_version++;
+        db_file->header.num_files++;
+        errcode = overwrite_metadata(db_file->fpdb, db_file->metadata,  index);
+        if(errcode == 0) {
+			errcode = overwrite_header(db_file->fpdb, &db_file->header);
+		}
+	}
 
 
-    return 0;
+    return errcode;
 }
