@@ -159,14 +159,14 @@ int do_insert_cmd(int argc, char *argv[])
     if(db_file.header.num_files >= db_file.header.max_files) {
         errcode = ERR_FULL_DATABASE;
     } else {
-        /*size_t size = 0;
-        void** buffer;
-		errcode = read_disk_image((const char*)argv[2], buffer, &size);
-        if(errcode == 0 && size !=  0) && buffer != NULL) {
-            errcode = do_insert(argv[1], (char *) *buffer, size, &db_file);
+        size_t size = 0;
+        void* buffer = NULL;
+		errcode = read_disk_image((const char*)argv[2], &buffer, &size);
+        if(errcode == 0 && size !=  0 && buffer != NULL) {
+            errcode = do_insert(argv[1], (char *) buffer, size, &db_file);
         } else {
             errcode = ERR_DEBUG;
-        }*/
+        }
     }
 
     return errcode;
@@ -192,9 +192,9 @@ int do_read_cmd(int argc, char *argv[])
         }
     }
     //utiliser do_read ??
-    char** image_buffer = NULL;
+    char* image_buffer = NULL;
     uint32_t image_size = 0;
-    errcode = do_read(argv[1], (const int)res, image_buffer, &image_size, &file);
+    errcode = do_read(argv[1], (const int)res, &image_buffer, &image_size, &file);
     if(errcode == 0) {
         char* filename = calloc(MAX_PIC_ID + 11, sizeof(char)); //11 pour le max des small/.jpg/...
         if(0 == (errcode = create_name((const char*)argv[1], filename, res))) {
@@ -203,7 +203,7 @@ int do_read_cmd(int argc, char *argv[])
             if(file == NULL) {
 				return ERR_IO;
 			}
-			errcode = write_disk_image(file, image_buffer[0], image_size);
+			errcode = write_disk_image(file, image_buffer, image_size);
 			fclose(file);
         }
     }

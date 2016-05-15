@@ -176,7 +176,7 @@ int create_name(const char* pict_id, char* filename, int res)
 /********************************************************************//**
  * Lecture d'une image.
  */
-/*int read_disk_image(const char* filename, void** buffer, size_t* size)
+int read_disk_image(const char* filename, void** buffer, size_t* size)
 {
     VipsObject* process = VIPS_OBJECT(vips_image_new());
     VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
@@ -185,24 +185,26 @@ int create_name(const char* pict_id, char* filename, int res)
     if(vips_jpegload(filename, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
-        if(vips_jpegsave_buffer(image[0], &buffer, size, NULL)) {
+        if(vips_jpegsave_buffer(image[0], buffer, size, NULL)) {
             errcode = ERR_VIPS;
         }
     }
-    int errcode = 0;
+    /*int errcode = 0;
     VipsImage* in = vips_image_new_from_file(filename, NULL);
-    if (in == NULL) vips_error_exit("unable to read \"%s\"", filename);
-    if(vips_jpegsave_buffer(in, buffer, size, NULL)) errcode = ERR_VIPS;
-    
+	if(in == NULL) errcode = ERR_VIPS;
+	else {
+		if(vips_jpegsave_buffer(in, *buffer, size, NULL)) errcode = ERR_VIPS;
+	}
+	*/
     return errcode;
-}*/
-int read_disk_image(FILE* file, char* image, size_t image_size) {
+}
+/*int read_disk_image(FILE* file, char* image, size_t image_size) {
 	if(file == NULL || image_size == 0 || image == NULL) return ERR_INVALID_ARGUMENT;
 	rewind(file);
 	if(image_size != fread(image, sizeof(char), image_size, file)) return ERR_IO;
 	
 	return 0;
-}
+}*/
 
 /********************************************************************//**
  * Écriture d'une image

@@ -256,8 +256,8 @@ int create_name(const char* pict_id, char* filename, int res);
  *
  * @return 0 en cas de succès, un code d'erreur sinon
  */
-//int read_disk_image(const char* filename, void** buffer, size_t* size);
-int read_disk_image(FILE* file, char* image, size_t image_size);
+int read_disk_image(const char* filename, void** buffer, size_t* size);
+//int read_disk_image(FILE* file, char* image, size_t image_size);
 
 /**@brief Écrit une image sur le disque
  *

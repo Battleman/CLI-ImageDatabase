@@ -33,12 +33,12 @@ int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* 
     }
 
     if(errcode == 0) {
-        image_buffer = calloc(*image_size, 1);
+        *image_buffer = calloc(*image_size, 1);
         if(image_buffer == NULL) {
             errcode = ERR_OUT_OF_MEMORY;
         } else {
             fseek(db_file -> fpdb, db_file -> metadata[index].offset[RES], SEEK_SET);
-            if(1 != fread(image_buffer, *image_size, 1, db_file -> fpdb)) {
+            if(1 != fread(*image_buffer, *image_size, 1, db_file -> fpdb)) {
                 errcode = ERR_IO;
             }
         }
