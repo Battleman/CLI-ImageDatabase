@@ -110,6 +110,8 @@ int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, 
         *width = (*image)->Xsize;
         *height = (*image)->Ysize;
     }
+    
+    g_object_unref(process);
 
     return errcode;
 }

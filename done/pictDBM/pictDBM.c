@@ -170,6 +170,7 @@ int do_insert_cmd(int argc, char *argv[])
 			}
 		}
     }
+    do_close(&db_file);
 
     return errcode;
 }
@@ -199,16 +200,23 @@ int do_read_cmd(int argc, char *argv[])
     errcode = do_read(argv[1], (const int)res, &image_buffer, &image_size, &file);
     if(errcode == 0) {
         char* filename = calloc(MAX_PIC_ID + 11, sizeof(char)); //11 pour le max des small/.jpg/...
-        if(0 == (errcode = create_name((const char*)argv[1], filename, res))) {
-            //errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
-            FILE* file = fopen(filename, "wb") ;
-            if(file == NULL) {
-				return ERR_IO;
+        if(filename == NULL) errcode = ERR_OUT_OF_MEMORY;
+        else {
+			if(0 == (errcode = create_name((const char*)argv[1], filename, res))) {
+	            //errcode = write_disk_image(&file, (const char*)argv[1], res, filename);
+	            FILE* image_file = fopen(filename, "wb"); //ouverture de l'image
+	            if(image_file == NULL) {
+					errcode = ERR_IO;
+				} else {
+					errcode = write_disk_image(image_file, image_buffer, image_size);
+					fclose(image_file); //fermeture de l'image
+				}
 			}
-			errcode = write_disk_image(file, image_buffer, image_size);
-			fclose(file);
-        }
+			free(filename);
+		}
+        
     }
+    free(image_buffer);
     do_close(&file);
     return errcode;
 }

@@ -45,18 +45,20 @@ int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_fi
     header.res_resized[2 * RES_SMALL + 1] = small_res_Y;
 
     db_file -> header = header;
-
-    //initialisation du fichier et de la mémoire
-    if(1 != fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb))
+    int printHead = 0;
+    int printMeta = 0;
+	//écriture du header
+    if(1 != (printHead = fwrite(&db_file->header, sizeof(struct pictdb_header), 1, db_file->fpdb)))
         errcode = ERR_IO;
 
-
+	//allocation et écriture des metadata
     if(	errcode == 0) {
         db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata));
         if(db_file->metadata == NULL) errcode = ERR_OUT_OF_MEMORY;
-        else if(max_files != fwrite(db_file->metadata, sizeof(struct pict_metadata), max_files, db_file->fpdb)) errcode = ERR_IO;
-            
+        else if(max_files != (printMeta =  fwrite(db_file->metadata, sizeof(struct pict_metadata), max_files, db_file->fpdb))) errcode = ERR_IO;
     }
+    
+    printf("%d item(s) written\n", printHead+printMeta);
 
     do_close(db_file);
 

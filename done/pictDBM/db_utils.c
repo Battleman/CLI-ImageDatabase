@@ -189,6 +189,7 @@ int read_disk_image(const char* filename, void** buffer, size_t* size)
             errcode = ERR_VIPS;
         }
     }
+    g_object_unref(process);
     return errcode;
 }
 

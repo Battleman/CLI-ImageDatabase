@@ -41,6 +41,7 @@ int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* 
             if(1 != fread(*image_buffer, *image_size, 1, db_file -> fpdb)) {
                 errcode = ERR_IO;
             }
+            
         }
     }
 
