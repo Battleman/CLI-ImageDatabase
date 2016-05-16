@@ -86,7 +86,8 @@ Thumbs.db
 
 # Décommenter pour faire le rendu #
 ###################################
-#*.sh
-#*/astyle_orig/
-#doxyfile
-#valgrind_ignore
+*.sh
+*/astyle_orig/
+doxyfile
+valgrind_ignore
+Makefile_tempo
