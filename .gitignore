@@ -87,7 +87,7 @@ Thumbs.db
 # Décommenter pour faire le rendu #
 ###################################
 *.sh
-/astyle_orig/
+*/astyle_orig/
 doxyfile.txt
 valgrind_ignore.txt
 Makefile_tempo.txt
