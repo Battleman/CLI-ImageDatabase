@@ -87,5 +87,5 @@ Thumbs.db
 # Décommenter pour faire le rendu #
 ###################################
 *.sh
-done/pictDBM/astyle_orig
+done/pictDBM/astyle_orig/
 *.txt
