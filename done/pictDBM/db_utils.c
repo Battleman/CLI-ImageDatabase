@@ -76,28 +76,6 @@ print_metadata (const struct pict_metadata* metadata)
     printf("ORIGINAL: %" PRIu32 " x %" PRIu32 "\n", metadata -> res_orig[0], metadata -> res_orig[1]);
     printf("*****************************************\n");
 }
-/* ces fonctions ne sont pas utilisées pour le moment, et sont probablement fausses, mais si
- * nécessaire, elles seront revues et décommentées. A ne pas lire/coriger pour le moment, merci :)
-void copy_header(struct pictdb_header* copy, const struct pictdb_header* header){
-	memcpy(&copy -> db_name, &header -> db_name, MAX_DB_NAME + 1);
-	memcpy(&copy -> res_resized, &header -> res_resized, 2*(NB_RES - 1));
-	copy -> db_version = header -> db_version;
-	copy -> num_files = header -> num_files;
-	copy -> max_files = header -> max_files;
-	copy -> unused_32 = header -> unused_32;
-	copy -> unused_64 = header -> unused_64;
-}
-
-void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metadata){
-	memcpy(&copy -> pict_id, &metadata -> pict_id, MAX_PIC_ID + 1);
-	memcpy(&copy -> SHA, &metadata -> SHA, SHA256_DIGEST_LENGTH);
-	memcpy(&copy -> res_orig, &metadata -> res_orig, RES_ORIG);
-	memcpy(&copy -> size, &metadata -> size, NB_RES);
-	memcpy(&copy -> offset, &metadata -> offset, NB_RES);
-	copy -> is_valid = metadata -> is_valid;
-	copy -> unused_16 = metadata -> unused_16;
-}*/
-
 /**********************************
  * Remplacement du header
  */
@@ -149,12 +127,12 @@ int resolution_atoi(const char* res_id)
  */
 int create_name(const char* pict_id, char* filename, int res)
 {
-    int errcode = 0;
+   
     if(filename == NULL) {
-        errcode = ERR_IO;
+        return ERR_IO;
     }
 
-    filename[MAX_PIC_ID + 11] = '\0';
+    filename[MAX_PIC_ID + 10] = '\0';
     strncpy(filename, pict_id, MAX_PIC_ID);
     switch(res) {
     case RES_THUMB:
@@ -167,41 +145,33 @@ int create_name(const char* pict_id, char* filename, int res)
         strcpy(&filename[strlen(pict_id)], "_orig.jpg");
         break;
     default:
-        errcode = ERR_RESOLUTIONS;
-        break;
+        return ERR_RESOLUTIONS;
     }
 
-    return errcode;
+    return 0;
 }
 /********************************************************************//**
  * Lecture d'une image.
  */
 int read_disk_image(const char* filename, void** buffer, size_t* size)
 {
-    VipsObject* process = VIPS_OBJECT(vips_image_new());
-    VipsImage** image = (VipsImage**) vips_object_local_array(process, 1);
-
-    int errcode = 0;
-    if(vips_jpegload(filename, image, NULL)) {
-        errcode = ERR_VIPS;
-    } else {
-        if(vips_jpegsave_buffer(image[0], buffer, size, NULL)) {
-            errcode = ERR_VIPS;
-        }
-    }
-    g_object_unref(process);
-    return errcode;
+    VipsImage* in = vips_image_new_from_file(filename, NULL);
+    if(in == NULL) return ERR_VIPS;
+    if(vips_jpegsave_buffer(in, buffer, size, NULL)) return ERR_VIPS;
+    return 0;
 }
 
 /********************************************************************//**
  * Écriture d'une image
  */
-int write_disk_image(FILE* file, const char* image, uint32_t image_size) {
-	if(file == NULL || image_size == 0 || image == NULL || !strcmp(image, "")) return ERR_INVALID_ARGUMENT;
-	rewind(file);
-	if(image_size != fwrite(image, sizeof(char), image_size, file)) return ERR_IO;
-	
-	return 0;
+int write_disk_image(FILE* file, const char* image, uint32_t image_size)
+{
+    //Vérification des input
+    if(file == NULL || image_size == 0 || image == NULL || !strcmp(image, "")) return ERR_INVALID_ARGUMENT;
+    rewind(file); //retour au début (précaution)
+    if(image_size != fwrite(image, sizeof(char), image_size, file)) return ERR_IO; //écriture
+
+    return 0;
 }
 /******************************************//**
  * File opening and header/metadata reading
@@ -209,7 +179,7 @@ int write_disk_image(FILE* file, const char* image, uint32_t image_size) {
 int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
 {
 
-    db_file -> fpdb = fopen(filename, mode);
+    db_file -> fpdb = fopen(filename, mode); //création d'une db
     if(db_file->fpdb == NULL) return ERR_IO;
     if(1 != fread(&db_file -> header, sizeof(struct pictdb_header), 1, db_file -> fpdb))
         return ERR_IO;
@@ -222,9 +192,9 @@ int do_open(const char* filename, const char* mode, struct pictdb_file* db_file)
     }
     int read_file = 0;
     if(db_file->header.max_files != (read_file = fread(	db_file->metadata,
-                                            sizeof(struct pict_metadata),
-                                            db_file->header.max_files,
-                                            db_file -> fpdb))) {
+                                     sizeof(struct pict_metadata),
+                                     db_file->header.max_files,
+                                     db_file -> fpdb))) {
         return ERR_IO;
     }
 

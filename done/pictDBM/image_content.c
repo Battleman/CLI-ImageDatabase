@@ -1,10 +1,17 @@
+/**
+ * @file image_content.c
+ * @brief Implémentation de méthodes de traitement d'images
+ */
+
 #include "error.h"
 #include "pictDB.h"
 #include "image_content.h"
 
 /**@brief Petit utilitaire pour retourner le ratio réduit d'une image
- *
- * @param image Pointeur vers une VipsImage, pour trouver ses dimensions
+ * 
+ * @author J.-C. Chappelier (on rigole pas avec le plagiat)
+ * 
+  *@param image Pointeur vers une VipsImage, pour trouver ses dimensions
  * @param max_thumb_width Largeur maximale que peut avoir l'image redimensionnée
  * @param max_thumb_height Hauteur maximale que peut avoir l'image redimensionnée
  *
@@ -19,6 +26,16 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
 }
 
 
+/**
+ * @brief Helper method. Création et sauvegarde d'une version réduite d'une image.
+ *
+ * @param file Le fichier dans lequel lire et écrire l'image
+ * @param meta La métadonnée dans laquelle travailler
+ * @param header Le header de la DB
+ * @param RES Code de la résolution dans laquelle transformer l'image.
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
 static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_header* header, const int RES)
 {
     size_t size_of_orig = meta->size[RES_ORIG]; //la taille à lire de l'image originale
@@ -39,8 +56,8 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     //On récupère l'image depuis le buffer
     if(vips_jpegload_buffer(buffer_in, size_of_orig, image, NULL)) errcode = ERR_VIPS;
     else {
-        double ratio = shrink_value(*image, header->res_resized[2*RES], header->res_resized[2*RES+1]);
-        VipsImage** image_small = (VipsImage**) vips_object_local_array( process, 1 );
+        double ratio = shrink_value(*image, header->res_resized[2*RES], header->res_resized[2*RES+1]); //calcul du ratio
+        VipsImage** image_small = (VipsImage**) vips_object_local_array( process, 1 ); //réceptacle pour l'image réduite
 
         vips_resize(image[0], &image_small[0], ratio, NULL); //redimensionnement de l'image
 
@@ -59,6 +76,15 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     return errcode;
 }
 
+/**@brief helper method. Met à jour la metadata concernée.
+ *
+ * Mise à jour de la métadonnée modifiée par l'ajout d'une dimension.
+ *
+ * @param db_file La base de donnée (locale)
+ * @param index l'index de la métadonnée modifiée
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
 static int update_file(struct pictdb_file* db_file, size_t index)
 {
     int errcode = 0;
@@ -67,37 +93,26 @@ static int update_file(struct pictdb_file* db_file, size_t index)
     }
     return errcode;
 }
-
-/**@brief Effectue un redimensionnement d'une image, l'écrit à la fin et met à jour la métadonnée et le header concernés
- *
- * @param res Le code de résolution de l'image redimensionnée
- * @param db_file la base de donnée dans laquelle travailler
- * @param index L'index de l'image (metadonnée) à redimensionner
- */
+/*****************************************
+ * Redimensionnement d'une image
+ ******/
 int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index)
 {
 
     /*Vérification des input*/
-    if(RES < 0 || RES >= NB_RES) {
-        return ERR_RESOLUTIONS;
-    }
-    if(db_file == NULL || db_file->fpdb == NULL) {
-        return ERR_INVALID_ARGUMENT;
-    }
-    if(index < 0 || index >= db_file->header.max_files) {
-        return ERR_INVALID_PICID;
-    }
-    if(RES == RES_ORIG || db_file->metadata[index].size[RES] != 0) {
-        return 0;
-    }
+    if(RES < 0 || RES >= NB_RES) 									return ERR_RESOLUTIONS;
+    if(db_file == NULL || db_file->fpdb == NULL) 					return ERR_INVALID_ARGUMENT;
+    if(index < 0 || index >= db_file->header.max_files) 			return ERR_INVALID_PICID;
+    if(RES == RES_ORIG || db_file->metadata[index].size[RES] != 0) 	return 0; //si on cherche la RES_ORIG, rien à faire
+
     int errcode = 0;
-    if(	0 != (errcode = create_small(db_file->fpdb, &db_file->metadata[index], &db_file->header, RES)) ||
-        0 != (errcode = update_file(db_file, index))) {
-        return errcode;
-    }
-    return 0;
+    if(0 != (errcode = create_small(db_file->fpdb, &db_file->metadata[index], &db_file->header, RES))) return errcode;
+    return update_file(db_file, index);
 }
 
+/*****************************************
+ * Getter de résolution d'une image
+ ******/
 int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, size_t image_size)
 {
     int errcode = 0;
@@ -110,7 +125,7 @@ int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, 
         *width = (*image)->Xsize;
         *height = (*image)->Ysize;
     }
-    
+
     g_object_unref(process);
 
     return errcode;

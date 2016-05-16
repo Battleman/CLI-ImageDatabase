@@ -1,8 +1,6 @@
 /**
  * @file dedup.h
  * @brief Header for de-duplication method.
- *
- * @author Othman Benchekroun & Olivier Cloux
  */
 
 #include "pictDB.h"

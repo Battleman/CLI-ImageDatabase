@@ -89,3 +89,4 @@ Thumbs.db
 #*.sh
 #*/astyle_orig/
 #doxyfile
+#valgrind_ignore

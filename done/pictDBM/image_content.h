@@ -2,8 +2,6 @@
  * @file image_content.h
  *
  * @brief entête des méthodes qui traitent des images
- *
- * @author Othman Benchekroun & Olivier Cloux
  */
 
 #include "pictDB.h"

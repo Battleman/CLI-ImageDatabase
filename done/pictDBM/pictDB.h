@@ -56,29 +56,30 @@ extern "C" {
 
 
 struct pictdb_header {
-    char db_name[MAX_DB_NAME + 1];
-    uint32_t db_version;
-    uint32_t num_files;
-    uint32_t max_files;
-    uint16_t res_resized[2*(NB_RES - 1)];
-    uint32_t unused_32;
-    uint64_t unused_64;
+    char db_name[MAX_DB_NAME + 1]; //!<Nom de la base de donnée
+    uint32_t db_version; //!< Version de la base de donnée (modif à chaque insertion/suppression d'image originale)
+    uint32_t num_files; //!<Nombre de fichiers actuellement dedans
+    uint32_t max_files; //!<Nombre maximum de fichiers autorisés
+    uint16_t res_resized[2*(NB_RES - 1)]; //!<Dimensions des résolutions inférieurs
+    uint32_t unused_32; //!<Inutilisé
+    uint64_t unused_64; //!<Inutilisé
 };
 
 struct pict_metadata {
-    char pict_id[MAX_PIC_ID + 1];
-    unsigned char SHA[SHA256_DIGEST_LENGTH];
-    uint32_t res_orig[2]; //de taille 2, car toujours 2 dimensions (on va pas réinventer la roue)
-    uint32_t size[NB_RES];
-    uint64_t offset[NB_RES];
-    uint16_t is_valid;
-    uint16_t unused_16;
+    char pict_id[MAX_PIC_ID + 1]; //!<Nom de l'image
+    unsigned char SHA[SHA256_DIGEST_LENGTH]; //!<SHA de l'image
+    //de taille 2, car toujours 2 dimensions (on va pas réinventer la roue)
+    uint32_t res_orig[2];//!<Dimensions de la résolution originale
+    uint32_t size[NB_RES]; //!<Taille (poids) de l'image dans ses résolutions
+    uint64_t offset[NB_RES]; //!<Offset (distance au début du disque) de chaque résolution
+    uint16_t is_valid; //!<"Interrupteur" de validité de l'image
+    uint16_t unused_16; //!<Inutilisé
 };
 
 struct pictdb_file {
-    FILE* fpdb;
-    struct pictdb_header header;
-    struct pict_metadata* metadata;
+    FILE* fpdb; //!<Lien vers le fichier de la DB
+    struct pictdb_header header; //!<Un header
+    struct pict_metadata* metadata; //!<Et un tableau de métadonnées
 };
 
 /**
@@ -166,23 +167,6 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
  */
 int overwrite_metadata(struct pictdb_file* db_file, size_t index);
 
-//Ne pas prendre en compte les deux fonctions suivantes. c.f. note dans db_utils.c.
-/**
- * @brief Méthode additionnelle pour la copie profonde d'un header dans un autre.
- *
- * @param copy Le header à mettre à jour
- * @param header Le header à copier
- */
-//void copy_header(struct pictdb_header* copy, const struct pictdb_header* header);
-
-/**
- * @brief Méthode additionnelle pour la copie profonde d'une métadonnée dans une autre.
- *
- * @param copy La metadata à mettre à jour
- * @param header La metadata à copier
- */
-//void copy_metadata(struct pict_metadata* copy, const struct pict_metadata* metadata);
-
 /**
  * @brief "Change" un texte (comme option de commande) en son code de résolution asosicé
  *
@@ -257,22 +241,19 @@ int create_name(const char* pict_id, char* filename, int res);
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 int read_disk_image(const char* filename, void** buffer, size_t* size);
-//int read_disk_image(FILE* file, char* image, size_t image_size);
 
 /**@brief Écrit une image sur le disque
  *
  * Cherche une image dans la base de donnée (dans la résolution choisie) et l'écrit sur
  * le disque sous la formed'une image au format jpeg
  *
- * @param db_file La base de donnée dans laquelle chercher l'image
- * @param pict_id Le nom de l'image a chercher
- * @param res La résolution de l'image a chercher
- * @param filename Le nom de l'image lors de l'écriture
+ * @param file Le fichier image (ouvert)
+ * @param image L'image à écrire dans le fichier
+ * @param image_size La taille de l'image
  *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-//int write_disk_image(const struct pictdb_file* db_file, const char* pict_id, const int res, const char* filename);
-int write_disk_image(FILE*, const char* image, uint32_t image_size);
+int write_disk_image(FILE* file, const char* image, uint32_t image_size);
 #ifdef __cplusplus
 }
 #endif

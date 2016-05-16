@@ -11,6 +11,11 @@
  */
 int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file)
 {
+	if(	pict_id == NULL || !strcmp(pict_id, "") || RES < 0 || RES > NB_RES || 
+		image_buffer == NULL || image_size == NULL || db_file == NULL) 
+		{
+		return ERR_INVALID_ARGUMENT;
+	}
     size_t index = 0;
     int found = 0, errcode = 0;
 
@@ -41,7 +46,7 @@ int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* 
             if(1 != fread(*image_buffer, *image_size, 1, db_file -> fpdb)) {
                 errcode = ERR_IO;
             }
-            
+
         }
     }
 

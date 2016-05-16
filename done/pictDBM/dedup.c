@@ -1,3 +1,8 @@
+/**
+ * @file dedup.c
+ * @brief Recherche et suppression de doublons
+ */
+
 #include "error.h"
 #include "pictDB.h"
 #include "image_content.h"

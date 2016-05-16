@@ -56,7 +56,7 @@ static int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metada
  */
 static int modify_header(FILE* fpdb, struct pictdb_header* header)
 {
-    if(header == NULL) return ERR_INVALID_ARGUMENT; //robustesse
+    if(header == NULL || fpdb == NULL) return ERR_INVALID_ARGUMENT; //robustesse
     header->num_files--; //réduction du nombre de fichiers
     header->db_version++; //version suivante
     rewind(fpdb); //retour au début du fichier pour écrire sur le header
@@ -70,15 +70,16 @@ static int modify_header(FILE* fpdb, struct pictdb_header* header)
 /********************************************************************//**
  * Supprime une image
  */
-int do_delete(const char* pic_name, struct pictdb_file* file)
-{
-    int err = 0;
-    if(file->header.num_files > 0) { //éviter des calculs si la base est vide
-        err = modify_reference(pic_name, file -> fpdb, file -> metadata, file -> header.max_files);
-        if(err == 0) {
-            err = modify_header(file -> fpdb, &file -> header);
+int do_delete(const char* pic_name, struct pictdb_file* db_file)
+{	//Vérification des input
+	if(pic_name == NULL || !strcmp(pic_name, "") || db_file == NULL) return ERR_INVALID_ARGUMENT;
+    int errcode = 0;
+    if(db_file->header.num_files > 0) { //éviter des calculs si la base est vide
+        errcode = modify_reference(pic_name, db_file -> fpdb, db_file -> metadata, db_file -> header.max_files);
+        if(errcode == 0) {
+            errcode = modify_header(db_file -> fpdb, &db_file -> header);
         }
     }
-    return err;
+    return errcode;
 }
 

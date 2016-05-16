@@ -41,13 +41,14 @@ clean:
 mrproper : clean
 	@rm -rf $(MAIN_EXEC)
 	@echo "Suppression des executables"
-	@rm -rf done/pictDBM/html #doxygen
-	@rm -rf done/pictDBM/latex #doxygen
+	@rm -rf html/ #doxygen
+	@rm -rf latex/ #doxygen
 	@echo "Suppression des fichiers liés à Doxygen"
-	@rm *.pictdb_static
+	@rm *.pictdb_*
 	@cp ../../provided/week04/testDB01.pictdb_static .
 	@cp ../../provided/week04/testDB02.pictdb_static .
 	@cp ../../provided/week07/testDB02.pictdb_dynamic .
+	@rm *.jpg
 	@cp ../../provided/week09/coquelicots.jpg .
 	@cp ../../provided/week09/foret.jpg .
 	@cp ../../provided/week09/papillon.jpg .
