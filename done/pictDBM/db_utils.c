@@ -31,7 +31,7 @@ sha_to_string (const unsigned char* SHA,
 }
 
 /********************************************************************//**
- * Comparaison entre deux tableaux
+ * Comparaison entre deux tableaux (permet entre autres la comparaison des SHA)
  */
 int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
 {
@@ -151,7 +151,7 @@ int create_name(const char* pict_id, char* filename, int res)
     return 0;
 }
 /********************************************************************//**
- * Lecture d'une image.
+ * Lecture d'une image (permet de remplir le buffer et déterminer la taille).
  */
 int read_disk_image(const char* filename, void** buffer, size_t* size)
 {

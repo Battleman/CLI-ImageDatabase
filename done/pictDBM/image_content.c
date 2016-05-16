@@ -119,9 +119,11 @@ int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, 
     VipsObject* process = VIPS_OBJECT( vips_image_new() );
     VipsImage** image = (VipsImage**) vips_object_local_array( process, 1 );
 
+	//vérification de l'obtention d'une image valide à partir du buffer
     if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
+		//permet d'obtenir les tailles des images
         *width = (*image)->Xsize;
         *height = (*image)->Ysize;
     }

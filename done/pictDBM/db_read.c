@@ -11,6 +11,7 @@
  */
 int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file)
 {
+	//vérification des inputs
 	if(	pict_id == NULL || !strcmp(pict_id, "") || RES < 0 || RES > NB_RES || 
 		image_buffer == NULL || image_size == NULL || db_file == NULL) 
 		{
@@ -19,6 +20,7 @@ int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* 
     size_t index = 0;
     int found = 0, errcode = 0;
 
+    //recherche de l'image demandée
     while(found == 0 && index < db_file -> header.max_files) {
         if(	1 == db_file -> metadata[index].is_valid &&
             !strncmp(&pict_id[0], &db_file -> metadata[index].pict_id[0], MAX_PIC_ID + 1)
@@ -36,7 +38,8 @@ int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* 
         }
         *image_size = db_file -> metadata[index].size[RES];
     }
-
+	
+	//écriture (robuste) de l'image dans le buffer
     if(errcode == 0) {
         *image_buffer = calloc(*image_size, 1);
         if(image_buffer == NULL) {
