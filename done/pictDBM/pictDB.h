@@ -82,6 +82,9 @@ struct pictdb_file {
     struct pict_metadata* metadata; //!<Et un tableau de métadonnées
 };
 
+enum do_list_mode {STDOUT, JSON};
+
+
 /**
  * @brief Prints database header informations.
  *
@@ -103,7 +106,7 @@ void print_metadata (const struct pict_metadata* metadata);
  * @param myfile In memory structure with header and metadata.
  */
 
-void do_list(const struct pictdb_file* myfile);
+const char* do_list(const struct pictdb_file* myfile, enum do_list_mode mode);
 
 
 /**

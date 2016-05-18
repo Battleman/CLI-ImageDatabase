@@ -13,6 +13,7 @@
 #include <vips/vips.h> // for obvious reasons ;-)
 #include <stdlib.h>
 #include <string.h>
+#include <json-c/json.h>
 #include "pictDBM_tools.h"
 
 /********************************************************************//**
@@ -27,7 +28,7 @@ do_list_cmd (int argc, char *argv[])
     if(argc > 0) {
         errcode = do_open(argv[0], "rb", &db_file);
         if(errcode == 0) {
-            do_list(&db_file);
+            do_list(&db_file, STDOUT);
         }
         do_close(&db_file);
     }
