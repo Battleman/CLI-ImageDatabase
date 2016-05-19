@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json-c/json.h>
+#include "libmongoose.so"
 #include "pictDBM_tools.h"
 
 /********************************************************************//**

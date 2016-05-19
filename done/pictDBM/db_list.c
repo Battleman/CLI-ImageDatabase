@@ -34,7 +34,7 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 		for(size_t i = 0; i < db_file->max_files, i++) {
 			struct json_object* pict_name = json_object_bew_string(db_file->metadata[i].pict_id);
 			json_object_array_add(array, pict_name);
-		}
+		}	
 		const char* string = json_object_to_json_string (object);
 		return string;
 	}

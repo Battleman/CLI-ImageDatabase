@@ -2,16 +2,18 @@ DEBUG=yes
 CC=gcc
 CFLAGS += -Wall -pedantic -std=c99 
 CFLAGS += $$(pkg-config vips --cflags)
+LDFLAGS += -L limbongoose
 ifeq ($(DEBUG), yes)
 	CFLAGS += -g
 endif
 MAIN_EXEC = pictDBM	
 LDLIBS += $$(pkg-config vips --libs) -lm -lssl -lcrypto
+LDLIBS += -lmongoose
 
 
 all: $(MAIN_EXEC)
 
-db_list.o: db_list.c pictDB.h error.h
+db_list.o: db_list.c pictDB.h libmongoose.so error.h
 error.o: error.c
 db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
 db_read.o : db_read.c image_content.h pictDB.h error.h
