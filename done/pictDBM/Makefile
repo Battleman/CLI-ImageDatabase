@@ -13,8 +13,6 @@ SERVER_EXEC = pictDB_server
 
 
 all: $(MAIN_EXEC) $(SERVER_EXEC)
-main : $(MAIN_EXEC)
-pictDB_server: $(SERVER_EXEC)
 
 db_list.o: db_list.c pictDB.h error.h
 error.o: error.c
@@ -30,7 +28,9 @@ db_insert.o : db_insert.c pictDB.h image_content.h error.h
 
 $(MAIN_EXEC): db_list.o image_content.o pictDBM.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o db_read.o
 
-$(SERVER_EXEC) : pictDB.h mongoose.h error.h
+
+pictDB_server.o : pictDB_server.c pictDB.h error.h
+$(SERVER_EXEC) : pictDB_server.o
 # scripts to facilitate cleaning and purging#
 #################################################
 .PHONY: clean mrproper stylish

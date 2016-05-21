@@ -25,17 +25,21 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 		}
 		return NULL;
 	} else if(mode == JSON) {
-		const char name_str[] = "Picture";
-		struct json_object* object = json_object_new_object();
-		//struct json_object* name_obj = json_object_new_string(name_str);
-		struct json_object* array = json_object_new_array();
-		for(size_t i = 0; i < db_file->header.max_files; i++) {
-			struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id);
-			json_object_array_add(array, pict_name);
+		const char name_str[] = "Picture";		
+		struct json_object* array = json_object_new_array(); //création d'un array
+
+		for(size_t i = 0; i < db_file->header.max_files; i++) { //pour chaque image :
+			struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id); //on crée une string
+			json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
 		}
-		json_object_object_add(object, name_str, array);
-		const char* string = json_object_to_json_string (object);
-		return string;
+		struct json_object* object = json_object_new_object(); //création d'un JSON object
+		json_object_object_add(object, name_str, array); //dans lequel on ajoute le couple Picture : array[]
+		const char* string = json_object_to_json_string (object); //transformation en string
+		if(1 != json_object_put(object)) { //décrémentation de l'objet -> free
+			const char* err_msg = "problem memory free";
+			return err_msg;
+		}
+		return string; //retour de l'objet en string
 	} else {
 		const char* err_msg = "unimplemented do_list mode";
 		return err_msg;
