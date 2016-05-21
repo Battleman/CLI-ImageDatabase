@@ -1,5 +1,6 @@
 #include "pictDB.h"
 #include "mongoose.h"
+//#include <json-c/json.h>
 
 static int s_sig_received = 0;
 static const char *s_http_port = "8000";
@@ -16,7 +17,7 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 	 if(db_file == NULL){
 		 //SEND HTML ERROR MESSAGE
 	 } else {
-		 const char* buffer = do_list(db_file, "JSON");
+		 const char* buffer = do_list(db_file, JSON);
 		 
 		 if(buffer == NULL){
 			//SEND HTML ERROR MESSAGE
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]){
 	
 	int ret = 0;
 	
-	if(arg < 2){
+	if(argc < 2){
 		ret = ERR_NOT_ENOUGH_ARGUMENTS;
 		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
 		return ret;
