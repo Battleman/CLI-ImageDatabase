@@ -48,7 +48,7 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 			const char* err_msg = "error memory";
 			return err_msg;
 		}
-		return indep_strin; //retour de l'objet en string
+		return indep_string; //retour de l'objet en string
 	
 	}else {
 		const char* err_msg = "unimplemented do_list mode";
