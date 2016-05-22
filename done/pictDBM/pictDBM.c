@@ -28,7 +28,8 @@ do_list_cmd (int argc, char *argv[])
     if(argc > 0) {
         errcode = do_open(argv[0], "rb", &db_file);
         if(errcode == 0) {
-            do_list(&db_file, STDOUT);
+            const char* listed = do_list(&db_file, JSON);
+            if(listed != NULL) printf("%s", listed);
         }
         do_close(&db_file);
     }

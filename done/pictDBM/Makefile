@@ -10,12 +10,12 @@ ifeq ($(DEBUG), yes)
 endif
 MAIN_EXEC = pictDBM	
 SERVER_EXEC = pictDB_server
+EXEC_LIST = $(MAIN_EXEC) $(SERVER_EXEC)
 
-
-all: $(MAIN_EXEC) $(SERVER_EXEC)
+all: $(MAIN_EXEC)
+everything: $(EXEC_LIST)
 
 db_list.o: db_list.c pictDB.h error.h
-error.o: error.c
 db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
 db_read.o : db_read.c image_content.h pictDB.h error.h
 db_utils.o: db_utils.c pictDB.h error.h
@@ -30,7 +30,8 @@ $(MAIN_EXEC): db_list.o image_content.o pictDBM.o db_utils.o error.o db_create.o
 
 
 pictDB_server.o : pictDB_server.c pictDB.h error.h
-$(SERVER_EXEC) : pictDB_server.o
+$(SERVER_EXEC) : pictDB_server.o libmongoose.so db_list.o db_utils.o error.o
+
 # scripts to facilitate cleaning and purging#
 #################################################
 .PHONY: clean mrproper stylish
@@ -45,7 +46,7 @@ clean:
 #temporary. Made to be totally cleaned and 
 #ready to be graded.
 mrproper : clean
-	@rm -rf $(MAIN_EXEC)
+	@rm -rf $(EXEC_LIST)
 	@echo "Suppression des executables"
 	@rm -rf html/ #doxygen
 	@rm -rf latex/ #doxygen

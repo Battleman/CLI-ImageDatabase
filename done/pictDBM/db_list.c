@@ -29,18 +29,28 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 		struct json_object* array = json_object_new_array(); //création d'un array
 
 		for(size_t i = 0; i < db_file->header.max_files; i++) { //pour chaque image :
-			struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id); //on crée une string
-			json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
+			if(db_file->metadata[i].is_valid == NON_EMPTY) {
+				struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id); //on crée une string
+				json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
+			}
 		}
 		struct json_object* object = json_object_new_object(); //création d'un JSON object
 		json_object_object_add(object, name_str, array); //dans lequel on ajoute le couple Picture : array[]
 		const char* string = json_object_to_json_string (object); //transformation en string
-		if(1 != json_object_put(object)) { //décrémentation de l'objet -> free
-			const char* err_msg = "problem memory free";
+		char* indep_string = malloc(strlen(string));
+		if(indep_string != NULL) {
+			strcpy(indep_string, string); 
+			if(1 != json_object_put(object)) { //décrémentation de l'objet -> free
+				const char* err_msg = "problem memory free";
+				return err_msg;
+			}
+		} else {
+			const char* err_msg = "error memory";
 			return err_msg;
 		}
-		return string; //retour de l'objet en string
-	} else {
+		return indep_strin; //retour de l'objet en string
+	
+	}else {
 		const char* err_msg = "unimplemented do_list mode";
 		return err_msg;
 	}
