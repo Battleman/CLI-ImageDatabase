@@ -37,7 +37,39 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 }
 
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
+	int res = -1;
+	char* tmp, pict_id;
+	const char* delim = "&=";
+	char* result[MAX_QUERY_PARAM];
 	
+	split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
+	
+	for(int i = 0; i < 2; ++i){
+		if(strcmp(result[2*i], "res")){
+			res = resolution_atoi(result[2*i + 1]);
+		} else if(strcmp(result[2*i], "pict_id")){
+			strcpy(pict_id, result[2*i + 1]);
+		}
+	}
+	
+	if(res == -1 || pict_id == NULL){
+		mg_error(nc, ERR_INVALID_ARGUMENT);
+	} else {
+		int err;
+		char* img_buffer;
+		uint32_t img_size;
+		
+		if(0 == (err = do_read(pict_id, res, &img_buffer, &img_size, db_file))){
+			mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+						"Content-Type: image/jpeg\r\n"
+						"Content-Length: %d\r\n\r\n",
+						img_size);
+			mg_send(*img_buffer);
+			 nc->flags |= MG_F_SEND_AND_CLOSE;
+		 } else {
+			mg_error(nc, err);
+		 }		 
+	}
 }
 
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm){
