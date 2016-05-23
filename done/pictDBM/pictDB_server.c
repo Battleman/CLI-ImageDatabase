@@ -61,7 +61,7 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 						"Content-Type: image/jpeg\r\n"
 						"Content-Length: %d\r\n\r\n",
 						img_size);
-			mg_send(*img_buffer);
+			mg_send(nc, *img_buffer, img_size);
 			nc->flags |= MG_F_SEND_AND_CLOSE;
 		 } else {
 			mg_error(nc, err);
