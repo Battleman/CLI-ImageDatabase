@@ -36,14 +36,32 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 	}
 }
 
+static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
+	
+}
+
+static void handle_insert_call(struct mg_connection *nc, struct http_message *hm){
+	
+}
+
+static void handle_delete_call(struct mg_connection *nc, struct http_message *hm){
+	
+}
+
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 	struct http_message *hm = (struct http_message *) ev_data;
 	
 	switch (ev) {
     case MG_EV_HTTP_REQUEST:
-      if (mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
-        handle_list_call(nc, hm); /* Handle basic call */
-      } else {
+      if(mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
+        handle_list_call(nc, hm); /* Handles basic list call */
+      } else if(mg_vcmp(&hm->uri, "/pictDB/read") == 0){
+		handle_read_call(nc, hm); /* Handles basic read call */
+	  } else if(mg_vcmp(&hm->uri, "/pictDB/insert") == 0){
+		handle_insert_call(nc, hm); /* Handles basic insert call */  
+	  } else if(mg_vcmp(&hm->uri, "/pictDB/delete") == 0){
+		handle_delete_call(nc, hm); /* Handles basic delete call */  
+	  } else {
         mg_serve_http(nc, hm, s_http_server_opts); /* Serve static content */
       }
       break;
