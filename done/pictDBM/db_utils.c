@@ -181,10 +181,11 @@ int write_disk_image(FILE* file, const char* image, uint32_t image_size)
 void split(char* result[], char* tmp, const char* src, const char* delim, size_t len){
 	
 	tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
-	tmp = strtok((char*)src, delim);
+	strcpy(tmp, src);
+	tmp = strtok(tmp, delim);
 	
 	for(int i = 0; i < MAX_QUERY_PARAM; ++i){
-		&result[i] = tmp;
+		result[i] = *tmp;
 		tmp = strtok(NULL, delim);
 	}
 }
