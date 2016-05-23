@@ -34,6 +34,7 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 				json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
 			}
 		}
+
 		struct json_object* object = json_object_new_object(); //création d'un JSON object
 		json_object_object_add(object, name_str, array); //dans lequel on ajoute le couple Picture : array[]
 		const char* string = json_object_to_json_string (object); //transformation en string
