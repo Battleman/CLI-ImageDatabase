@@ -3,7 +3,7 @@
 
 static int s_sig_received = 0;
 static const char *s_http_port = "8000";
-static struct pictdb_file* db_file;
+static struct pictdb_file db_file;
 static struct mg_serve_http_opts s_http_server_opts;
 
 static void signal_handler(int sig_num) {
@@ -13,36 +13,34 @@ static void signal_handler(int sig_num) {
 
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 	 
-	 if(db_file == NULL){
-		 //SEND HTML ERROR MESSAGE
-	 } else {
-		 const char* buffer = do_list(db_file, JSON);
-		 
-		 if(buffer == NULL){
-			//SEND HTML ERROR MESSAGE
-		 }
-		 
-		 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
-					"Content-Type: application/json\r\n"
-					"Content-Length: %d\r\n\r\n%s",
-					(int) strlen(buffer), buffer);
-		  nc->flags |= MG_F_SEND_AND_CLOSE;
-	}
+	 
+	 const char* buffer = do_list(&db_file, JSON);
+	 
+	 if(buffer == NULL){
+		//SEND HTML ERROR MESSAGE
+	 }
+	 
+	 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+				"Content-Type: application/json\r\n"
+				"Content-Length: %d\r\n\r\n%s",
+				(int) strlen(buffer), buffer);
+	  nc->flags |= MG_F_SEND_AND_CLOSE;
 }
+
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 	struct http_message *hm = (struct http_message *) ev_data;
-	
 	switch (ev) {
-    case MG_EV_HTTP_REQUEST:
-      if (mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
-        handle_list_call(nc, hm); /* Handle basic call */
-      } else {
-        mg_serve_http(nc, hm, s_http_server_opts); /* Serve static content */
-      }
-      break;
-    default:
-      break;
+		case MG_EV_HTTP_REQUEST:
+			if (mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
+				handle_list_call(nc, hm); /* Handle basic call */
+		      } else {
+				printf("Faux");
+		        mg_serve_http(nc, hm, s_http_server_opts); /* Serve static content */
+		      }
+		    break;
+		default:
+		    break;
   }
 }
 
@@ -71,19 +69,19 @@ int main(int argc, char* argv[]){
 	}
 	
 	const char* db_name = argv[1];
-    if(0 != do_open(db_name, "r+b", db_file)){
+    if(0 != do_open(db_name, "r+b", &db_file)){
 		ret = ERR_IO;
 		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
 		return ret;
 	}
-    print_header(&db_file->header);
-	
+    print_header(&db_file.header);
+	mg_set_protocol_http_websocket(nc);
 	while (!s_sig_received) {
-		mg_mgr_poll(&mgr, 1000000);
+		mg_mgr_poll(&mgr, 300);
 	}
 	
 	printf("Exiting on signal %d\n", s_sig_received);
-	do_close(db_file);
+	do_close(&db_file);
 
 	mg_mgr_free(&mgr);
 	
