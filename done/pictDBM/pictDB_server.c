@@ -11,6 +11,12 @@ static void signal_handler(int sig_num) {
   s_sig_received = sig_num;
 }
 
+void mg_error(struct mg_connection* nc, int error){
+	mg_printf(nc, "HTTP/1.1 500 %s\r\n"
+				"Content-Length: 0\r\n\r\n",
+				ERROR_MESSAGES[error]);
+}
+
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 	 
 	 if(db_file == NULL){
@@ -26,7 +32,7 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 					"Content-Type: application/json\r\n"
 					"Content-Length: %d\r\n\r\n%s",
 					(int) strlen(buffer), buffer);
-		  nc->flags |= MG_F_SEND_AND_CLOSE;
+		 nc->flags |= MG_F_SEND_AND_CLOSE;
 	}
 }
 
