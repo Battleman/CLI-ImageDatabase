@@ -32,8 +32,8 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 	int res = -1;
-	char* pict_id;
 	const char* delim = "&=";
+	char pict_id[MAX_PIC_ID];
 	char* result[MAX_QUERY_PARAM];
 	
 	char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
@@ -43,7 +43,6 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 		if(strcmp(result[2*i], "res")){
 			res = resolution_atoi(result[2*i + 1]);
 		} else if(strcmp(result[2*i], "pict_id")){
-			pict_id = calloc(MAX_PIC_ID + 1, sizeof(char));
 			strcpy(pict_id, result[2*i + 1]);
 			pict_id[MAX_PIC_ID] = '\0';
 		}
