@@ -11,36 +11,94 @@ static void signal_handler(int sig_num) {
   s_sig_received = sig_num;
 }
 
+void mg_error(struct mg_connection* nc, int error){
+	mg_printf(nc, "HTTP/1.1 500 %s\r\n"
+				"Content-Length: 0\r\n\r\n",
+				ERROR_MESSAGES[error]);
+}
+
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
-	 
-	 
-	 const char* buffer = do_list(&db_file, JSON);
-	 
-	 if(buffer == NULL){
-		//SEND HTML ERROR MESSAGE
-	 }
-	 
-	 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
-				"Content-Type: application/json\r\n"
-				"Content-Length: %d\r\n\r\n%s",
-				(int) strlen(buffer), buffer);
-	  nc->flags |= MG_F_SEND_AND_CLOSE;
+	if(db_file == NULL){
+		 //SEND HTML ERROR MESSAGE
+	 } else {
+		 const char* buffer = do_list(db_file, JSON);
+		 
+		 if(buffer == NULL){
+			//SEND HTML ERROR MESSAGE
+		 }
+		 
+		 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+					"Content-Type: application/json\r\n"
+					"Content-Length: %d\r\n\r\n%s",
+					(int) strlen(buffer), buffer);
+		 nc->flags |= MG_F_SEND_AND_CLOSE;
+	}
+}
+
+static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
+	int res = -1;
+	char* tmp, pict_id;
+	const char* delim = "&=";
+	char* result[MAX_QUERY_PARAM];
+	
+	split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
+	
+	for(int i = 0; i < 2; ++i){
+		if(strcmp(result[2*i], "res")){
+			res = resolution_atoi(result[2*i + 1]);
+		} else if(strcmp(result[2*i], "pict_id")){
+			strcpy(pict_id, result[2*i + 1]);
+		}
+	}
+	
+	if(res == -1 || pict_id == NULL){
+		mg_error(nc, ERR_INVALID_ARGUMENT);
+	} else {
+		int err;
+		char* img_buffer;
+		uint32_t img_size;
+		
+		if(0 == (err = do_read(pict_id, res, &img_buffer, &img_size, db_file))){
+			mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+						"Content-Type: image/jpeg\r\n"
+						"Content-Length: %d\r\n\r\n",
+						img_size);
+			mg_send(*img_buffer);
+			 nc->flags |= MG_F_SEND_AND_CLOSE;
+		 } else {
+			mg_error(nc, err);
+		 }		 
+	}
+}
+
+static void handle_insert_call(struct mg_connection *nc, struct http_message *hm){
+	
+}
+
+static void handle_delete_call(struct mg_connection *nc, struct http_message *hm){
+
 }
 
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 	struct http_message *hm = (struct http_message *) ev_data;
 	switch (ev) {
-		case MG_EV_HTTP_REQUEST:
-			if (mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
-				handle_list_call(nc, hm); /* Handle basic call */
-		      } else {
-				printf("Faux");
-		        mg_serve_http(nc, hm, s_http_server_opts); /* Serve static content */
-		      }
-		    break;
-		default:
-		    break;
+
+    case MG_EV_HTTP_REQUEST:
+      if(mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
+        handle_list_call(nc, hm); /* Handles basic list call */
+      } else if(mg_vcmp(&hm->uri, "/pictDB/read") == 0){
+		handle_read_call(nc, hm); /* Handles basic read call */
+	  } else if(mg_vcmp(&hm->uri, "/pictDB/insert") == 0){
+		handle_insert_call(nc, hm); /* Handles basic insert call */  
+	  } else if(mg_vcmp(&hm->uri, "/pictDB/delete") == 0){
+		handle_delete_call(nc, hm); /* Handles basic delete call */  
+	  } else {
+        mg_serve_http(nc, hm, s_http_server_opts); /* Serve static content */
+      }
+      break;
+    default:
+      break;
   }
 }
 

@@ -50,6 +50,9 @@
 /*Amount of defined commands*/
 #define NB_COMMANDS 6
 
+/*Amount of maximum arguments of a URI function */
+#define MAX_QUERY_PARAM 5
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -257,6 +260,21 @@ int read_disk_image(const char* filename, void** buffer, size_t* size);
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
 int write_disk_image(FILE* file, const char* image, uint32_t image_size);
+
+/**@brief Parse une chaîne de charactères
+ *
+ * Permet de récupérer tous les arguments URI reçus
+ *
+ * @param result pointeur vers le tableau de charactères renvoyant les différents arguments
+ * @param tmp chaîne de charactères contenant la chaîne intermédiaire parsée avec des '/0'
+ * @param src chaîne de charactères originales contenant tous les arguments en format URI
+ * @param delim délimiteurs de charactères
+ * @param len longueur de la chaîne à étudier
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
+void split(char* result[], char* tmp, const char* src, const char* delim, size_t len);
+
 #ifdef __cplusplus
 }
 #endif
