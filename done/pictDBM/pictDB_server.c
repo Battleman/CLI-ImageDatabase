@@ -125,12 +125,16 @@ int main(int argc, char* argv[]){
 		return ERR_IO;
 	}
 	
+	const char* app_name = argv[0];
+	VIPS_INIT(app_name);
+	
 	const char* db_name = argv[1];
     if(0 != do_open(db_name, "r+b", &db_file)){
 		ret = ERR_IO;
 		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
 		return ret;
 	}
+	
     print_header(&db_file.header);
 	mg_set_protocol_http_websocket(nc);
 	while (!s_sig_received) {
@@ -139,6 +143,7 @@ int main(int argc, char* argv[]){
 	
 	printf("Exiting on signal %d\n", s_sig_received);
 	do_close(&db_file);
+	vips_shutdown();
 
 	mg_mgr_free(&mgr);
 	
