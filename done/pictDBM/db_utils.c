@@ -184,7 +184,7 @@ void split(char* result[], char* tmp, const char* src, const char* delim, size_t
 	tmp = strtok(tmp, delim);
 	
 	for(int i = 0; i < MAX_QUERY_PARAM; ++i){
-		result[i] = *tmp;
+		result[i] = tmp;
 		tmp = strtok(NULL, delim);
 	}
 }
