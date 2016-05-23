@@ -5,7 +5,7 @@
 
 static int s_sig_received = 0;
 static const char *s_http_port = "8000";
-static struct pictdb_file db_file;
+static struct pictdb_file* db_file;
 static struct mg_serve_http_opts s_http_server_opts;
 
 static void signal_handler(int sig_num) {
@@ -22,10 +22,10 @@ void split(char* result[], char* tmp, const char* src, const char* delim, size_t
 
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 	 
-	 //if(&db_file == NULL){
+	 if(db_file == NULL){
 		 //SEND HTML ERROR MESSAGE
-	 //} else {
-		 const char* buffer = do_list(&db_file, JSON);
+	 } else {
+		 const char* buffer = do_list(db_file, JSON);
 		 
 		 if(buffer == NULL){
 			//SEND HTML ERROR MESSAGE
@@ -36,7 +36,7 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 					"Content-Length: %d\r\n\r\n%s",
 					(int) strlen(buffer), buffer);
 		  nc->flags |= MG_F_SEND_AND_CLOSE;
-	//}
+	}
 }
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
@@ -80,19 +80,19 @@ int main(int argc, char* argv[]){
 	}
 	
 	const char* db_name = argv[1];
-    if(0 != do_open(db_name, "r+b", &db_file)){
+    if(0 != do_open(db_name, "r+b", db_file)){
 		ret = ERR_IO;
 		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
 		return ret;
 	}
-    print_header(&db_file.header);
+    print_header(&db_file->header);
 	
 	while (!s_sig_received) {
 		mg_mgr_poll(&mgr, 1000000);
 	}
 	
 	printf("Exiting on signal %d\n", s_sig_received);
-	do_close(&db_file);
+	do_close(db_file);
 
 	mg_mgr_free(&mgr);
 	
