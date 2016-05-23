@@ -65,10 +65,12 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 						"Content-Length: %d\r\n\r\n",
 						img_size);
 			mg_send(*img_buffer);
-			 nc->flags |= MG_F_SEND_AND_CLOSE;
+			nc->flags |= MG_F_SEND_AND_CLOSE;
 		 } else {
 			mg_error(nc, err);
-		 }		 
+		 }
+		 
+		 free(img_buffer);		 
 	}
 }
 
