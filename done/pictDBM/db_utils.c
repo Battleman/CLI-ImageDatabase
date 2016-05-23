@@ -173,6 +173,21 @@ int write_disk_image(FILE* file, const char* image, uint32_t image_size)
 
     return 0;
 }
+
+/********************************************************************//**
+ * Parsing d'une chaîne de charactères
+ */
+
+void split(char* result[], char* tmp, const char* src, const char* delim, size_t len){
+	
+	tmp = strtok(src, delim);
+	
+	for(int i = 0; i < MAX_QUERY_PARAM; ++i){
+		result[i] = tmp;
+		tmp = strtok(NULL, delim);
+	}
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */

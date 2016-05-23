@@ -1,8 +1,6 @@
 #include "pictDB.h"
 #include "mongoose.h"
 
-#define MAX_QUERY_PARAM 5
-
 static int s_sig_received = 0;
 static const char *s_http_port = "8000";
 static struct pictdb_file* db_file;
@@ -11,13 +9,6 @@ static struct mg_serve_http_opts s_http_server_opts;
 static void signal_handler(int sig_num) {
   signal(sig_num, signal_handler);
   s_sig_received = sig_num;
-}
-
-void split(char* result[], char* tmp, const char* src, const char* delim, size_t len){
-	
-	for(int i = 0; i < MAX_QUERY_PARAM; ++i){
-		result[i] = 
-	}
 }
 
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
