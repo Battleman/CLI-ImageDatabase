@@ -18,21 +18,17 @@ void mg_error(struct mg_connection* nc, int error){
 }
 
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
-	if(db_file == NULL){
-		 //SEND HTML ERROR MESSAGE
-	 } else {
-		 const char* buffer = do_list(db_file, JSON);
+	const char* buffer = do_list(db_file, JSON);
 		 
-		 if(buffer == NULL){
-			//SEND HTML ERROR MESSAGE
-		 }
+	 if(buffer == NULL){
+		//SEND HTML ERROR MESSAGE
+	 }
 		 
-		 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
-					"Content-Type: application/json\r\n"
-					"Content-Length: %d\r\n\r\n%s",
-					(int) strlen(buffer), buffer);
-		 nc->flags |= MG_F_SEND_AND_CLOSE;
-	}
+	 mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+				"Content-Type: application/json\r\n"
+				"Content-Length: %d\r\n\r\n%s",
+				(int) strlen(buffer), buffer);
+	 nc->flags |= MG_F_SEND_AND_CLOSE;
 }
 
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
