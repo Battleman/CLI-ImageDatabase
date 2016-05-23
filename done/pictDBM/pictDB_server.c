@@ -32,11 +32,11 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 	int res = -1;
-	char* tmp;
 	char* pict_id;
 	const char* delim = "&=";
 	char* result[MAX_QUERY_PARAM];
 	
+	char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
 	split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
 	
 	for(int i = 0; i < 2; ++i){
