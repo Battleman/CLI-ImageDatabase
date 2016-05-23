@@ -32,7 +32,8 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm){
 
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 	int res = -1;
-	char* tmp, pict_id;
+	char* tmp;
+	char* pict_id;
 	const char* delim = "&=";
 	char* result[MAX_QUERY_PARAM];
 	
@@ -55,7 +56,7 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm){
 		char* img_buffer;
 		uint32_t img_size;
 		
-		if(0 == (err = do_read(pict_id, res, &img_buffer, &img_size, db_file))){
+		if(0 == (err = do_read(pict_id, res, &img_buffer, &img_size, &db_file))){
 			mg_printf(nc, "HTTP/1.0 200 OK\r\n"
 						"Content-Type: image/jpeg\r\n"
 						"Content-Length: %d\r\n\r\n",
