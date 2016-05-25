@@ -71,8 +71,9 @@ static int modify_header(FILE* fpdb, struct pictdb_header* header)
  * Supprime une image
  */
 int do_delete(const char* pic_name, struct pictdb_file* db_file)
-{	//Vérification des input
-	if(pic_name == NULL || !strcmp(pic_name, "") || db_file == NULL) return ERR_INVALID_ARGUMENT;
+{
+    //Vérification des input
+    if(pic_name == NULL || !strcmp(pic_name, "") || db_file == NULL) return ERR_INVALID_ARGUMENT;
     int errcode = 0;
     if(db_file->header.num_files > 0) { //éviter des calculs si la base est vide
         errcode = modify_reference(pic_name, db_file -> fpdb, db_file -> metadata, db_file -> header.max_files);

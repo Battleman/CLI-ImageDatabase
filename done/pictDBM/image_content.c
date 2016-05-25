@@ -8,9 +8,9 @@
 #include "image_content.h"
 
 /**@brief Petit utilitaire pour retourner le ratio réduit d'une image
- * 
+ *
  * @author J.-C. Chappelier (on rigole pas avec le plagiat)
- * 
+ *
   *@param image Pointeur vers une VipsImage, pour trouver ses dimensions
  * @param max_thumb_width Largeur maximale que peut avoir l'image redimensionnée
  * @param max_thumb_height Hauteur maximale que peut avoir l'image redimensionnée
@@ -119,11 +119,11 @@ int get_resolution(uint32_t* height, uint32_t* width, const char* image_buffer, 
     VipsObject* process = VIPS_OBJECT( vips_image_new() );
     VipsImage** image = (VipsImage**) vips_object_local_array( process, 1 );
 
-	//vérification de l'obtention d'une image valide à partir du buffer
+    //vérification de l'obtention d'une image valide à partir du buffer
     if(vips_jpegload_buffer((char*)image_buffer, image_size, image, NULL)) {
         errcode = ERR_VIPS;
     } else {
-		//permet d'obtenir les tailles des images
+        //permet d'obtenir les tailles des images
         *width = (*image)->Xsize;
         *height = (*image)->Ysize;
     }

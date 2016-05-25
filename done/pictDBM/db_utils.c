@@ -127,7 +127,7 @@ int resolution_atoi(const char* res_id)
  */
 int create_name(const char* pict_id, char* filename, int res)
 {
-   
+
     if(filename == NULL) {
         return ERR_IO;
     }
@@ -178,15 +178,16 @@ int write_disk_image(FILE* file, const char* image, uint32_t image_size)
  * Parsing d'une chaîne de charactères
  */
 
-void split(char* result[], char* tmp, const char* src, const char* delim, size_t len){
-	
-	strcpy(tmp, src);
-	tmp = strtok(tmp, delim);
-	
-	for(int i = 0; i < MAX_QUERY_PARAM; ++i){
-		result[i] = tmp;
-		tmp = strtok(NULL, delim);
-	}
+void split(char* result[], char* tmp, const char* src, const char* delim, size_t len)
+{
+
+    strcpy(tmp, src);
+    tmp = strtok(tmp, delim);
+
+    for(int i = 0; i < MAX_QUERY_PARAM; ++i) {
+        result[i] = tmp;
+        tmp = strtok(NULL, delim);
+    }
 }
 
 /******************************************//**

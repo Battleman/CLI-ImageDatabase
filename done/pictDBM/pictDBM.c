@@ -30,7 +30,9 @@ do_list_cmd (int argc, char *argv[])
         if(errcode == 0) {
             const char* listed = do_list(&db_file, STDOUT);
             if(listed != NULL) printf("%s", listed);
+            free((void*)listed);
         }
+
         do_close(&db_file);
     }
     return errcode;
@@ -57,7 +59,7 @@ do_create_cmd (int argc, char *argv[])
 
     while(argc != 0) { //itération jusqu'à la fin des arguments
         if(!strcmp(argv[0], "-max_files")) {
-			//Parsing des arguments de -max_files
+            //Parsing des arguments de -max_files
             if(argc > 1) {
                 max_files = atouint32(argv[1]);
                 if(max_files <= 0 || max_files > MAX_MAX_FILES) return ERR_INVALID_ARGUMENT;
@@ -65,7 +67,7 @@ do_create_cmd (int argc, char *argv[])
                 argv += 2;
             } else return ERR_NOT_ENOUGH_ARGUMENTS;
         } else if(!strcmp(argv[0], "-thumb_res")) {
-			//Parsing des arguments de -thumb_res
+            //Parsing des arguments de -thumb_res
             if(argc > 2) {
                 thumb_res_X = atouint16(argv[1]);
                 thumb_res_Y = atouint16(argv[2]);
@@ -74,7 +76,7 @@ do_create_cmd (int argc, char *argv[])
                 argv += 3;
             } else return ERR_NOT_ENOUGH_ARGUMENTS;
         } else if(!strcmp(argv[0], "-small_res")) {
-			//Parsing des arguments de -small_res
+            //Parsing des arguments de -small_res
             if(argc > 2) {
                 small_res_X = atouint16(argv[1]);
                 small_res_Y = atouint16(argv[2]);
@@ -84,7 +86,7 @@ do_create_cmd (int argc, char *argv[])
             } else return ERR_NOT_ENOUGH_ARGUMENTS;
         } else return ERR_INVALID_ARGUMENT;
     }
-    
+
     // Création d'une base de données avec les arguments fournis (ou uniquement les valeurs par défaut si elles n'ont pas été modifiées)
     int errcode = do_create(db_name, &db_file, max_files, thumb_res_X, thumb_res_Y, small_res_X, small_res_Y);
     if(errcode == 0) {
@@ -131,11 +133,11 @@ do_delete_cmd (int argc, char *argv[])
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
 
-	// Test de la validité des arguments
+    // Test de la validité des arguments
     if(strlen(argv[1]) > MAX_PIC_ID || strlen(argv[1]) == 0) {
         return ERR_INVALID_PICID;
     }
-    
+
     // Traitement de la commande avec la gestion d'erreur appropriées
     struct pictdb_file db_file;//!<La base de donnée locale
     int errcode = do_open(argv[0], "r+b", &db_file); //ouverture de la base de données
@@ -187,7 +189,7 @@ int do_read_cmd(int argc, char *argv[])
     if(argc < 2) {
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
-    
+
     //Traitement arguments et des données nécessaires à la lecture
 
     int errcode = 0;
@@ -199,7 +201,7 @@ int do_read_cmd(int argc, char *argv[])
             errcode = ERR_RESOLUTIONS;
         }
     }
-    
+
     // Lecture à proprement parler
 
     char* image_buffer = NULL; //emplacement pour l'image

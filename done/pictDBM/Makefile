@@ -3,8 +3,10 @@ CC=gcc
 LIBS = vips openssl json-c
 CFLAGS += -Wall -ansi -pedantic -std=c99 
 CFLAGS += $$(pkg-config --cflags $(LIBS))
-LDFLAGS += -L libmongoose
+LDFLAGS += -L./libmongoose
 LDLIBS += $$(pkg-config --libs $(LIBS)) -lmongoose -ljson-c
+
+#export LD_LIBRARY_PATH=libmongoose
 ifeq ($(DEBUG), yes)
 	CFLAGS += -g
 endif
@@ -30,7 +32,7 @@ $(MAIN_EXEC): db_list.o image_content.o pictDBM.o db_utils.o error.o db_create.o
 
 
 pictDB_server.o : pictDB_server.c pictDB.h error.h
-$(SERVER_EXEC) : pictDB_server.o libmongoose.so db_list.o db_utils.o error.o
+$(SERVER_EXEC) : pictDB_server.o db_list.o db_utils.o db_read.o image_content.o db_insert.o dedup.o error.o
 
 # scripts to facilitate cleaning and purging#
 #################################################
@@ -41,10 +43,6 @@ clean:
 	@rm -rf *.o
 	@echo "Suppression des fichiers objets (exemple.o)"
 
-#3 last lines are here to "reset" the provided
-#databases, and removed other ones. Essentially
-#temporary. Made to be totally cleaned and 
-#ready to be graded.
 mrproper : clean
 	@rm -rf $(EXEC_LIST)
 	@echo "Suppression des executables"
