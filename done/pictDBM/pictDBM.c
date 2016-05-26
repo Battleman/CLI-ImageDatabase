@@ -196,9 +196,9 @@ int do_read_cmd(int argc, char *argv[])
     struct pictdb_file db_file;//!<La base de donnée locale
     if(0 != (errcode = do_open(argv[0], "r+b", &db_file))) return errcode;
     int res = RES_ORIG;
-    if(argc >= 3) {
-        if(-1 == (res = resolution_atoi(argv[2]))) {
-            errcode = ERR_RESOLUTIONS;
+    if (argc >= 3) {
+        if (-1 == (res = resolution_atoi(argv[2]))) {
+            return ERR_RESOLUTIONS;
         }
     }
 

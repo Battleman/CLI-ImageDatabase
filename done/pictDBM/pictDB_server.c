@@ -31,7 +31,6 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
                              "Content-Type: application/json\r\n"
                              "Content-Length: %zu\r\n\r\n"
                              "%s", strlen(buffer), buffer);
-        mg_send(nc, "", 0);                     
 		free((char*)buffer);
     }
 }
@@ -40,16 +39,18 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 {
     int res = -1;
     const char* delim = "&=";
-    char pict_id[MAX_PIC_ID];
+    char pict_id[MAX_PIC_ID+1];
     char* result[MAX_QUERY_PARAM];
 
     char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
     split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
-    for(int i = 0; i < 2; ++i) {
-        if(!strcmp(result[2*i], "res")) {
-            res = resolution_atoi(result[2*i + 1]);
-        } else if(!strcmp(result[2*i], "pict_id")) {
-            strcpy(pict_id, result[2*i + 1]);
+    for(int i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //stops at first NULL
+        if(!strcmp(result[i], "res")) {
+            i++;
+            res = resolution_atoi(result[i]);
+        } else if(!strcmp(result[i], "pict_id")) {
+            i++;
+            strcpy(pict_id, result[i]);
             pict_id[MAX_PIC_ID] = '\0';
         }
     }
@@ -78,10 +79,10 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm)
 {
-		char var_name[100];
-		char pic_name[MAX_PIC_ID+1];
-        const char *chunk;
-        size_t chunk_len;
+		char var_name[100] = {(char)0};
+		char pic_name[MAX_PIC_ID+1]= {(char)0};
+        const char *chunk = NULL;
+        size_t chunk_len = 0;
 
 		mg_parse_multipart(	hm->body.p, hm->body.len,
 							var_name, sizeof(var_name),
@@ -90,16 +91,16 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
 		if(!fail) {
 			mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
 							"Location: http://localhost:%s/index.html\r\n\r\n",
-							s_http_port);							
+							s_http_port);		
 		} else {
 			mg_error(nc, fail);
-		}
+		}	
 		
 }
 
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)
 {
-
+	
 }
 
 

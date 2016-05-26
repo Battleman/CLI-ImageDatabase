@@ -47,7 +47,8 @@ int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* 
                                             size
                                          )
                 )
-          ) errcode = ERR_RESOLUTIONS;
+          )	
+			  return ERR_RESOLUTIONS;
     }
     //Qu'on trouve un doublon ou non, on màj la DB
     db_file->header.db_version++;

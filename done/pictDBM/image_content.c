@@ -48,7 +48,10 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     if(	NULL == (buffer_in = malloc(size_of_orig))) return ERR_OUT_OF_MEMORY;
 
     fseek(file, meta->offset[RES_ORIG], SEEK_SET); //déplacement au niveau de l'image originale
-    if(1 != fread(buffer_in, size_of_orig, 1, file)) return ERR_IO; //lecture de l'image originale dans le buffer
+    if(1 != fread(buffer_in, size_of_orig, 1, file)) {
+		free(buffer_in);
+		return ERR_IO; //lecture de l'image originale dans le buffer
+	}
 
     VipsObject* process = VIPS_OBJECT( vips_image_new() );
     VipsImage** image = (VipsImage**) vips_object_local_array( process, 1 );
@@ -72,7 +75,8 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
         }
     }
     g_object_unref(process);
-    g_free(buffer_in);
+    free(buffer_in);
+    g_free(buffer_out);
     return errcode;
 }
 
