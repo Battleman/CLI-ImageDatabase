@@ -14,7 +14,7 @@ static void signal_handler(int sig_num)
 
 void mg_error(struct mg_connection* nc, int error)
 {
-	printf("Erreur : %s\n", ERROR_MESSAGES[error]);
+    printf("Erreur : %s\n", ERROR_MESSAGES[error]);
     mg_printf(nc, "HTTP/1.1 500\r\n"
               "ERROR: %s\n"
               "Content-Length: 0\r\n\r\n",
@@ -28,10 +28,10 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
         mg_error(nc, ERR_IO);
     } else {
         mg_printf(nc, "HTTP/1.1 200 OK\r\n"
-                             "Content-Type: application/json\r\n"
-                             "Content-Length: %zu\r\n\r\n"
-                             "%s", strlen(buffer), buffer);
-		free((char*)buffer);
+                  "Content-Type: application/json\r\n"
+                  "Content-Length: %zu\r\n\r\n"
+                  "%s", strlen(buffer), buffer);
+        free((char*)buffer);
     }
 }
 
@@ -55,7 +55,7 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
         }
     }
     free(tmp);
-    
+
     if(res == -1 || pict_id == NULL) {
         mg_error(nc, ERR_INVALID_ARGUMENT);
     } else {
@@ -79,28 +79,28 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm)
 {
-		char var_name[100] = {(char)0};
-		char pic_name[MAX_PIC_ID+1]= {(char)0};
-        const char *chunk = NULL;
-        size_t chunk_len = 0;
+    char var_name[100] = {(char)0};
+    char pic_name[MAX_PIC_ID+1]= {(char)0};
+    const char *chunk = NULL;
+    size_t chunk_len = 0;
 
-		mg_parse_multipart(	hm->body.p, hm->body.len,
-							var_name, sizeof(var_name),
-                            pic_name, MAX_PIC_ID, &chunk, &chunk_len);		
-		int fail = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
-		if(!fail) {
-			mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
-							"Location: http://localhost:%s/index.html\r\n\r\n",
-							s_http_port);		
-		} else {
-			mg_error(nc, fail);
-		}	
-		
+    mg_parse_multipart(	hm->body.p, hm->body.len,
+                        var_name, sizeof(var_name),
+                        pic_name, MAX_PIC_ID, &chunk, &chunk_len);
+    int fail = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
+    if(!fail) {
+        mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
+                  "Location: http://localhost:%s/index.html\r\n\r\n",
+                  s_http_port);
+    } else {
+        mg_error(nc, fail);
+    }
+
 }
 
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)
 {
-	
+
 }
 
 
@@ -128,51 +128,52 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
     }
 }
 
-int main(int argc, char* argv[]){
-	
-	int ret = 0;
-	
-	if(argc < 2){
-		ret = ERR_NOT_ENOUGH_ARGUMENTS;
-		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
-		return ret;
-	}
-	
-	struct mg_mgr mgr;
-	struct mg_connection *nc;
-	
-	signal(SIGTERM, signal_handler);
-	signal(SIGINT, signal_handler);
-	
-	mg_mgr_init(&mgr, NULL);
-	nc = mg_bind(&mgr, s_http_port, ev_handler);
-	
-	if (nc == NULL) {
-		fprintf(stderr, "Error starting server on port %s\n", s_http_port);
-		return ERR_IO;
-	}
-	
-	const char* app_name = argv[0];
-	VIPS_INIT(app_name);
-	
-	const char* db_name = argv[1];
-    if(0 != do_open(db_name, "r+b", &db_file)){
-		ret = ERR_IO;
-		fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
-		return ret;
-	}
-	
-    print_header(&db_file.header);
-	mg_set_protocol_http_websocket(nc);
-	while (!s_sig_received) {
-		mg_mgr_poll(&mgr, 300);
-	}
-	
-	printf("Exiting on signal %d\n", s_sig_received);
-	do_close(&db_file);
-	vips_shutdown();
+int main(int argc, char* argv[])
+{
 
-	mg_mgr_free(&mgr);
-	
-	return 0;
+    int ret = 0;
+
+    if(argc < 2) {
+        ret = ERR_NOT_ENOUGH_ARGUMENTS;
+        fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
+        return ret;
+    }
+
+    struct mg_mgr mgr;
+    struct mg_connection *nc;
+
+    signal(SIGTERM, signal_handler);
+    signal(SIGINT, signal_handler);
+
+    mg_mgr_init(&mgr, NULL);
+    nc = mg_bind(&mgr, s_http_port, ev_handler);
+
+    if (nc == NULL) {
+        fprintf(stderr, "Error starting server on port %s\n", s_http_port);
+        return ERR_IO;
+    }
+
+    const char* app_name = argv[0];
+    VIPS_INIT(app_name);
+
+    const char* db_name = argv[1];
+    if(0 != do_open(db_name, "r+b", &db_file)) {
+        ret = ERR_IO;
+        fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
+        return ret;
+    }
+
+    print_header(&db_file.header);
+    mg_set_protocol_http_websocket(nc);
+    while (!s_sig_received) {
+        mg_mgr_poll(&mgr, 300);
+    }
+
+    printf("Exiting on signal %d\n", s_sig_received);
+    do_close(&db_file);
+    vips_shutdown();
+
+    mg_mgr_free(&mgr);
+
+    return 0;
 }

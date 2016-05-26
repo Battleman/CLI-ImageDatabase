@@ -8,7 +8,7 @@
  * Iterates through the database and prints the header and each
  * valid database entry
  */
-  
+
 const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 {
     if(mode == STDOUT) {
@@ -32,7 +32,7 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 
         for(size_t i = 0; i < db_file->header.max_files; i++) { //pour chaque image :
             if(db_file->metadata[i].is_valid == NON_EMPTY) {
-				printf("List de JSON : %s\n", db_file->metadata[i].pict_id);
+                printf("List de JSON : %s\n", db_file->metadata[i].pict_id);
                 struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id); //on crée une string
                 json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
             }
@@ -41,18 +41,18 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
         struct json_object* object = json_object_new_object(); //création d'un JSON object
         json_object_object_add(object, name_str, array); //dans lequel on ajoute le couple Picture : array[]
         const char* string = json_object_to_json_string (object); //transformation en string
-        
+
         char* indep_string = malloc(strlen(string)+1);
         if(indep_string == NULL) return NULL;
         strcpy(indep_string, string);
-        
+
         if(1 != json_object_put(object)) {
-			free(indep_string);
-			return NULL;
-		}
+            free(indep_string);
+            return NULL;
+        }
         return indep_string; //retour de l'objet en string
 
     } else {
-			return "unimplemented do_list mode";
+        return "unimplemented do_list mode";
     }
 }
