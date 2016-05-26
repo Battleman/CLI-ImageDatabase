@@ -15,9 +15,9 @@ static void signal_handler(int sig_num)
 void mg_error(struct mg_connection* nc, int error)
 {
     printf("Erreur : %s\n", ERROR_MESSAGES[error]);
-    mg_printf(nc, "HTTP/1.1 500\r\n"
-              "ERROR: %s\n"
-              "Content-Length: 0\r\n\r\n",
+    mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
+              "ERROR: %s\r\n"
+              "Content-Length: 0\r\n",
               ERROR_MESSAGES[error]);
 }
 
@@ -50,7 +50,7 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
             res = resolution_atoi(result[i]);
         } else if(!strcmp(result[i], "pict_id")) {
             i++;
-            strcpy(pict_id, result[i]);
+            strncpy(pict_id, result[i], MAX_PIC_ID);
             pict_id[MAX_PIC_ID] = '\0';
         }
     }
@@ -100,7 +100,34 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
 
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)
 {
+    const char* delim = "&=";
+    char pict_id[MAX_PIC_ID+1];
+    char* result[MAX_QUERY_PARAM];
 
+    char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
+    split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
+    for(int i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //stops at first NULL
+		if(!strcmp(result[i], "pict_id")) {
+            i++;
+            strncpy(pict_id, result[i], MAX_PIC_ID);
+            pict_id[MAX_PIC_ID] = '\0';
+        }
+    }
+    free(tmp);
+
+    if(pict_id == NULL) {
+        mg_error(nc, ERR_INVALID_ARGUMENT);
+    } else {
+        int err = 0;
+        if(0 != (err = do_delete(pict_id, &db_file))) {
+			mg_error(nc, err);
+		} else {
+            mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
+                  "Location: http://localhost:%s/index.html\r\n\r\n",
+                  s_http_port);
+        }
+
+    }
 }
 
 

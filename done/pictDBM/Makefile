@@ -16,8 +16,8 @@ EXEC_LIST = $(MAIN_EXEC) $(SERVER_EXEC)
 all: $(MAIN_EXEC)
 everything: $(EXEC_LIST)
 
+#Common to both exec
 db_list.o: db_list.c pictDB.h error.h
-db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
 db_read.o : db_read.c image_content.h pictDB.h error.h
 db_utils.o: db_utils.c pictDB.h error.h
 db_delete.o: db_delete.c pictDB.h error.h
@@ -27,11 +27,14 @@ image_content.o : image_content.c pictDB.h image_content.h dedup.h error.h
 dedup.o : dedup.c dedup.h pictDB.h error.h
 db_insert.o : db_insert.c pictDB.h image_content.h error.h 
 
-$(MAIN_EXEC): db_list.o image_content.o pictDBM.o db_utils.o error.o db_create.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o db_read.o
+COMMON_OBJ = db_list.o image_content.o db_utils.o error.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o db_read.o
+
+db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
+$(MAIN_EXEC): $(COMMON_OBJ) pictDBM.o db_create.o
 
 
 pictDB_server.o : pictDB_server.c pictDB.h error.h
-$(SERVER_EXEC) : pictDB_server.o db_list.o db_utils.o db_read.o image_content.o db_insert.o dedup.o error.o
+$(SERVER_EXEC) : $(COMMON_OBJ) pictDB_server.o
 
 # scripts to facilitate cleaning and purging#
 #################################################
@@ -65,3 +68,5 @@ mrproper : clean
 stylish:
 	./stylish.sh
 
+problem_search:
+	./flaw.sh
