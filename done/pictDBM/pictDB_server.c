@@ -90,9 +90,7 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
 		if(!fail) {
 			mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
 							"Location: http://localhost:%s/index.html\r\n\r\n",
-							s_http_port);
-							
-			//mg_send(nc, "", 0);
+							s_http_port);							
 		} else {
 			mg_error(nc, fail);
 		}
