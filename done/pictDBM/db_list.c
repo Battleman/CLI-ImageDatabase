@@ -32,7 +32,6 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 
         for(size_t i = 0; i < db_file->header.max_files; i++) { //pour chaque image :
             if(db_file->metadata[i].is_valid == NON_EMPTY) {
-                printf("List de JSON : %s\n", db_file->metadata[i].pict_id);
                 struct json_object* pict_name = json_object_new_string(db_file->metadata[i].pict_id); //on crée une string
                 json_object_array_add(array, pict_name); //qu'on ajoute dans l'array
             }
