@@ -6,7 +6,6 @@ CFLAGS += $$(pkg-config --cflags $(LIBS))
 LDFLAGS += -L./libmongoose
 LDLIBS += $$(pkg-config --libs $(LIBS)) -lmongoose -ljson-c
 
-#export LD_LIBRARY_PATH=libmongoose
 ifeq ($(DEBUG), yes)
 	CFLAGS += -g
 endif

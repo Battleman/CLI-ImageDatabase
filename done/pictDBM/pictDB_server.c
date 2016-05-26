@@ -14,7 +14,9 @@ static void signal_handler(int sig_num)
 
 void mg_error(struct mg_connection* nc, int error)
 {
-    mg_printf(nc, "HTTP/1.1 500 %s\r\n"
+	printf("Erreur : %s\n", ERROR_MESSAGES[error]);
+    mg_printf(nc, "HTTP/1.1 500\r\n"
+              "ERROR: %s\n"
               "Content-Length: 0\r\n\r\n",
               ERROR_MESSAGES[error]);
 }
@@ -25,10 +27,11 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
     if(buffer == NULL) {
         mg_error(nc, ERR_IO);
     } else {
-        mg_printf_http_chunk(nc, "HTTP/1.1 200 OK\r\n"
+        mg_printf(nc, "HTTP/1.1 200 OK\r\n"
                              "Content-Type: application/json\r\n"
                              "Content-Length: %zu\r\n\r\n"
                              "%s", strlen(buffer), buffer);
+        mg_send(nc, "", 0);                     
 		free((char*)buffer);
     }
 }
@@ -42,16 +45,16 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 
     char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
     split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
-
     for(int i = 0; i < 2; ++i) {
-        if(strcmp(result[2*i], "res")) {
+        if(!strcmp(result[2*i], "res")) {
             res = resolution_atoi(result[2*i + 1]);
-        } else if(strcmp(result[2*i], "pict_id")) {
+        } else if(!strcmp(result[2*i], "pict_id")) {
             strcpy(pict_id, result[2*i + 1]);
             pict_id[MAX_PIC_ID] = '\0';
         }
     }
-
+    free(tmp);
+    
     if(res == -1 || pict_id == NULL) {
         mg_error(nc, ERR_INVALID_ARGUMENT);
     } else {
@@ -65,7 +68,6 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
                       "Content-Length: %d\r\n\r\n",
                       img_size);
             mg_send(nc, img_buffer, img_size);
-            nc->flags |= MG_F_SEND_AND_CLOSE;
         } else {
             mg_error(nc, err);
         }
@@ -76,7 +78,25 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm)
 {
+		char var_name[100];
+		char pic_name[MAX_PIC_ID+1];
+        const char *chunk;
+        size_t chunk_len;
 
+		mg_parse_multipart(	hm->body.p, hm->body.len,
+							var_name, sizeof(var_name),
+                            pic_name, MAX_PIC_ID, &chunk, &chunk_len);		
+		int fail = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
+		if(!fail) {
+			mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
+							"Location: http://localhost:%s/index.html\r\n\r\n",
+							s_http_port);
+							
+			//mg_send(nc, "", 0);
+		} else {
+			mg_error(nc, fail);
+		}
+		
 }
 
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)

@@ -180,8 +180,9 @@ int write_disk_image(FILE* file, const char* image, uint32_t image_size)
 
 void split(char* result[], char* tmp, const char* src, const char* delim, size_t len)
 {
-
-    strcpy(tmp, src);
+	//vérification des input
+	if(tmp == NULL || src == NULL || result == NULL) return;
+    strncpy(tmp, src, len);
     tmp = strtok(tmp, delim);
 
     for(int i = 0; i < MAX_QUERY_PARAM; ++i) {
