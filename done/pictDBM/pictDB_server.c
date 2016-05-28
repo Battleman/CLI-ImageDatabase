@@ -17,8 +17,10 @@ void mg_error(struct mg_connection* nc, int error)
     printf("Erreur : %s\n", ERROR_MESSAGES[error]);
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
-              "Content-Length: 0\r\n",
-              ERROR_MESSAGES[error]);
+              "Content-Length: 0\r\n\r\n"
+              "<h1>Internal Error: %s</h1><a href='/index.html'>Back to index</a>",
+              ERROR_MESSAGES[error], ERROR_MESSAGES[error]);
+    nc->flags |= MG_F_SEND_AND_CLOSE;
 }
 
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
@@ -89,7 +91,7 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
                         pic_name, MAX_PIC_ID, &chunk, &chunk_len);
     int fail = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
     if(!fail) {
-        mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
+        mg_printf(nc, "HTTP/1.1 302 Found\r\n"
                   "Location: http://localhost:%s/index.html\r\n\r\n",
                   s_http_port);
     } else {

@@ -14,9 +14,10 @@
 int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* db_file)
 {
     //Vérification des input
-    if(db_file == NULL || db_file->metadata == NULL) return ERR_INVALID_ARGUMENT;
+    if(db_file == NULL || db_file->metadata == NULL || pict_id == NULL || !strcmp(pict_id, "")) return ERR_INVALID_ARGUMENT;
     if(db_file->header.num_files >= db_file->header.max_files) return ERR_FULL_DATABASE;
-    int found_empty = 0, index = 0, errcode = 0;
+    int found_empty = 0, errcode = 0;
+    size_t index = 0;
 
     //recherche d'un emplacement libre
     while(index < db_file->header.max_files && !found_empty) {

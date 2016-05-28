@@ -21,6 +21,7 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
         if((i != index) && (NON_EMPTY == db_file -> metadata[i].is_valid)) {
             //erreur dans le cas où 2 images portent le même nom
             if(0 == strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
+                db_file->metadata[index].is_valid = EMPTY;
                 return ERR_DUPLICATE_ID;
             }
 
