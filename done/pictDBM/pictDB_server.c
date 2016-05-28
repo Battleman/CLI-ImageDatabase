@@ -67,8 +67,8 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 
         if(0 == (err = do_read(pict_id, (const int)res, &img_buffer, &img_size, &db_file))) {
             mg_printf(nc, "HTTP/1.0 200 OK\r\n"
-                      "Content-Type: image/jpeg\r\n"
-                      "Content-Length: %d\r\n\r\n",
+						  "Content-Type: image/jpeg\r\n"
+						  "Content-Length: %d\r\n\r\n",
                       img_size);
             mg_send(nc, img_buffer, img_size);
         } else {
@@ -89,15 +89,15 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
     mg_parse_multipart(	hm->body.p, hm->body.len,
                         var_name, sizeof(var_name),
                         pic_name, MAX_PIC_ID, &chunk, &chunk_len);
-    int fail = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
-    if(!fail) {
+    int err = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
+    if(!err) {
         mg_printf(nc, "HTTP/1.1 302 Found\r\n"
-                  "Location: http://localhost:%s/index.html\r\n\r\n",
+					  "Location: http://localhost:%s/index.html\r\n\r\n",
+
                   s_http_port);
     } else {
-        mg_error(nc, fail);
+        mg_error(nc, err);
     }
-
 }
 
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)
@@ -124,8 +124,8 @@ static void handle_delete_call(struct mg_connection *nc, struct http_message *hm
         if(0 != (err = do_delete(pict_id, &db_file))) {
 			mg_error(nc, err);
 		} else {
-            mg_printf(nc, 	"HTTP/1.1 302 Found\r\n"
-                  "Location: http://localhost:%s/index.html\r\n\r\n",
+            mg_printf(nc, "HTTP/1.1 302 Found\r\n"
+						  "Location: http://localhost:%s/index.html\r\n\r\n",
                   s_http_port);
         }
 
