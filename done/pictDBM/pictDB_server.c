@@ -20,6 +20,21 @@ void mg_error(struct mg_connection* nc, int error)
               "Content-Length: 0\r\n\r\n"
               "<h1>Internal Error: %s</h1><a href='/index.html'>Back to index</a>",
               ERROR_MESSAGES[error], ERROR_MESSAGES[error]);
+    
+    const char* html_page;
+              
+    mg_printf(nc, "HTTP/1.1 200 OK\r\n"
+              "Content-Type: text/html\r\n"
+              "Content-Length: 0\r\n\r\n"
+              "<html>\n"
+              "\t<head>\n"
+              "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
+              "\t</head>\n"
+              "\t<body>\n"
+              "<h1>Internal Error: %s</h1><a href='/index.html'>Back to index</a>\n"
+              "\t</body>\n"
+              "</html>",
+              ERROR_MESSAGES[error], ERROR_MESSAGES[error]);
     nc->flags |= MG_F_SEND_AND_CLOSE;
 }
 
