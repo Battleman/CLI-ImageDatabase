@@ -108,7 +108,7 @@ void print_metadata (const struct pict_metadata* metadata);
  *
  * @param myfile In memory structure with header and metadata.
  * @param mode The behavious mode. STDOUT (just print) or JSON.
- * 
+ *
  * @return If mode STDOUT, NULL. If mode JSON, a JSON string of the database, or NULL in case of an error.
  */
 

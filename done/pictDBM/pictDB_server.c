@@ -1,5 +1,5 @@
 /**@file pictDB_server.c
- * 
+ *
  * @brief implémentation d'un web-serveur exploitant les méthodes sur base de donnée
  */
 
@@ -18,7 +18,7 @@ static void signal_handler(int sig_num)
 }
 
 /**@brief gestion d'erreur mongoose
- * 
+ *
  * Fonction générique qui redirige une page d'erreur en cas de problème
  */
 void mg_error(struct mg_connection* nc, int error)
@@ -28,9 +28,9 @@ void mg_error(struct mg_connection* nc, int error)
               "ERROR: %s\r\n"
               "Content-Length: 0\r\n\r\n",
               ERROR_MESSAGES[error]);
-                 
-	/* Pas surs que ce soit autorisé. On ajoutera au bonus
-	 * const char* htmlBefore = "<html>\n"
+
+    /* Pas surs que ce soit autorisé. On ajoutera au bonus
+     * const char* htmlBefore = "<html>\n"
               "\t<head>\n"
               "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
               "\t</head>\n"
@@ -39,14 +39,14 @@ void mg_error(struct mg_connection* nc, int error)
     const char* htmlAfter = "</h1><a href='/index.html'>Back to index</a>\n"
               "\t</body>\n"
               "</html>";
-              
+
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
               "Content-Type: text/html\r\n"
-              "Content-Length: %zu\r\n\r\n"	
+              "Content-Length: %zu\r\n\r\n"
               "%s" //htmlBefore
               "%s" //error
-			  "%s", //htmlAfter	
+    		  "%s", //htmlAfter
               ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
     */
 }
@@ -95,10 +95,10 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
         uint32_t img_size = 0;
 
         if(0 == (err = do_read(pict_id, (const int)res, &img_buffer, &img_size, &db_file))) {
-			//Header de la page
-			mg_printf(nc, "HTTP/1.0 200 OK\r\n"
-						  "Content-Type: image/jpeg\r\n"
-						  "Content-Length: %d\r\n\r\n",
+            //Header de la page
+            mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+                      "Content-Type: image/jpeg\r\n"
+                      "Content-Length: %d\r\n\r\n",
                       img_size);
             //contenu de la page (l'image)
             mg_send(nc, img_buffer, img_size);
@@ -123,7 +123,7 @@ static void handle_insert_call(struct mg_connection *nc, struct http_message *hm
     int err = do_insert(pic_name, (char*)image, img_len, &db_file);
     if(!err) {
         mg_printf(nc, "HTTP/1.1 302 Found\r\n"
-					  "Location: http://localhost:%s/index.html\r\n\r\n",
+                  "Location: http://localhost:%s/index.html\r\n\r\n",
                   s_http_port);
     } else {
         mg_error(nc, err);
@@ -140,7 +140,7 @@ static void handle_delete_call(struct mg_connection *nc, struct http_message *hm
     char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
     split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
     for(int i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //stops at first NULL
-		if(!strcmp(result[i], "pict_id")) {
+        if(!strcmp(result[i], "pict_id")) {
             i++;
             strncpy(pict_id, result[i], MAX_PIC_ID);
             pict_id[MAX_PIC_ID] = '\0';
@@ -153,11 +153,11 @@ static void handle_delete_call(struct mg_connection *nc, struct http_message *hm
     } else {
         int err = 0;
         if(0 != (err = do_delete(pict_id, &db_file))) {
-			mg_error(nc, err);
-		} else {
+            mg_error(nc, err);
+        } else {
             mg_printf(nc, "HTTP/1.1 302 Found\r\n"
-						  "Location: http://localhost:%s/index.html\r\n\r\n",
-                  s_http_port);
+                      "Location: http://localhost:%s/index.html\r\n\r\n",
+                      s_http_port);
         }
 
     }

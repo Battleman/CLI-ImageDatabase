@@ -34,8 +34,8 @@ static int modify_reference(const char* pic_name, FILE* fpdb, struct pict_metada
     if(valid == 0) {
         return ERR_FILE_NOT_FOUND;
     } else {
-		memset(&meta_table[index], 0, sizeof(struct pict_metadata)); //mise à 0 de tous les champs
-		fseek(fpdb, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET); //déplace la tête de lecture
+        memset(&meta_table[index], 0, sizeof(struct pict_metadata)); //mise à 0 de tous les champs
+        fseek(fpdb, sizeof(struct pictdb_header) + index * sizeof(struct pict_metadata), SEEK_SET); //déplace la tête de lecture
         valid = fwrite(&meta_table[index], sizeof(struct pict_metadata), 1, fpdb); //ecriture au niveau de la tête, avec test de validité
     }
 
