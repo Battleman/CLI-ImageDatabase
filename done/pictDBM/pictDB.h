@@ -107,6 +107,9 @@ void print_metadata (const struct pict_metadata* metadata);
  * @brief Displays (on stdout) pictDB metadata.
  *
  * @param myfile In memory structure with header and metadata.
+ * @param mode The behavious mode. STDOUT (just print) or JSON.
+ * 
+ * @return If mode STDOUT, NULL. If mode JSON, a JSON string of the database, or NULL in case of an error.
  */
 
 const char* do_list(const struct pictdb_file* myfile, enum do_list_mode mode);

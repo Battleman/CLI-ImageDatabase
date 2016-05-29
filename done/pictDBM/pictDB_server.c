@@ -1,9 +1,14 @@
+/**@file pictDB_server.c
+ * 
+ * @brief implémentation d'un web-serveur exploitant les méthodes sur base de donnée
+ */
+
 #include "pictDB.h"
 #include "libmongoose/mongoose.h"
 
 static int s_sig_received = 0;
-static const char *s_http_port = "8000";
-static struct pictdb_file db_file;
+static const char *s_http_port = "8000"; //!<Le port sur lequel on travaille
+static struct pictdb_file db_file; //!<La base de donnée "en local"
 static struct mg_serve_http_opts s_http_server_opts;
 
 static void signal_handler(int sig_num)
@@ -12,12 +17,20 @@ static void signal_handler(int sig_num)
     s_sig_received = sig_num;
 }
 
+/**@brief gestion d'erreur mongoose
+ * 
+ * Fonction générique qui redirige une page d'erreur en cas de problème
+ */
 void mg_error(struct mg_connection* nc, int error)
 {
     printf("Erreur : %s\n", ERROR_MESSAGES[error]);
-    /**/
+    mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
+              "ERROR: %s\r\n"
+              "Content-Length: 0\r\n\r\n",
+              ERROR_MESSAGES[error]);
                  
-	const char* htmlBefore = "<html>\n"
+	/* Pas surs que ce soit autorisé. On ajoutera au bonus
+	 * const char* htmlBefore = "<html>\n"
               "\t<head>\n"
               "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
               "\t</head>\n"
@@ -27,7 +40,6 @@ void mg_error(struct mg_connection* nc, int error)
               "\t</body>\n"
               "</html>";
               
-              
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
               "Content-Type: text/html\r\n"
@@ -36,13 +48,10 @@ void mg_error(struct mg_connection* nc, int error)
               "%s" //error
 			  "%s", //htmlAfter	
               ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
-    /*mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
-              "ERROR: %s\r\n"
-              "Content-Length: 0\r\n\r\n",
-              ERROR_MESSAGES[error]);*/
-    nc->flags |= MG_F_SEND_AND_CLOSE;
+    */
 }
 
+/**@brief Gestion de l'affichage (list) des images*/
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
 {
     const char* buffer = do_list(&db_file, JSON);
@@ -56,17 +65,17 @@ static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
         free((char*)buffer);
     }
 }
-
+/**@brief Gestion de l'affichage (read) des images*/
 static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 {
-    int res = -1;
-    const char* delim = "&=";
+    int res = -1; //!<Par défaut, la résolution est "fausse"
+    const char* delim = "&="; //!<List des délimiteurs de l'URI
     char pict_id[MAX_PIC_ID+1];
     char* result[MAX_QUERY_PARAM];
 
     char* tmp = calloc((MAX_PIC_ID + 1) * MAX_QUERY_PARAM, sizeof(char));
     split(result, tmp, hm -> query_string.p, delim, hm -> query_string.len);
-    for(int i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //stops at first NULL
+    for(size_t i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //dès le premier NULL, il n'y a plus d'arguments
         if(!strcmp(result[i], "res")) {
             i++;
             res = resolution_atoi(result[i]);
@@ -81,45 +90,47 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
     if(res == -1 || pict_id == NULL) {
         mg_error(nc, ERR_INVALID_ARGUMENT);
     } else {
-        int err;
-        char* img_buffer;
-        uint32_t img_size;
+        int err = 0;
+        char* img_buffer = NULL;
+        uint32_t img_size = 0;
 
         if(0 == (err = do_read(pict_id, (const int)res, &img_buffer, &img_size, &db_file))) {
-            mg_printf(nc, "HTTP/1.0 200 OK\r\n"
+			//Header de la page
+			mg_printf(nc, "HTTP/1.0 200 OK\r\n"
 						  "Content-Type: image/jpeg\r\n"
 						  "Content-Length: %d\r\n\r\n",
                       img_size);
+            //contenu de la page (l'image)
             mg_send(nc, img_buffer, img_size);
         } else {
             mg_error(nc, err);
         }
 
-        free(img_buffer);
+        free(img_buffer); //alloué dans do_read -> libération
     }
 }
-
+/**@brief Gestion de l'insertion des images*/
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm)
 {
     char var_name[100] = {(char)0};
     char pic_name[MAX_PIC_ID+1]= {(char)0};
-    const char *chunk = NULL;
-    size_t chunk_len = 0;
+    const char *image = NULL;
+    size_t img_len = 0;
 
     mg_parse_multipart(	hm->body.p, hm->body.len,
                         var_name, sizeof(var_name),
-                        pic_name, MAX_PIC_ID, &chunk, &chunk_len);
-    int err = do_insert(pic_name, (char*)chunk, chunk_len, &db_file);
+                        pic_name, MAX_PIC_ID, &image, &img_len);
+    int err = do_insert(pic_name, (char*)image, img_len, &db_file);
     if(!err) {
         mg_printf(nc, "HTTP/1.1 302 Found\r\n"
 					  "Location: http://localhost:%s/index.html\r\n\r\n",
-
                   s_http_port);
     } else {
         mg_error(nc, err);
     }
 }
 
+/**@brief Gestion de la suppression des images*/
 static void handle_delete_call(struct mg_connection *nc, struct http_message *hm)
 {
     const char* delim = "&=";
@@ -152,7 +163,7 @@ static void handle_delete_call(struct mg_connection *nc, struct http_message *hm
     }
 }
 
-
+/**@brief Tri puis appel correct selon la fonction voulue*/
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 {
     struct http_message *hm = (struct http_message *) ev_data;

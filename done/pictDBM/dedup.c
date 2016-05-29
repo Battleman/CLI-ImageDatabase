@@ -12,16 +12,15 @@
 int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
 {
     //vérification des inputs et des cas limites
-    if(db_file == NULL) return ERR_IO;
-    //if(EMPTY == (db_file -> metadata[index].is_valid)) return 0;
+    if(db_file == NULL || index < 0 || index >= db_file->header.max_files) return ERR_IO;
 
     //recherche de doublons
     int doublon = 0;
     for(int i = 0; i < db_file -> header.max_files; i++) {
         if((i != index) && (NON_EMPTY == db_file -> metadata[i].is_valid)) {
             //erreur dans le cas où 2 images portent le même nom
-            if(0 == strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
-                db_file->metadata[index].is_valid = EMPTY;
+            if(!strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
+                db_file->metadata[index].is_valid = EMPTY; //duplicata -> image invalide
                 return ERR_DUPLICATE_ID;
             }
 
@@ -34,7 +33,6 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index)
                 db_file -> metadata[index].size[RES_SMALL] = db_file -> metadata[i].size[RES_SMALL];
                 db_file -> metadata[index].res_orig[0] = db_file -> metadata[i].res_orig[0];
                 db_file -> metadata[index].res_orig[1] = db_file -> metadata[i].res_orig[1];
-                //db_file -> metadata[i].is_valid = EMPTY;
                 doublon = 1;
             }
         }

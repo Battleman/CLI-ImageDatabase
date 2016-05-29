@@ -6,9 +6,8 @@
 #include <json-c/json.h>
 /********************************************************************//**
  * Iterates through the database and prints the header and each
- * valid database entry
+ * valid database entry. Different behaviour considering the mode.
  */
-
 const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
 {
     if(mode == STDOUT) {
