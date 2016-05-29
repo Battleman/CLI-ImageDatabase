@@ -28,7 +28,7 @@ int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* 
         }
     }
 
-    db_file->metadata[index].is_valid = NON_EMPTY; //depuis là, on considère l'image comme valide
+    //db_file->metadata[index].is_valid = NON_EMPTY; //depuis là, on considère l'image comme valide
     (void)SHA256((unsigned char *)img, size, db_file->metadata[index].SHA); //placement du SHA
     strncpy(db_file->metadata[index].pict_id, pict_id, MAX_PIC_ID); //copie de la pict_id
     db_file->metadata[index].size[RES_ORIG] = (uint32_t)size; //copie de la taille originale
@@ -51,15 +51,17 @@ int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* 
           )
             return ERR_RESOLUTIONS;
     }
+    //une fois que le job est fini, l'image est valide
+    db_file->metadata[index].is_valid = NON_EMPTY;
     //Qu'on trouve un doublon ou non, on màj la DB
     db_file->header.db_version++;
     db_file->header.num_files++;
-
+	
     errcode = overwrite_metadata(db_file, index);
     if(errcode == 0) {
         errcode = overwrite_header(db_file->fpdb, &db_file->header);
     }
-
+	
 
     return errcode;
 }

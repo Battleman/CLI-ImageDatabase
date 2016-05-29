@@ -15,26 +15,31 @@ static void signal_handler(int sig_num)
 void mg_error(struct mg_connection* nc, int error)
 {
     printf("Erreur : %s\n", ERROR_MESSAGES[error]);
-    mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
-              "ERROR: %s\r\n"
-              "Content-Length: 0\r\n\r\n"
-              "<h1>Internal Error: %s</h1><a href='/index.html'>Back to index</a>",
-              ERROR_MESSAGES[error], ERROR_MESSAGES[error]);
-    
-    const char* html_page;
-              
-    mg_printf(nc, "HTTP/1.1 200 OK\r\n"
-              "Content-Type: text/html\r\n"
-              "Content-Length: 0\r\n\r\n"
-              "<html>\n"
+    /**/
+                 
+	const char* htmlBefore = "<html>\n"
               "\t<head>\n"
               "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
               "\t</head>\n"
               "\t<body>\n"
-              "<h1>Internal Error: %s</h1><a href='/index.html'>Back to index</a>\n"
+              "<h1>Internal Error:  ";
+    const char* htmlAfter = "</h1><a href='/index.html'>Back to index</a>\n"
               "\t</body>\n"
-              "</html>",
-              ERROR_MESSAGES[error], ERROR_MESSAGES[error]);
+              "</html>";
+              
+              
+    mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
+              "ERROR: %s\r\n"
+              "Content-Type: text/html\r\n"
+              "Content-Length: %zu\r\n\r\n"	
+              "%s" //htmlBefore
+              "%s" //error
+			  "%s", //htmlAfter	
+              ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
+    /*mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
+              "ERROR: %s\r\n"
+              "Content-Length: 0\r\n\r\n",
+              ERROR_MESSAGES[error]);*/
     nc->flags |= MG_F_SEND_AND_CLOSE;
 }
 
