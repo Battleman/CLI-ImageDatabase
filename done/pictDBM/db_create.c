@@ -60,7 +60,5 @@ int do_create(const char* db_name, struct pictdb_file* db_file, uint32_t max_fil
 
     printf("%d item(s) written\n", printHead+printMeta);
 
-    do_close(db_file);
-
     return errcode; // retourne l'erreur;
 }

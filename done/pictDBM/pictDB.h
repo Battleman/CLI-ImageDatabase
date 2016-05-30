@@ -48,7 +48,7 @@
 #define NB_RES    3
 
 /*Amount of defined commands*/
-#define NB_COMMANDS 6
+#define NB_COMMANDS 7
 
 /*Amount of maximum arguments of a URI function */
 #define MAX_QUERY_PARAM 5
