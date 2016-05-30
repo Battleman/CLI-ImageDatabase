@@ -15,6 +15,7 @@
 #include <string.h>
 #include <json-c/json.h>
 #include "pictDBM_tools.h"
+#include <stdio.h>
 
 /********************************************************************//**
  * Opens pictDB file and calls do_list command.
@@ -278,7 +279,7 @@ int main (int argc, char* argv[])
     (command_mapping){"help", help},
     (command_mapping){"delete", do_delete_cmd},
     (command_mapping){"read", do_read_cmd},
-    (command_mapping){"insert", do_insert_cmd}
+    (command_mapping){"insert", do_insert_cmd},
     (command_mapping){"gc", do_gc_cmd}};
     int ret = 0;
     if (argc < 2) {
