@@ -250,6 +250,8 @@ int do_gc_cmd(int argc, char *argv[])
     struct pictdb_file db_file; // La base de données
     if(0 != (errcode = do_open(original_file, "r+b", &db_file))) return errcode;
     
+    
+    // Garbage collection à "proprement" parler
     if(0 != (errcode = do_gbcollect(&db_file, original_file, temporary_file))) return errcode;  
     
 }
@@ -286,6 +288,38 @@ int main (int argc, char* argv[])
         argc--;
         argv++; // skips command call name
 
+		if(argc > 0 && !strcmp(argv[0], "interpretor")){
+			size_t MAX_INTERPRETOR_PARAM = 7;
+			size_t MAX_INTERPRETOR_CMD = 2*MAX_DB_NAME + 2*MAX_PIC_ID + 27;
+			
+			int nb_args = 0, errcode = 0;
+			char* args[MAX_INTERPRETOR_PARAM];
+			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
+			
+			while(-1 != (getline(&cmd, &MAX_INTERPRETOR_CMD, stdin)) && !strcmp(cmd, "quit")){
+				nb_args = 0;
+				cmd = strtok(cmd, " ");
+				for(int i = 0; i < MAX_INTERPRETOR_CMD; ++i){
+					args[i] = cmd;
+					if(cmd != NULL) ++nb_args;
+					cmd = strtok(NULL, " ");
+				}
+				
+				if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
+				else {
+					int index = 0, valid = 0;
+					do {
+						if(!strcmp(commands[index].name, args[0])){
+							nb_args--;
+							args++;
+							errcode = commands[index].cmd(nb_args, args);
+							valid = 0;
+						} else ++index;
+					} while(index < NB_COMMANDS && valid == 0);
+				}
+			}
+		}
+		
         int index = 0, valid = 0;
         VIPS_INIT(app_name);
         do {

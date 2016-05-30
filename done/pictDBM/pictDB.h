@@ -41,7 +41,7 @@
 #define EMPTY 0
 #define NON_EMPTY 1
 
-// pictDB library internal codes for different picture resolutions.
+/* pictDB library internal codes for different picture resolutions.*/
 #define RES_THUMB 0
 #define RES_SMALL 1
 #define RES_ORIG  2
