@@ -87,6 +87,106 @@ struct pictdb_file {
 
 enum do_list_mode {STDOUT, JSON};
 
+/* *****************************************************************
+ * Commandes de base (utilisées dans l'interpréteur)
+ * ***************************************************************** */
+
+/**
+ * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)
+ *
+ * @param filename name of the file to open
+ * @param mode opening (r/w (b)...)
+ * @param db_file In memory structure ; where to stock the read file
+ *
+ * @return 0 if success; a non-null integer if fail (corresponds to an
+ * 			error code, defined in error.h
+ **/
+int do_open(const char* filename, const char* mode, struct pictdb_file* db_file);
+
+/**
+ * @brief Creates the database called db_filename. Writes the header and the
+ *        preallocated empty metadata array to database file.
+ *
+ * @param db_file In memory structure with header and metadata.
+ */
+int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t thumb_res_X, uint16_t thumb_res_Y,
+              uint16_t small_res_X, uint16_t small_res_Y);
+
+/**
+ * @brief Lecture d'une résolution d'une image
+ *
+ * Cherche une image dans la base de donnée. Si la résolution souhaitée n'existe pas,
+ * les fonctions nécessaires sont appelées pour la créer. La l'image est alors
+ * retournée dans un argument de sortie.
+ *
+ * @param pict_id Le nom de l'image
+ * @param RES La résolution souhaitée de l'image
+ * @param image_buffer Paramètre de sortie : Buffer dans lequelle stocker l'image
+ * @param image_size Paramètre de sortie : taille de l'image
+ * @param db_file La base de donnée
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
+ */
+int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file);
+
+/** @brief Insère une image dans la base de donnée
+ *
+ * @param pict_id Le nom de l'image
+ * @param img L'image
+ * @param size La taille de l'image
+ * @param db_file La DB dans laquelle insérer l'image
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
+int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* db_file);
+
+/**
+ * @brief Displays (on stdout) pictDB metadata.
+ *
+ * @param myfile In memory structure with header and metadata.
+ * @param mode The behavious mode. STDOUT (just print) or JSON.
+ *
+ * @return If mode STDOUT, NULL. If mode JSON, a JSON string of the database, or NULL in case of an error.
+ */
+
+const char* do_list(const struct pictdb_file* myfile, enum do_list_mode mode);
+
+/**
+ * @brief Deletes a specified entry in the database of the specified file
+ *
+ * @param picname The ID of the pic to be deleted
+ * @param file The file (already opened) in which delete the image
+ *
+ * @return 0 if success; else a non-null integer (corresponds to an
+ * 			error code defined in error.h)
+ **/
+int do_delete(const char* picname, struct pictdb_file* file);
+
+/**@brief Effectue un garbage collector sur une base de donnée
+  * 
+  * Copie les données nécessaires dans un fichier temporaire pour ensuite remplacer l'original
+  * 
+  * @param db_file La base de donnée en local
+  * @param original_file Le nom du fichier original (le fichier correspondant est déjà ouvert !)
+  * @param new_file Le nom du nouveau fichier, à ouvrir
+  * 
+  * @return 0 en cas de succès, un code d'erreur sinon
+  */
+  
+int do_gbcollect(const struct pictdb_file* original_db_file, const char* original_file, const char* new_file);
+
+
+/**
+ * @brief Closes a file (if possible)
+ *
+ * @param db_file The file to close
+ */
+
+void do_close(struct pictdb_file* db_file);
+
+/* *****************************************************************
+ * Commandes utilitaires pour les structures de données complexes
+ * ***************************************************************** */
 
 /**
  * @brief Prints database header informations.
@@ -103,57 +203,6 @@ void print_header(const struct pictdb_header* header);
  */
 void print_metadata (const struct pict_metadata* metadata);
 
-/**
- * @brief Displays (on stdout) pictDB metadata.
- *
- * @param myfile In memory structure with header and metadata.
- * @param mode The behavious mode. STDOUT (just print) or JSON.
- *
- * @return If mode STDOUT, NULL. If mode JSON, a JSON string of the database, or NULL in case of an error.
- */
-
-const char* do_list(const struct pictdb_file* myfile, enum do_list_mode mode);
-
-
-/**
- * @brief Creates the database called db_filename. Writes the header and the
- *        preallocated empty metadata array to database file.
- *
- * @param db_file In memory structure with header and metadata.
- */
-int do_create(const char* filename, struct pictdb_file* db_file, uint32_t max_files, uint16_t thumb_res_X, uint16_t thumb_res_Y,
-              uint16_t small_res_X, uint16_t small_res_Y);
-
-/**
- * @brief opens a file in the desired mode, and stocks the read file (header+metadata table)
- *
- * @param filename name of the file to open
- * @param mode opening (r/w (b)...)
- * @param db_file In memory structure ; where to stock the read file
- *
- * @return 0 if success; a non-null integer if fail (corresponds to an
- * 			error code, defined in error.h
- **/
-int do_open(const char* filename, const char* mode, struct pictdb_file* db_file);
-
-/**
- * @brief Closes a file (if possible)
- *
- * @param db_file The file to close
- */
-
-void do_close(struct pictdb_file* db_file);
-
-/**
- * @brief Deletes a specified entry in the database of the specified file
- *
- * @param picname The ID of the pic to be deleted
- * @param file The file (already opened) in which delete the image
- *
- * @return 0 if success; else a non-null integer (corresponds to an
- * 			error code defined in error.h)
- **/
-int do_delete(const char* picname, struct pictdb_file* file);
 
 /**
  * @brief Remplacement du header (par overwrite) sur le fichier spécifié. N'influence pas la tête de lecture.
@@ -175,69 +224,6 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 int overwrite_metadata(struct pictdb_file* db_file, size_t index);
-
-/**
- * @brief "Change" un texte (comme option de commande) en son code de résolution asosicé
- *
- * e.g. change "small" dans la constante RES_SMALL.
- *
- * @param res_id Le texte de la résolution
- *
- * @return Le code de résolution de l'image (défini dans ce fichier) ou -1 en cas d'erreur
- */
-int resolution_atoi(const char* res_id);
-
-/**
- * @brief Lecture d'une résolution d'une image
- *
- * Cherche une image dans la base de donnée. Si la résolution souhaitée n'existe pas,
- * les fonctions nécessaires sont appelées pour la créer. La l'image est alors
- * retournée dans un argument de sortie.
- *
- * @param pict_id Le nom de l'image
- * @param RES La résolution souhaitée de l'image
- * @param image_buffer Paramètre de sortie : Buffer dans lequelle stocker l'image
- * @param image_size Paramètre de sortie : taille de l'image
- * @param db_file La base de donnée
- *
- * @return 0 en cas de succès, un code d'erreur sinon
- */
-int do_read(const char pict_id[], const int RES, char** image_buffer, uint32_t* image_size, struct pictdb_file* db_file);
-
-/**
- * @brief compare les @p size  premières entrées de deux tableaux
- *
- * Les deux tableaux doivent contenir des char (e.g. comparaison de SHA). @p Size doit
- * être plus petit que la taille du plus petit tableau. Si les tailles sont différentes,
- * aucune erreur n'est retournée.
- * @param orig Le premier tableau à comparer
- * @param comp Le second tableau à comparer
- * @param size La taille (normalement des tableaux) sur laquelle comparer les tableaux
- *
- * @return 0 en cas de succès, un code d'erreur sinon.
- */
-int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
-
-/** @brief Insère une image dans la base de donnée
- *
- * @param pict_id Le nom de l'image
- * @param img L'image
- * @param size La taille de l'image
- * @param db_file La DB dans laquelle insérer l'image
- *
- * @return 0 en cas de succès, un code d'erreur sinon.
- */
-int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* db_file);
-
-/**@brief Crée un nom standardisé pour une image
- *
- * @param pict_id Le nom de l'image
- * @param filename L'emplacement pour y écrire le nom
- * @param res Le code de la résolution
- *
- * @return 0 en cas de succès, un code d'erreur sinon
- */
-int create_name(const char* pict_id, char* filename, int res);
 
 /**@brief lit une image sur le disque
  *
@@ -263,6 +249,45 @@ int read_disk_image(const char* filename, void** buffer, size_t* size);
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
 int write_disk_image(FILE* file, const char* image, uint32_t image_size);
+
+/* *****************************************************************
+ * Commandes utiliaires diverses
+ * ***************************************************************** */
+
+/**
+ * @brief "Change" un texte (comme option de commande) en son code de résolution asosicé
+ *
+ * e.g. change "small" dans la constante RES_SMALL.
+ *
+ * @param res_id Le texte de la résolution
+ *
+ * @return Le code de résolution de l'image (défini dans ce fichier) ou -1 en cas d'erreur
+ */
+int resolution_atoi(const char* res_id);
+
+/**
+ * @brief compare les @p size  premières entrées de deux tableaux
+ *
+ * Les deux tableaux doivent contenir des char (e.g. comparaison de SHA). @p Size doit
+ * être plus petit que la taille du plus petit tableau. Si les tailles sont différentes,
+ * aucune erreur n'est retournée.
+ * @param orig Le premier tableau à comparer
+ * @param comp Le second tableau à comparer
+ * @param size La taille (normalement des tableaux) sur laquelle comparer les tableaux
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon.
+ */
+int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
+
+/**@brief Crée un nom standardisé pour une image
+ *
+ * @param pict_id Le nom de l'image
+ * @param filename L'emplacement pour y écrire le nom
+ * @param res Le code de la résolution
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
+ */
+int create_name(const char* pict_id, char* filename, int res);
 
 /**@brief Parse une chaîne de charactères
  *

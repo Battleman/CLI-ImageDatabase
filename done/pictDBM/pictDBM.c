@@ -119,6 +119,7 @@ help (int argc, char *argv[])
     printf("\t   read an image from the pictDB and save it to a file.\n");
     printf("\t   default resolution is 'original'.\n");
     printf("\tinsert <dbfilename> <pictID> <filename>: insert a new image in the pictDB.\n");
+    printf("\tgc <dbfilename> <tmp dbfilename>: performs garbage collecting on pictDB. Requires a temporary filename for copying the pictDB.\n");
     printf("\tdelete <dbfilename> <pictID>: delete picture pictID from pictDB.\n");
     return 0;
 }
@@ -234,8 +235,23 @@ int do_read_cmd(int argc, char *argv[])
  * Clean the database and resize the file containing potential 
  * useless pictures.
  ********************************************************************* */
-int do_gbcollect(int argc, char *argv[])
+int do_gc_cmd(int argc, char *argv[])
 {
+	if(argc < 2) {
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+    
+    //Traitement des arguments
+
+	const char* original_file = argv[0];
+	const char* temporary_file = argv[1];
+
+    int errcode = 0;
+    struct pictdb_file db_file; // La base de données
+    if(0 != (errcode = do_open(original_file, "r+b", &db_file))) return errcode;
+    
+    if(0 != (errcode = do_gbcollect(&db_file, original_file, temporary_file))) return errcode;  
+    
 }
 
 /********************************************************************//**
@@ -261,8 +277,7 @@ int main (int argc, char* argv[])
     (command_mapping){"delete", do_delete_cmd},
     (command_mapping){"read", do_read_cmd},
     (command_mapping){"insert", do_insert_cmd}
-    (command_mapping){"gc", do_gbcollect}
-                                            };
+    (command_mapping){"gc", do_gc_cmd}};
     int ret = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
