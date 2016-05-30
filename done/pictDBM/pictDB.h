@@ -53,6 +53,10 @@
 /*Amount of maximum arguments of a URI function */
 #define MAX_QUERY_PARAM 5
 
+/*Command interpretor constants */
+#define MAX_INTERPRETOR_PARAM 7
+#define MAX_INTERPRETOR_CMD (2*MAX_DB_NAME + 2*MAX_PIC_ID + 27)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -288,15 +288,12 @@ int main (int argc, char* argv[])
         argc--;
         argv++; // skips command call name
 
-		if(argc > 0 && !strcmp(argv[0], "interpretor")){
-			size_t MAX_INTERPRETOR_PARAM = 7;
-			size_t MAX_INTERPRETOR_CMD = 2*MAX_DB_NAME + 2*MAX_PIC_ID + 27;
-			
+		if(argc > 0 && !strcmp(argv[0], "interpretor")){			
 			int nb_args = 0, errcode = 0;
 			char* args[MAX_INTERPRETOR_PARAM];
 			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
 			
-			while(-1 != (getline(&cmd, &MAX_INTERPRETOR_CMD, stdin)) && !strcmp(cmd, "quit")){
+			while(-1 != (fgets(&cmd, MAX_INTERPRETOR_CMD, stdin)) && !strcmp(cmd, "quit")){
 				nb_args = 0;
 				cmd = strtok(cmd, " ");
 				for(int i = 0; i < MAX_INTERPRETOR_CMD; ++i){
