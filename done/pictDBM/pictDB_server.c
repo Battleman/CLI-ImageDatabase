@@ -23,14 +23,14 @@ static void signal_handler(int sig_num)
  */
 void mg_error(struct mg_connection* nc, int error)
 {
-    printf("Erreur : %s\n", ERROR_MESSAGES[error]);
+	
+    /*printf("Erreur : %s\n", ERROR_MESSAGES[error]);
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
               "Content-Length: 0\r\n\r\n",
-              ERROR_MESSAGES[error]);
+              ERROR_MESSAGES[error]);*/
 
-    /* Pas surs que ce soit autorisé. On ajoutera au bonus
-     * const char* htmlBefore = "<html>\n"
+     const char* htmlBefore = "<html>\n"
               "\t<head>\n"
               "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
               "\t</head>\n"
@@ -48,7 +48,7 @@ void mg_error(struct mg_connection* nc, int error)
               "%s" //error
     		  "%s", //htmlAfter
               ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
-    */
+    
 }
 
 /**@brief Gestion de l'affichage (list) des images*/
