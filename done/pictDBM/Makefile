@@ -29,7 +29,7 @@ db_insert.o : db_insert.c pictDB.h image_content.h error.h
 
 COMMON_OBJ = db_list.o image_content.o db_utils.o error.o db_delete.o dedup.o pictDBM_tools.o dedup.o db_insert.o db_read.o
 
-db_gbcollect.o: db_gbcollect.c error.h 
+db_gbcollect.o: db_gbcollect.c image_content.h error.h 
 db_create.o: db_create.c pictDBM_tools.h pictDB.h error.h
 $(MAIN_EXEC): $(COMMON_OBJ) pictDBM.o db_create.o db_gbcollect.o
 

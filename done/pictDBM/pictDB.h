@@ -177,7 +177,7 @@ int do_delete(const char* picname, struct pictdb_file* file);
   * @return 0 en cas de succès, un code d'erreur sinon
   */
   
-int do_gbcollect(const struct pictdb_file* original_db_file, const char* original_file, const char* new_file);
+int do_gbcollect(struct pictdb_file* original_db_file, const char* original_file, const char* new_file);
 
 
 /**

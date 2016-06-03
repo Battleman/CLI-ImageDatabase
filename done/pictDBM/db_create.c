@@ -23,8 +23,10 @@ int do_create(const char* db_name, struct pictdb_file* db_file, uint32_t max_fil
         thumb_res_X < 0 || thumb_res_Y > MAX_THUMB_SIZE || thumb_res_Y < 0) {
         return ERR_INVALID_ARGUMENT;
     }
+    memset(db_file, 0, sizeof(struct pictdb_file)); //mise à 0 de toute la DB
     db_file -> fpdb = fopen(db_name, "wb");
     struct pictdb_header header;
+    memset(&header, 0, sizeof(struct pictdb_header)); //mise à 0 du header
     int errcode = 0;
 
     if(NULL == db_file -> fpdb) {
@@ -53,11 +55,11 @@ int do_create(const char* db_name, struct pictdb_file* db_file, uint32_t max_fil
 
     //allocation et écriture des metadata
     if(	errcode == 0) {
-        db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata));
+        db_file -> metadata = calloc(max_files, sizeof(struct pict_metadata)); //allocation et mise à 0 de toutes les metadata
         if(db_file->metadata == NULL) errcode = ERR_OUT_OF_MEMORY;
         else if(max_files != (printMeta =  fwrite(db_file->metadata, sizeof(struct pict_metadata), max_files, db_file->fpdb))) errcode = ERR_IO;
     }
-
+	do_close(db_file);
     printf("%d item(s) written\n", printHead+printMeta);
 
     return errcode; // retourne l'erreur;
