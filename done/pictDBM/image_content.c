@@ -32,12 +32,13 @@ shrink_value(VipsImage* image, int max_thumb_width, int max_thumb_height)
  * @param file Le fichier dans lequel lire et écrire l'image
  * @param meta La métadonnée dans laquelle travailler
  * @param header Le header de la DB
- * @param RES Code de la résolution dans laquelle transformer l'image.
+ * @param res Code de la résolution dans laquelle transformer l'image.
  *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_header* header, const int RES)
+static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_header* header, const int res)
 {
+    //Vérification des input
     size_t size_of_orig = meta->size[RES_ORIG]; //la taille à lire de l'image originale
     int errcode = 0;
     size_t size_of_small = 0;
@@ -59,7 +60,7 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
     //On récupère l'image depuis le buffer
     if(vips_jpegload_buffer(buffer_in, size_of_orig, image, NULL)) errcode = ERR_VIPS;
     else {
-        double ratio = shrink_value(*image, header->res_resized[2*RES], header->res_resized[2*RES+1]); //calcul du ratio
+        double ratio = shrink_value(*image, header->res_resized[2*res], header->res_resized[2*res+1]); //calcul du ratio
         VipsImage** image_small = (VipsImage**) vips_object_local_array( process, 1 ); //réceptacle pour l'image réduite
 
         vips_resize(image[0], &image_small[0], ratio, NULL); //redimensionnement de l'image
@@ -67,8 +68,8 @@ static int create_small(FILE* file, struct pict_metadata* meta, struct pictdb_he
         if(vips_jpegsave_buffer(image_small[0], &buffer_out, &size_of_small, NULL)) errcode = ERR_VIPS;
         else {
             fseek(file, 0, SEEK_END); //déplacement en fin de fichier pour l'écriture
-            meta->offset[RES] = ftell(file); //on sauve la position d'écriture
-            meta->size[RES] = size_of_small;
+            meta->offset[res] = ftell(file); //on sauve la position d'écriture
+            meta->size[res] = size_of_small;
             if(!fwrite(buffer_out, size_of_small, 1, file)) {
                 errcode = ERR_IO;
             }
@@ -100,17 +101,17 @@ static int update_file(struct pictdb_file* db_file, size_t index)
 /*****************************************
  * Redimensionnement d'une image
  ******/
-int lazily_resize(const int RES, struct pictdb_file* db_file, size_t index)
+int lazily_resize(const int res, struct pictdb_file* db_file, size_t index)
 {
 
     /*Vérification des input*/
-    if(RES < 0 || RES >= NB_RES) 									return ERR_RESOLUTIONS;
+    if(res < 0 || res >= NB_RES) 									return ERR_RESOLUTIONS;
     if(db_file == NULL || db_file->fpdb == NULL) 					return ERR_INVALID_ARGUMENT;
     if(index < 0 || index >= db_file->header.max_files) 			return ERR_INVALID_PICID;
-    if(RES == RES_ORIG || db_file->metadata[index].size[RES] != 0) 	return 0; //si on cherche la RES_ORIG, rien à faire
+    if(res == RES_ORIG || db_file->metadata[index].size[res] != 0) 	return 0; //si on cherche la RES_ORIG, rien à faire
 
     int errcode = 0;
-    if(0 != (errcode = create_small(db_file->fpdb, &db_file->metadata[index], &db_file->header, RES))) return errcode;
+    if(0 != (errcode = create_small(db_file->fpdb, &db_file->metadata[index], &db_file->header, res))) return errcode;
     return update_file(db_file, index);
 }
 

@@ -34,7 +34,7 @@ int do_insert(const char pict_id[], char* img, size_t size, struct pictdb_file* 
                 );
     strncpy(db_file->metadata[index].pict_id, pict_id, MAX_PIC_ID); 				//copie de la pict_id
     db_file->metadata[index].size[RES_ORIG] = (uint32_t)size; 						//copie de la taille originale
-    if(0 != (errcode = do_name_and_content_dedup(db_file, index))) return errcode; 	//recherche de doublon
+    if(0 != (errcode = do_name_and_content_dedup(db_file, index, GCOLLECT_OFF))) return errcode; 	//recherche de doublon
 
     //si on a pas trouvé de doublon
     if(db_file->metadata[index].offset[RES_ORIG] == 0) {

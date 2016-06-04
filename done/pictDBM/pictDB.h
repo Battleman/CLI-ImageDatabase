@@ -57,6 +57,9 @@
 #define MAX_INTERPRETOR_PARAM 7
 #define MAX_INTERPRETOR_CMD (2*MAX_DB_NAME + 2*MAX_PIC_ID + 27)
 
+#define GCOLLECT_OFF 0
+#define GCOLLECT_ON 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -167,16 +170,16 @@ const char* do_list(const struct pictdb_file* myfile, enum do_list_mode mode);
 int do_delete(const char* picname, struct pictdb_file* file);
 
 /**@brief Effectue un garbage collector sur une base de donnée
-  * 
+  *
   * Copie les données nécessaires dans un fichier temporaire pour ensuite remplacer l'original
-  * 
+  *
   * @param db_file La base de donnée en local
   * @param original_file Le nom du fichier original (le fichier correspondant est déjà ouvert !)
   * @param new_file Le nom du nouveau fichier, à ouvrir
-  * 
+  *
   * @return 0 en cas de succès, un code d'erreur sinon
   */
-  
+
 int do_gbcollect(struct pictdb_file* original_db_file, const char* original_file, const char* new_file);
 
 
@@ -228,6 +231,10 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
  * @return 0 en cas de succès, un code d'erreur sinon
  */
 int overwrite_metadata(struct pictdb_file* db_file, size_t index);
+
+
+int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata);
+
 
 /**@brief lit une image sur le disque
  *

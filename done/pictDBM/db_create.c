@@ -59,7 +59,7 @@ int do_create(const char* db_name, struct pictdb_file* db_file, uint32_t max_fil
         if(db_file->metadata == NULL) errcode = ERR_OUT_OF_MEMORY;
         else if(max_files != (printMeta =  fwrite(db_file->metadata, sizeof(struct pict_metadata), max_files, db_file->fpdb))) errcode = ERR_IO;
     }
-	do_close(db_file);
+    do_close(db_file);
     printf("%d item(s) written\n", printHead+printMeta);
 
     return errcode; // retourne l'erreur;

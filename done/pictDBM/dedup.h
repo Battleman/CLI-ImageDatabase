@@ -19,4 +19,4 @@
  *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-int do_name_and_content_dedup(struct pictdb_file* db_file, uint32_t index);
+int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index, const int gbcollect);

@@ -23,22 +23,22 @@ static void signal_handler(int sig_num)
  */
 void mg_error(struct mg_connection* nc, int error)
 {
-	
+
     /*printf("Erreur : %s\n", ERROR_MESSAGES[error]);
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
               "Content-Length: 0\r\n\r\n",
               ERROR_MESSAGES[error]);*/
 
-     const char* htmlBefore = "<html>\n"
-              "\t<head>\n"
-              "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
-              "\t</head>\n"
-              "\t<body>\n"
-              "<h1>Internal Error:  ";
+    const char* htmlBefore = "<html>\n"
+                             "\t<head>\n"
+                             "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
+                             "\t</head>\n"
+                             "\t<body>\n"
+                             "<h1>Internal Error:  ";
     const char* htmlAfter = "</h1><a href='/index.html'>Back to index</a>\n"
-              "\t</body>\n"
-              "</html>";
+                            "\t</body>\n"
+                            "</html>";
 
     mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
               "ERROR: %s\r\n"
@@ -46,9 +46,9 @@ void mg_error(struct mg_connection* nc, int error)
               "Content-Length: %zu\r\n\r\n"
               "%s" //htmlBefore
               "%s" //error
-    		  "%s", //htmlAfter
+              "%s", //htmlAfter
               ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
-    
+
 }
 
 /**@brief Gestion de l'affichage (list) des images*/

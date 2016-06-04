@@ -110,6 +110,21 @@ int overwrite_metadata(struct pictdb_file* db_file, size_t index)
     return errcode;
 }
 
+int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata)
+{
+    //Vérification des input
+    if(copy == NULL || metadata == NULL) return ERR_INVALID_ARGUMENT;
+
+    memcpy(&copy -> pict_id, &metadata -> pict_id, MAX_PIC_ID + 1);
+    memcpy(&copy -> SHA, &metadata -> SHA, SHA256_DIGEST_LENGTH);
+    memcpy(&copy -> res_orig, &metadata -> res_orig, RES_ORIG);
+    memcpy(&copy -> size, &metadata -> size, NB_RES);
+    memcpy(&copy -> offset, &metadata -> offset, NB_RES);
+    copy -> is_valid = metadata -> is_valid;
+    copy -> unused_16 = metadata -> unused_16;
+    return 0;
+}
+
 /********************************************************************//**
  * Transformation de la dénomination de la résolution dans son code associé
  */
