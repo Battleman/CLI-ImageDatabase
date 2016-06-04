@@ -287,7 +287,7 @@ int main (int argc, char* argv[])
         argc--;
         argv++; // skips command call name
 		
-		/*if(argc > 0 && !strcmp(argv[0], "interpretor")){			
+		if(argc > 0 && !strcmp(argv[0], "interpretor")){			
 			int nb_args = 0, errcode = 0;
 			char* args[MAX_INTERPRETOR_PARAM];
 			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
@@ -307,15 +307,14 @@ int main (int argc, char* argv[])
 					do {
 						if(!strcmp(commands[index].name, args[0])){
 							nb_args--;
-							args++;
-							errcode = commands[index].cmd(nb_args, args);
+							errcode = commands[index].cmd(nb_args, &args[1]);
 							valid = 0;
 						} else ++index;
 					} while(index < NB_COMMANDS && valid == 0);
 				}
 			}
 			return errcode;
-		}*/
+		}
 		
         int index = 0, valid = 0;
         VIPS_INIT(app_name);
