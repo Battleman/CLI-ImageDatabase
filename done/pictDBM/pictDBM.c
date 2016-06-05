@@ -288,19 +288,21 @@ int main (int argc, char* argv[])
         const char* app_name = argv[0]; //pour vips
         argc--;
         argv++; // skips command call name
+        
+        int interpretor = 0;
 		if(argc > 0 && !strcmp(argv[0], "interpretor")){			
-			int nb_args = 0, errcode = 0;
+			int errcode = 0;
+			size_t nb_args = 0, errcode = 0;
 			char* args[MAX_INTERPRETOR_PARAM];
 			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
 			
+			interpret_commands(cmd, &nb_args);
+			if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
+			else args[nb_args-1][strlen(args[nb_args-1])-1] = '\0';
+			
 			while(errcode == 0 && NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin) && strcmp(cmd, "quit")){
-				nb_args = 0;
-				cmd = strtok(cmd, " ");
-				for(int i = 0; i < MAX_INTERPRETOR_CMD && cmd != NULL; ++i){
-					args[i] = cmd;
-					if(cmd != NULL) ++nb_args;
-					cmd = strtok(NULL, " ");
-				}
+				size_t nb_args = 0;
+							
 				
 				if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
 				else {
@@ -318,22 +320,35 @@ int main (int argc, char* argv[])
 			free(cmd);
 			return errcode;
 		}
+		
 		int index = 0, valid = 0;
         VIPS_INIT(app_name);
+        
         do {
-            if(!strcmp(commands[index].name, argv[0])) {
-                if (argc < 1) { //au moins 1, pour help
-                    ret = ERR_NOT_ENOUGH_ARGUMENTS;
-                } else {
-                    argc--;
-                    argv++;
-                    ret = commands[index].cmd(argc, argv);
-                }
-                valid = 1;
-            } else {
-                ++index;
-            }
-        } while(index < NB_COMMANDS && valid == 0);
+			do {
+				if(interpretor == 1){
+					if(NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin)){
+						interpret_commands(cmd, &nb_args);
+						if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
+						else args[nb_args-1][strlen(args[nb_args-1])-1] = '\0';
+					} else {
+						interpretor = 0;
+					}
+				}
+				if(!strcmp(commands[index].name, argv[0]) || !strcmp(commands[index].name, args[0])) {
+					if (argc < 1) { //au moins 1, pour help
+						ret = ERR_NOT_ENOUGH_ARGUMENTS;
+					} else {
+						argc--;
+						argv++;
+						ret = commands[index].cmd(argc, argv);
+					}
+					valid = 1;
+				} else {
+					++index;
+				}
+			} while(index < NB_COMMANDS && valid == 0);
+		} while((interpretor == 1) && (errcode == 0) && (strcmp(cmd, "quit")));
         vips_shutdown();
         if(valid == 0) {
             ret = ERR_INVALID_COMMAND;

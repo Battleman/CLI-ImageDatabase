@@ -207,6 +207,22 @@ void split(char* result[], char* tmp, const char* src, const char* delim, size_t
     }
 }
 
+/********************************************************************//**
+ * Parsing et enregistrement des commandes
+ */
+
+void interpret_commands(char* cmd[], size_t* nb_args)
+{
+    //vérification des input
+    if(tmp == NULL ||len == NULL) return;
+    cmd = strtok(cmd, " ");
+	for(int i = 0; i < MAX_INTERPRETOR_CMD && cmd != NULL; ++i){
+		args[i] = cmd;
+		if(cmd != NULL) ++nb_args;
+		cmd = strtok(NULL, " ");
+	}
+}
+
 /******************************************//**
  * File opening and header/metadata reading
  */
