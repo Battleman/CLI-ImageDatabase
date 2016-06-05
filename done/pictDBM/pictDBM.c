@@ -26,15 +26,14 @@ do_list_cmd (int argc, char *argv[])
     int errcode = ERR_NOT_ENOUGH_ARGUMENTS; //sera retourné si le premier if échoue
     struct pictdb_file db_file; //!<La base de donnée locale
 
-    if(argc > 0) {
+    if(argc == 1) {
         errcode = do_open(argv[0], "rb", &db_file);
         if(errcode == 0) {
             const char* listed = do_list(&db_file, STDOUT);
             if(listed != NULL) printf("%s", listed);
             free((void*)listed);
+            do_close(&db_file);
         }
-
-        do_close(&db_file);
     }
     return errcode;
 }
@@ -45,6 +44,7 @@ do_list_cmd (int argc, char *argv[])
 int
 do_create_cmd (int argc, char *argv[])
 {
+    if(argc < 1) return ERR_NOT_ENOUGH_ARGUMENTS;
     //Valeurs par défaut
     uint32_t max_files = 10;
     uint16_t thumb_res_X = 64, thumb_res_Y = 64;
@@ -58,7 +58,7 @@ do_create_cmd (int argc, char *argv[])
     argc--;
     argv++;
 
-    while(argc != 0) { //itération jusqu'à la fin des arguments
+    while(argc > 0) { //itération jusqu'à la fin des arguments
         if(!strcmp(argv[0], "-max_files")) {
             //Parsing des arguments de -max_files
             if(argc > 1) {
@@ -104,6 +104,7 @@ help (int argc, char *argv[])
 {
     printf("pictDBM [COMMAND] [ARGUMENTS]\n");
     printf("\thelp: displays this help.\n");
+    printf("\tinterpretor : launches command interpretor\n");
     printf("\tlist <dbfilename>: list pictDB content.\n");
     printf("\tcreate <dbfilename> [options]: create a new pictDB.\n");
     printf("\t\t\toptions are:\n");
@@ -273,91 +274,115 @@ typedef struct {
 int main (int argc, char* argv[])
 {
     command_mapping commands[NB_COMMANDS] = {
-		(command_mapping){"list", do_list_cmd},
-		(command_mapping){"create", do_create_cmd},
-		(command_mapping){"help", help},
-		(command_mapping){"delete", do_delete_cmd},
-		(command_mapping){"read", do_read_cmd},
-		(command_mapping){"insert", do_insert_cmd},
-		(command_mapping){"gc", do_gc_cmd}
-                                            };
-    int ret = 0;
+        (command_mapping){"list", do_list_cmd},
+        (command_mapping){"create", do_create_cmd},
+        (command_mapping){"help", help},
+        (command_mapping){"delete", do_delete_cmd},
+        (command_mapping){"read", do_read_cmd},
+        (command_mapping){"insert", do_insert_cmd},
+        (command_mapping)
+        {"gc", do_gc_cmd
+        }
+    };
+    int ret = 0, index = 0, valid = 0;
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
     } else {
+
         const char* app_name = argv[0]; //pour vips
+        VIPS_INIT(app_name);
         argc--;
         argv++; // skips command call name
         
-        int interpretor = 0;
-		if(argc > 0 && !strcmp(argv[0], "interpretor")){			
-			int errcode = 0;
-			size_t nb_args = 0, errcode = 0;
-			char* args[MAX_INTERPRETOR_PARAM];
-			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
-			
-			interpret_commands(cmd, &nb_args);
-			if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
-			else args[nb_args-1][strlen(args[nb_args-1])-1] = '\0';
-			
-			while(errcode == 0 && NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin) && strcmp(cmd, "quit")){
-				size_t nb_args = 0;
-							
-				
-				if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
-				else {
-					args[nb_args-1][strlen(args[nb_args-1])-1] = '\0'; //supprime le \n final
-					int index = 0, valid = 0;
-					do {
-						if(!strcmp(commands[index].name, args[0])){
-							nb_args--;
-							errcode = commands[index].cmd(nb_args, &args[1]);
-							valid = 1;
-						} else ++index;
-					} while(index < NB_COMMANDS && valid == 0);
-				}
-			}
-			free(cmd);
-			return errcode;
-		}
-		
-		int index = 0, valid = 0;
-        VIPS_INIT(app_name);
-        
-        do {
-			do {
-				if(interpretor == 1){
-					if(NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin)){
-						interpret_commands(cmd, &nb_args);
-						if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
-						else args[nb_args-1][strlen(args[nb_args-1])-1] = '\0';
-					} else {
-						interpretor = 0;
+        //première vérification : si on est en mode interpreteur
+        //difficile de merge avec l'autre (origine des arguments, fget ou argv)
+        if(argc > 0 && !strcmp(argv[0], "interpretor")) {
+            int nb_args = 0, loop = 1;
+            static const char* blank = " \n\r\t"; //!<Séparateurs entre les arguments
+            char* cmd = NULL;
+            char** args = NULL;
+            do { //boucle "infinie" (attente du mot <<quit>>)
+				/*Allocations mémoire*/
+				args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
+				if(NULL == args) {
+                    vips_shutdown();
+                    return ERR_OUT_OF_MEMORY;
+                }
+                cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
+                if(NULL == cmd) {
+                    free(args);
+                    vips_shutdown();
+                    return ERR_OUT_OF_MEMORY;
+                }
+                /*backup pour free*/
+                char** backup_args = args;
+                char* backup_cmd = cmd;
+                //On récupère la commande utilisateur
+                if(NULL == fgets(cmd, MAX_INTERPRETOR_CMD, stdin))
+                    ret = ERR_IO;
+                else {
+					//Séparation de la commande en arguments indépendantes
+					nb_args = 0;
+					cmd = strtok(cmd, blank);
+					for(int i = 0; i < MAX_INTERPRETOR_PARAM && cmd != NULL; ++i) {
+						args[i] = cmd;
+						if(cmd != NULL) ++nb_args;
+						cmd = strtok(NULL, blank);
 					}
-				}
-				if(!strcmp(commands[index].name, argv[0]) || !strcmp(commands[index].name, args[0])) {
-					if (argc < 1) { //au moins 1, pour help
-						ret = ERR_NOT_ENOUGH_ARGUMENTS;
-					} else {
-						argc--;
-						argv++;
-						ret = commands[index].cmd(argc, argv);
-					}
-					valid = 1;
-				} else {
-					++index;
-				}
-			} while(index < NB_COMMANDS && valid == 0);
-		} while((interpretor == 1) && (errcode == 0) && (strcmp(cmd, "quit")));
-        vips_shutdown();
-        if(valid == 0) {
-            ret = ERR_INVALID_COMMAND;
+					//appel de la fonction selon les arguments
+					if(nb_args < 1) ret = ERR_NOT_ENOUGH_ARGUMENTS;
+					else {
+                        if(!strcmp(args[0], "quit")) { //commande de sortie
+							loop = 0;
+						} else {
+                            do {
+                                if(!strcmp(commands[index].name, args[0])) {
+                                    nb_args--;
+                                    args++;
+                                    ret = commands[index].cmd(nb_args, args);
+                                    valid = 1;
+                                } else ++index;
+                            } while(index < NB_COMMANDS && valid == 0);
+                            if(valid == 0) ret = ERR_INVALID_ARGUMENT;
+                        }
+                    }
+                    if (ret) {
+                        fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
+                        (void)help(argc, args);
+                    }
+                }
+                free(backup_args);
+                free(backup_cmd);
+            } while(loop);
+            printf("Thanks for traveling with us. By By !\n"); fflush(stdout);
+            return 0;
+        } else {
+            //sinon, commande simple
+            if (argc < 1) { //au moins 1, pour help
+                ret = ERR_NOT_ENOUGH_ARGUMENTS;
+            } else {
+                do {
+                    if(!strcmp(commands[index].name, argv[0])) {
+                        argc--;
+                        argv++;
+                        ret = commands[index].cmd(argc, argv);
+                        valid = 1;
+                    } else {
+                        ++index;
+                    }
+                } while(index < NB_COMMANDS && valid == 0);
+            }
+            vips_shutdown();
+            if(valid == 0) {
+                ret = ERR_INVALID_COMMAND;
+            }
         }
-    }
+    
 
-    if (ret) {
-        fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
-        (void)help(argc, argv);
-    }
+	    if (ret) {
+	        fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
+	        (void)help(argc, argv);
+	    }
+	}
     return ret;
 }

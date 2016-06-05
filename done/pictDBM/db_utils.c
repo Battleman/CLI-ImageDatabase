@@ -44,6 +44,19 @@ int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
 }
 
 /********************************************************************//**
+ * Copie d'un tableau dans l'autre
+ */
+int table_copy(const char** orig[], char** that[], size_t size)
+{
+    if(orig == NULL || that == NULL) return 1;
+    
+    for(size_t i = 0; i < size; i++) {
+        strcpy(*that[i], *orig[i]);
+    }
+    return 0;
+}
+
+/********************************************************************//**
  * pictDB header display.
  */
 
