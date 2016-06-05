@@ -46,15 +46,16 @@ int table_compare(unsigned char orig[], unsigned char comp[], size_t size)
 /********************************************************************//**
  * Copie d'un tableau dans l'autre
  */
-int table_copy(const char** orig[], char** that[], size_t size)
+/*int table_copy(const char** orig, char** dest, size_t size)
 {
-    if(orig == NULL || that == NULL) return 1;
+    if(orig == NULL || dest == NULL) return 1;
     
     for(size_t i = 0; i < size; i++) {
-        strcpy(*that[i], *orig[i]);
+        //strcpy(dest[i], orig[i]);
+        dest[i] = orig[i]
     }
     return 0;
-}
+}*/
 
 /********************************************************************//**
  * pictDB header display.
@@ -223,7 +224,7 @@ void split(char* result[], char* tmp, const char* src, const char* delim, size_t
 /********************************************************************//**
  * Parsing et enregistrement des commandes
  */
-
+/*
 void interpret_commands(char* cmd[], size_t* nb_args)
 {
     //vérification des input
@@ -234,7 +235,7 @@ void interpret_commands(char* cmd[], size_t* nb_args)
 		if(cmd != NULL) ++nb_args;
 		cmd = strtok(NULL, " ");
 	}
-}
+}*/
 
 /******************************************//**
  * File opening and header/metadata reading

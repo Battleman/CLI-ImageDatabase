@@ -230,10 +230,6 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
  */
 int overwrite_metadata(struct pictdb_file* db_file, size_t index);
 
-
-//int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata);
-
-
 /**@brief lit une image sur le disque
  *
  * Lit sur le disque une image de type jpeg et la renvoie dans un argument de sortie
@@ -297,7 +293,7 @@ int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
  *
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-int table_copy(const char** orig[], char** that[], size_t size);
+int table_copy(const char** orig, char** that, size_t size);
 
 /**@brief Crée un nom standardisé pour une image
  *
