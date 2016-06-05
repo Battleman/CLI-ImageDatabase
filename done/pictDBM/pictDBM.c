@@ -295,39 +295,49 @@ int main (int argc, char* argv[])
         argv++; // skips command call name
         //première vérification : si on est en mode interpreteur
         //difficile de merge avec l'autre (origine des arguments, fget ou argv)
-        if(argc > 0 && !strcmp(argv[0], "interpretor")) {
+        if(argc > 0) {
             int nb_args = 0, loop = 1;
             static const char* blank = " \n\r\t"; //!<Séparateurs entre les arguments
             char* cmd = NULL;
+            char* backup_cmd = NULL;
             char** args = NULL;
+            char** backup_args = NULL;
             do { //boucle "infinie" (attente du mot <<quit>>)
-				/*Allocations mémoire*/
-				args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
-				if(NULL == args) {
-                    vips_shutdown();
-                    return ERR_OUT_OF_MEMORY;
-                }
-                cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
-                if(NULL == cmd) {
-                    free(args);
-                    vips_shutdown();
-                    return ERR_OUT_OF_MEMORY;
-                }
-                /*backup pour free*/
-                char** backup_args = args;
-                char* backup_cmd = cmd;
-                //On récupère la commande utilisateur
-                if(NULL == fgets(cmd, MAX_INTERPRETOR_CMD, stdin))
-                    ret = ERR_IO;
-                else {
-					//Séparation de la commande en arguments indépendantes
-					nb_args = 0;
-					cmd = strtok(cmd, blank);
-					for(int i = 0; i < MAX_INTERPRETOR_PARAM && cmd != NULL; ++i) {
-						args[i] = cmd;
-						if(cmd != NULL) ++nb_args;
-						cmd = strtok(NULL, blank);
+                !strcmp(argv[0], "interpretor")) {
+					args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
+					if(NULL == args) {
+	                    vips_shutdown();
+	                    return ERR_OUT_OF_MEMORY;
+	                }
+	                cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
+	                if(NULL == cmd) {
+	                    free(args);
+	                    vips_shutdown();
+	                    return ERR_OUT_OF_MEMORY;
 					}
+					/*Allocations mémoire*/
+				
+					/*backup pour free*/
+					backup_args = args;
+					backup_cmd = cmd;
+					//On récupère la commande utilisateur
+					if(NULL == fgets(cmd, MAX_INTERPRETOR_CMD, stdin))
+						ret = ERR_IO;
+					else {
+						//Séparation de la commande en arguments indépendantes
+						nb_args = 0;
+						cmd = strtok(cmd, blank);
+						for(int i = 0; i < MAX_INTERPRETOR_PARAM && cmd != NULL; ++i) {
+							args[i] = cmd;
+							if(cmd != NULL) ++nb_args;
+							cmd = strtok(NULL, blank);
+						}
+					}
+				} else {
+					nb_args = argc;
+					copy_table(argv, args, argc)
+					
+				}
 					//appel de la fonction selon les arguments
 					if(nb_args < 1) ret = ERR_NOT_ENOUGH_ARGUMENTS;
 					else {
