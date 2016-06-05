@@ -57,9 +57,6 @@
 #define MAX_INTERPRETOR_PARAM 7
 #define MAX_INTERPRETOR_CMD (2*MAX_DB_NAME + 2*MAX_PIC_ID + 27)
 
-#define GCOLLECT_OFF 0
-#define GCOLLECT_ON 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -93,6 +90,7 @@ struct pictdb_file {
 };
 
 enum do_list_mode {STDOUT, JSON};
+enum dedup_mode {GCOLLECT_OFF, GCOLLECT_ON};
 
 /* *****************************************************************
  * Commandes de base (utilisées dans l'interpréteur)
@@ -233,7 +231,7 @@ int overwrite_header(FILE* file, struct pictdb_header* header);
 int overwrite_metadata(struct pictdb_file* db_file, size_t index);
 
 
-int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata);
+//int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata);
 
 
 /**@brief lit une image sur le disque

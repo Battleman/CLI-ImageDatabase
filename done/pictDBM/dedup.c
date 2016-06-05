@@ -9,7 +9,7 @@
 /********************************************************************//**
  * Localisation de doublon
  */
-int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index, const int gbcollect)
+int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index, const enum dedup_mode gbcollect)
 {
     //vérification des inputs et des cas limites
     if(db_file == NULL || index < 0 || index >= db_file->header.max_files) return ERR_IO;
@@ -23,7 +23,7 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index,
         if((i != index) && (NON_EMPTY == db_file -> metadata[i].is_valid)) {
             valid_files++;
             //erreur dans le cas où 2 images portent le même nom
-            if(!strcmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id)) {
+            if(!strncmp(db_file -> metadata[index].pict_id, db_file -> metadata[i].pict_id, MAX_PIC_ID)) {
                 db_file->metadata[index].is_valid = EMPTY; //duplicata -> image invalide
                 return ERR_DUPLICATE_ID;
             }

@@ -110,7 +110,8 @@ int overwrite_metadata(struct pictdb_file* db_file, size_t index)
     return errcode;
 }
 
-int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata)
+
+/*int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metadata)
 {
     //Vérification des input
     if(copy == NULL || metadata == NULL) return ERR_INVALID_ARGUMENT;
@@ -123,7 +124,7 @@ int metadata_copy(struct pict_metadata* copy, const struct pict_metadata* metada
     copy -> is_valid = metadata -> is_valid;
     copy -> unused_16 = metadata -> unused_16;
     return 0;
-}
+}*/
 
 /********************************************************************//**
  * Transformation de la dénomination de la résolution dans son code associé

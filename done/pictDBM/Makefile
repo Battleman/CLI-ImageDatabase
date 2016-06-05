@@ -63,6 +63,8 @@ mrproper : clean
 	@echo "Réinitialisation des images et bases de donnée"
 	@rm -rf *~
 	@echo "Suppression de fichiers de sauvegarde"
+	@rm astyle_orig/*
+	@echo "Suppression des fichiers générés par astyle"
 	@echo "--- \nMr Proper a rendu votre repo tout propre !"
 #to apply astyle -A8 ; script is not provided, only 
 #used before handing back.

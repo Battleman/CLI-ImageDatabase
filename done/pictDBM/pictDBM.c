@@ -272,15 +272,14 @@ typedef struct {
  */
 int main (int argc, char* argv[])
 {
-    command_mapping commands[NB_COMMANDS] = {(command_mapping){"list", do_list_cmd},
-    (command_mapping){"create", do_create_cmd},
-    (command_mapping){"help", help},
-    (command_mapping){"delete", do_delete_cmd},
-    (command_mapping){"read", do_read_cmd},
-    (command_mapping){"insert", do_insert_cmd},
-    (command_mapping)
-    {"gc", do_gc_cmd
-    }
+    command_mapping commands[NB_COMMANDS] = {
+		(command_mapping){"list", do_list_cmd},
+		(command_mapping){"create", do_create_cmd},
+		(command_mapping){"help", help},
+		(command_mapping){"delete", do_delete_cmd},
+		(command_mapping){"read", do_read_cmd},
+		(command_mapping){"insert", do_insert_cmd},
+		(command_mapping){"gc", do_gc_cmd}
                                             };
     int ret = 0;
     if (argc < 2) {
@@ -289,38 +288,37 @@ int main (int argc, char* argv[])
         const char* app_name = argv[0]; //pour vips
         argc--;
         argv++; // skips command call name
-
-        /*if(argc > 0 && !strcmp(argv[0], "interpretor")){
-        	int nb_args = 0, errcode = 0;
-        	char* args[MAX_INTERPRETOR_PARAM];
-        	char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
-
-        	while(NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin) && !strcmp(cmd, "quit")){
-        		nb_args = 0;
-        		cmd = strtok(cmd, " ");
-        		for(int i = 0; i < MAX_INTERPRETOR_CMD; ++i){
-        			args[i] = cmd;
-        			if(cmd != NULL) ++nb_args;
-        			cmd = strtok(NULL, " ");
-        		}
-
-        		if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
-        		else {
-        			int index = 0, valid = 0;
-        			do {
-        				if(!strcmp(commands[index].name, args[0])){
-        					nb_args--;
-        					args++;
-        					errcode = commands[index].cmd(nb_args, args);
-        					valid = 0;
-        				} else ++index;
-        			} while(index < NB_COMMANDS && valid == 0);
-        		}
-        	}
-        	return errcode;
-        }*/
-
-        int index = 0, valid = 0;
+		if(argc > 0 && !strcmp(argv[0], "interpretor")){			
+			int nb_args = 0, errcode = 0;
+			char* args[MAX_INTERPRETOR_PARAM];
+			char* cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
+			
+			while(errcode == 0 && NULL != fgets(cmd, MAX_INTERPRETOR_CMD, stdin) && strcmp(cmd, "quit")){
+				nb_args = 0;
+				cmd = strtok(cmd, " ");
+				for(int i = 0; i < MAX_INTERPRETOR_CMD && cmd != NULL; ++i){
+					args[i] = cmd;
+					if(cmd != NULL) ++nb_args;
+					cmd = strtok(NULL, " ");
+				}
+				
+				if(nb_args < 1) errcode = ERR_NOT_ENOUGH_ARGUMENTS;
+				else {
+					args[nb_args-1][strlen(args[nb_args-1])-1] = '\0'; //supprime le \n final
+					int index = 0, valid = 0;
+					do {
+						if(!strcmp(commands[index].name, args[0])){
+							nb_args--;
+							errcode = commands[index].cmd(nb_args, &args[1]);
+							valid = 1;
+						} else ++index;
+					} while(index < NB_COMMANDS && valid == 0);
+				}
+			}
+			free(cmd);
+			return errcode;
+		}
+		int index = 0, valid = 0;
         VIPS_INIT(app_name);
         do {
             if(!strcmp(commands[index].name, argv[0])) {

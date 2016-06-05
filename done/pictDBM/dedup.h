@@ -12,11 +12,12 @@
  * les valeurs du doublon sont mises dans celles de l'image recherchée. Si pas de
  * doublon n'est trouvé, l'offset de la résolution originale est mis à 0. La manière de penser
  * cette fonction est : vérifie à cet index si une telle image existe déjà. Si ce n'est pas le cas,
- * met le offset[RES_ORIG] à 0.
+ * met le offset[RES_ORIG] à 0. Si le mode est GCOLLECT_ON, alors l'offset ne sera pas mis à 0
+ * en cas de non-doublon.
  *
  * @param db_file La DB dans laquelle chercher le doublon
  * @param index L'index de l'image de laquelle on cherche un doublon
- *
+ * @param gbcollect Indique le comportement que doit avoir le programme
  * @return 0 en cas de succès, un code d'erreur sinon.
  */
-int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index, const int gbcollect);
+int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index, const enum dedup_mode gbcollect);
