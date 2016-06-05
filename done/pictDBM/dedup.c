@@ -33,19 +33,23 @@ int do_name_and_content_dedup(struct pictdb_file* db_file, const uint32_t index,
                     //de base, on cherche une originale à copier dans le doublon
                     to_meta_index = index;
                     from_meta_index = i;
-                    //si on a déjà une donnée dans le doublon, on la copie dans l'originale
+                    //si on a déjà une donnée dans le doublon, on la copie dans l'originale (x -> 0 ou 0 <- x)
                     if(db_file->metadata[to_meta_index].offset[res] != 0) {
                         to_meta_index = i;
                         from_meta_index = index;
                     }
+                    //copie de l'offset et de la taille
                     db_file -> metadata[to_meta_index].offset[res] = db_file -> metadata[from_meta_index].offset[res];
                     db_file -> metadata[to_meta_index].size[res] = db_file -> metadata[from_meta_index].size[res];
                 }
+                //copie des résolutions originales
                 db_file -> metadata[index].res_orig[0] = db_file -> metadata[i].res_orig[0];
                 db_file -> metadata[index].res_orig[1] = db_file -> metadata[i].res_orig[1];
                 doublon = 1;
             }
-            if(gbcollect == GCOLLECT_ON) {
+            //si on est en mode garbace collector, on ne veut plus mettre
+            //l'offset à 0 si on a pas de doublon
+            if(gbcollect == GCOLLECT_ON) { 
                 if(	0 != (errcode = overwrite_metadata(db_file, to_meta_index)) ||
                     0 != (errcode = overwrite_metadata(db_file, from_meta_index))) return errcode;
             }
