@@ -284,17 +284,6 @@ int resolution_atoi(const char* res_id);
  */
 int table_compare(unsigned char orig[], unsigned char comp[], size_t size);
 
-/**
- * @brief Copie le contenu du premier tableau dans le deuxième
- *
- * @param orig Le tableau à copier
- * @param that Le tableau dans lequel on copie les éléments
- * @param size La taille (normalement des tableaux) sur laquelle copier les tableaux
- *
- * @return 0 en cas de succès, un code d'erreur sinon.
- */
-int table_copy(const char** orig, char** that, size_t size);
-
 /**@brief Crée un nom standardisé pour une image
  *
  * @param pict_id Le nom de l'image

@@ -281,87 +281,87 @@ int main (int argc, char* argv[])
         (command_mapping){"read", do_read_cmd},
         (command_mapping){"insert", do_insert_cmd},
         (command_mapping)
-        {"gc", do_gc_cmd
+        {
+            "gc", do_gc_cmd
         }
     };
     if (argc < 2) {
         return ERR_NOT_ENOUGH_ARGUMENTS;
-	}
-	const char* app_name = argv[0]; //pour vips
-	VIPS_INIT(app_name);
-	argc--;
-	argv++; // skips command call name
-	
-	//déclarations de variables
-	static const char* blank = " \n\r\t"; //!<Séparateurs entre les arguments
-	char* cmd = NULL;
-	char* backup_cmd = NULL;
-	char** args = argv;
-	char** backup_args = NULL;
-	size_t nb_args = argc;
-	int loop = 0, ret = 0;
-	const int interpret_mode = !strcmp(args[0], "interpretor");
-	
-	do { //boucle infinie (si interpréteur), sinon simple
-		int index = 0, valid = 0;
-		loop = 0;
-		//si on est en mode interpretor, on rentre dans une boucle infinie
-		if(interpret_mode) {
-			loop = 1;
-			/*Allocations mémoire*/
-			args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
-			if(NULL == args) {
-				vips_shutdown();
-				return ERR_OUT_OF_MEMORY;
-			}
-			cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
-			if(NULL == cmd) {
-				free(args);
-				vips_shutdown();
-				return ERR_OUT_OF_MEMORY;
-			}				
-			/*backup pour free*/
-			backup_args = args;
-			backup_cmd = cmd;
-			//On récupère la commande utilisateur
-			if(NULL == fgets(cmd, MAX_INTERPRETOR_CMD, stdin))
-				ret = ERR_IO;
-			else {
-				//Séparation de la commande en arguments indépendantes
-				nb_args = 0;
-				cmd = strtok(cmd, blank);
-				for(int i = 0; i < MAX_INTERPRETOR_PARAM && cmd != NULL; ++i) {
-					args[i] = cmd;
-					if(cmd != NULL) ++nb_args;
-					cmd = strtok(NULL, blank);
-				}
-			}
-		}	
-		if(args != NULL && args[0] != NULL) {
-			//appel de la fonction selon les arguments
-			if(!strcmp(args[0], "quit")) { //commande de sortie
-				loop = 0;
-			} else {
-				do {
-					if(!strcmp(commands[index].name, args[0])) {
-						nb_args--;
-						args++;
-						ret = commands[index].cmd(nb_args, args);
-						valid = 1;
-					} else ++index;
-				} while(index < NB_COMMANDS && valid == 0);
-				if(valid == 0) ret = ERR_INVALID_ARGUMENT;
-			}
-		}
-		if (ret) {
-			fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
-			(void)help(argc, args);
-		}
-		
-		if(interpret_mode){
-			free(backup_args);
-			free(backup_cmd);
-		}
-	} while(loop);
+    }
+    const char* app_name = argv[0]; //pour vips
+    VIPS_INIT(app_name);
+    argc--;
+    argv++; // skips command call name
+
+    //déclarations de variables
+    static const char* blank = " \n\r\t"; //!<Séparateurs entre les arguments
+    char* cmd = NULL; //!<String des arguments lus 
+    char* backup_cmd = NULL; //!<Sauvegarde de cmd (pour free)
+    char** args = argv; //!<List des arguments
+    char** backup_args = NULL; //!<Sauvegarde de args (pour free)
+    size_t nb_args = argc;
+    int loop = 0, ret = 0;
+    const int interpret_mode = !strcmp(args[0], "interpretor");
+
+    do { //boucle infinie (si interpréteur), sinon simple
+        int index = 0, valid = 0;
+        //si on est en mode interpretor, on rentre dans une boucle infinie
+        if(interpret_mode) {
+            loop = 1; //si on interprète, alors on boucle
+            /*Allocations mémoire*/
+            args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
+            if(NULL == args) {
+                vips_shutdown();
+                return ERR_OUT_OF_MEMORY;
+            }
+            cmd = calloc(MAX_INTERPRETOR_CMD, sizeof(char));
+            if(NULL == cmd) {
+                free(args);
+                vips_shutdown();
+                return ERR_OUT_OF_MEMORY;
+            }
+            /*backup pour free*/
+            backup_args = args;
+            backup_cmd = cmd;
+            //On récupère la commande utilisateur
+            if(NULL == fgets(cmd, MAX_INTERPRETOR_CMD, stdin))
+                ret = ERR_IO;
+            else {
+                //Séparation de la commande en arguments indépendantes
+                nb_args = 0;
+                cmd = strtok(cmd, blank);
+                for(int i = 0; i < MAX_INTERPRETOR_PARAM && cmd != NULL; ++i) {
+                    args[i] = cmd;
+                    if(cmd != NULL) ++nb_args;
+                    cmd = strtok(NULL, blank);
+                }
+            }
+        }
+        if(args != NULL && args[0] != NULL) {
+            //appel de la fonction selon les arguments
+            if(!strcmp(args[0], "quit")) { //commande de sortie
+                loop = 0;
+            } else {
+                do {
+                    if(!strcmp(commands[index].name, args[0])) {
+                        nb_args--;
+                        args++;
+                        ret = commands[index].cmd(nb_args, args);
+                        valid = 1;
+                    } else ++index;
+                } while(index < NB_COMMANDS && valid == 0);
+                if(valid == 0) ret = ERR_INVALID_ARGUMENT;
+            }
+        }
+        if (ret) { //une erreur n'est pas une condition de sortie
+            fprintf(stderr, "ERROR: %s\n", ERROR_MESSAGES[ret]);
+            (void)help(argc, args);
+        }
+
+        if(interpret_mode) { //si on interprète, on les a forcément alloué
+            free(backup_args);
+            free(backup_cmd);
+        }
+    } while(loop);
     return ret;
 }

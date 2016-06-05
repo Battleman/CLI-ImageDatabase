@@ -44,7 +44,7 @@ const char* do_list(const struct pictdb_file* db_file, enum do_list_mode mode)
         if(indep_string == NULL) return NULL;
         strcpy(indep_string, string);
 
-        if(1 != json_object_put(object)) {
+        if(1 != json_object_put(object)) { //libération de l'objet, et suppression de la string indep en cas d'échec
             free(indep_string);
             return NULL;
         }

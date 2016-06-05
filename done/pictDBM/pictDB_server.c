@@ -23,20 +23,14 @@ static void signal_handler(int sig_num)
  */
 void mg_error(struct mg_connection* nc, int error)
 {
-
-    /*printf("Erreur : %s\n", ERROR_MESSAGES[error]);
-    mg_printf(nc, "HTTP/1.1 500 Internal Error\r\n"
-              "ERROR: %s\r\n"
-              "Content-Length: 0\r\n\r\n",
-              ERROR_MESSAGES[error]);*/
-
-    const char* htmlBefore = "<html>\n"
+    const char* htmlBefore = "<html>\n" //première partie de la page
                              "\t<head>\n"
                              "\t\t<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js\"></script>\n"
                              "\t</head>\n"
                              "\t<body>\n"
                              "<h1>Internal Error:  ";
-    const char* htmlAfter = "</h1><a href='/index.html'>Back to index</a>\n"
+                             
+    const char* htmlAfter = "</h1><a href='/index.html'>Back to index</a>\n" //Seconde partie
                             "\t</body>\n"
                             "</html>";
 
@@ -45,7 +39,7 @@ void mg_error(struct mg_connection* nc, int error)
               "Content-Type: text/html\r\n"
               "Content-Length: %zu\r\n\r\n"
               "%s" //htmlBefore
-              "%s" //error
+              "%s" //error message
               "%s", //htmlAfter
               ERROR_MESSAGES[error], strlen(htmlBefore) + strlen(htmlAfter) + strlen(ERROR_MESSAGES[error]), htmlBefore, ERROR_MESSAGES[error], htmlAfter);
 
@@ -54,7 +48,7 @@ void mg_error(struct mg_connection* nc, int error)
 /**@brief Gestion de l'affichage (list) des images*/
 static void handle_list_call(struct mg_connection *nc, struct http_message *hm)
 {
-    const char* buffer = do_list(&db_file, JSON);
+    const char* buffer = do_list(&db_file, JSON); //récupération de la string JSON
     if(buffer == NULL) {
         mg_error(nc, ERR_IO);
     } else {
@@ -78,20 +72,20 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
     for(size_t i = 0; i < MAX_QUERY_PARAM && result[i] != NULL; ++i) { //dès le premier NULL, il n'y a plus d'arguments
         if(!strcmp(result[i], "res")) {
             i++;
-            res = resolution_atoi(result[i]);
+            res = resolution_atoi(result[i]); //récupération de la résolution
         } else if(!strcmp(result[i], "pict_id")) {
             i++;
-            strncpy(pict_id, result[i], MAX_PIC_ID);
+            strncpy(pict_id, result[i], MAX_PIC_ID); //récupération du nom
             pict_id[MAX_PIC_ID] = '\0';
         }
     }
-    free(tmp);
+    free(tmp); //string intermédiaire inutile
 
-    if(res == -1 || pict_id == NULL) {
+    if(res == -1 || pict_id == NULL) { //si la lecture de la résolution ou du nom a échoué
         mg_error(nc, ERR_INVALID_ARGUMENT);
     } else {
         int err = 0;
-        char* img_buffer = NULL;
+        char* img_buffer = NULL;//buffer pour l'image
         uint32_t img_size = 0;
 
         if(0 == (err = do_read(pict_id, (const int)res, &img_buffer, &img_size, &db_file))) {
@@ -112,14 +106,15 @@ static void handle_read_call(struct mg_connection *nc, struct http_message *hm)
 /**@brief Gestion de l'insertion des images*/
 static void handle_insert_call(struct mg_connection *nc, struct http_message *hm)
 {
-    char var_name[100] = {(char)0};
-    char pic_name[MAX_PIC_ID+1]= {(char)0};
+    char var_name[100]; //dummy variable
+    char pic_name[MAX_PIC_ID+1]; pic_name[MAX_PIC_ID] = '\0';
     const char *image = NULL;
     size_t img_len = 0;
 
     mg_parse_multipart(	hm->body.p, hm->body.len,
                         var_name, sizeof(var_name),
                         pic_name, MAX_PIC_ID, &image, &img_len);
+                        
     int err = do_insert(pic_name, (char*)image, img_len, &db_file);
     if(!err) {
         mg_printf(nc, "HTTP/1.1 302 Found\r\n"
@@ -171,11 +166,11 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 
     case MG_EV_HTTP_REQUEST:
         if(mg_vcmp(&hm->uri, "/pictDB/list") == 0) {
-            handle_list_call(nc, hm); // Handles basic list call
+            handle_list_call(nc, hm); 	// Handles basic list call
         } else if(mg_vcmp(&hm->uri, "/pictDB/read") == 0) {
-            handle_read_call(nc, hm); // Handles basic read call
+            handle_read_call(nc, hm); 	// Handles basic read call
         } else if(mg_vcmp(&hm->uri, "/pictDB/insert") == 0) {
-            handle_insert_call(nc, hm); 	// Handles basic insert call
+            handle_insert_call(nc, hm); // Handles basic insert call
         } else if(mg_vcmp(&hm->uri, "/pictDB/delete") == 0) {
             handle_delete_call(nc, hm); // Handles basic delete call
         } else {
