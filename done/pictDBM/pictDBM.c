@@ -307,7 +307,7 @@ int main (int argc, char* argv[])
         int index = 0, valid = 0;
         //si on est en mode interpretor, on rentre dans une boucle infinie
         if(interpret_mode) {
-            loop = 1; //si on interprète, alors on boucle
+            loop = 1; //si on veut l'interpréteur, alors on boucle
             /*Allocations mémoire*/
             args = calloc(MAX_INTERPRETOR_PARAM, sizeof(char*));
             if(NULL == args) {
@@ -350,7 +350,7 @@ int main (int argc, char* argv[])
                         valid = 1;
                     } else ++index;
                 } while(index < NB_COMMANDS && valid == 0);
-                if(valid == 0) ret = ERR_INVALID_ARGUMENT;
+                if(valid == 0) ret = ERR_INVALID_ARGUMENT; //pas de match trouvé
             }
         }
         if (ret) { //une erreur n'est pas une condition de sortie
