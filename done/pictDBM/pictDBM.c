@@ -293,6 +293,7 @@ int main (int argc, char* argv[])
         VIPS_INIT(app_name);
         argc--;
         argv++; // skips command call name
+        
         //première vérification : si on est en mode interpreteur
         //difficile de merge avec l'autre (origine des arguments, fget ou argv)
         if(argc > 0) {
