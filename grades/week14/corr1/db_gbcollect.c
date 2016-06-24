@@ -1,0 +1,61 @@
+/**
+ * @file db_delete.c
+ * @brief pictDB library: do_delete implementation.
+ */
+#include "pictDB.h"
+#include "image_content.h"
+#include "dedup.h"
+/**@brief Effectue un garbage collector sur une base de donnée
+ *
+ * Copie les données nécessaires dans un fichier temporaire pour ensuite remplacer l'original
+ *
+ * @param db_file La base de donnée en local
+ * @param original_file Le nom du fichier original (le fichier correspondant est déjà ouvert !)
+ * @param new_file Le nom du nouveau fichier, à ouvrir
+ *
+ * @return 0 en cas de succès, un code d'erreur sinon
+ */
+int do_gbcollect(struct pictdb_file* original_db_file, const char* original_filename, const char* tmp_filename)
+{
+
+    if(	original_db_file == NULL ||
+        original_filename == NULL || !strcmp(original_filename, "") ||
+        tmp_filename == NULL || !strcmp(tmp_filename, "")) return ERR_INVALID_ARGUMENT;
+    struct pictdb_file tmp_db_file; // La base de données intermédiaire
+    int errcode = 0;
+
+    //création de la DB temporaire
+    //correcteur: rarement vu quelque chose d'aussi illisible. Iln'auraispas fallu changer le prototype de do_create mais initialiser les champs avant (comme dans db_creat_cmd).
+    if(0 != (errcode = do_create(	tmp_filename, &tmp_db_file, original_db_file->header.max_files,
+                                    original_db_file->header.res_resized[2*RES_THUMB], original_db_file->header.res_resized[2*RES_THUMB + 1],
+                                    original_db_file->header.res_resized[2*RES_SMALL], original_db_file->header.res_resized[2*RES_SMALL + 1]
+                                )
+            )
+      ) return errcode;
+
+    if(0 != (errcode = do_open(tmp_filename, "rb+", &tmp_db_file))) return errcode;
+    //pour toutes les images valides
+    uint32_t index_tmp = 0;
+    for(size_t i = 0; i < original_db_file->header.max_files; i++) {
+        if(original_db_file->metadata[i].is_valid == NON_EMPTY) {
+            char* img = NULL;
+            uint32_t img_size = 0;
+            //correcteur: c'est très illisible (-0.5) et il manque le free du img dans le cas ou insert rate ou réussi (pas dans le cas ou read rate).
+            if(	0 != (errcode = do_read(original_db_file->metadata[i].pict_id, RES_ORIG, &img, &img_size, original_db_file)) ||
+                0 != (errcode = do_insert(original_db_file->metadata[i].pict_id, img, img_size, &tmp_db_file)))
+                return errcode;
+            for(int res = 0; res < NB_RES-1; res++) {
+                //correcteur: ne pas faire pour RES_ORIG
+                //correcteur: c'est pour index_tmp l'offset doit etre 0 et différent de 0 pour i
+                if(tmp_db_file.metadata[index_tmp].offset[res] != 0 || original_db_file->metadata[i].offset[res] != 0)
+                    if(0 != (errcode = lazily_resize(res, &tmp_db_file, index_tmp))) return errcode;
+            }
+            if(0 != (errcode = do_name_and_content_dedup(&tmp_db_file, index_tmp, GCOLLECT_ON))) return errcode;
+            index_tmp++;
+        }
+    }
+    do_close(&tmp_db_file);
+    //remplacement du temp par l'original
+    if(0 != remove(original_filename) || 0 != rename(tmp_filename, original_filename)) return ERR_IO;
+    return 0;
+}
