@@ -1,3 +1,0 @@
-group number,pictDB.h,pictDBM.c,db_create.c,db_gbcollect.c:general,db_gbcollect.c:fonction do_gbcollect,Makefile,bonus/malus garbage collector,total gc,final webserver,final command line
-,2,3.5,0.5,5,10,2,3,26,76,133
-team-38credits,2,3.25,0.25,3.25,8.5,2,-0.5,18.75,70.25,121.875
